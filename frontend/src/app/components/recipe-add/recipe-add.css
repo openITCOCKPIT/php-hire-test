@@ -1,0 +1,26 @@
+.btn-ai-optimize {
+    color: #0d9488;
+    background-color: #ffffff;
+    border: 1px solid #0d9488;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.btn-ai-optimize:hover:not(:disabled) {
+    background-color: #0d9488;
+    color: #ffffff;
+}
+
+.btn-ai-optimize:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+.ai-hint {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    font-style: italic;
+}

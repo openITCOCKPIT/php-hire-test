@@ -1,0 +1,189 @@
+<div class="container my-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-4">
+            <app-logo></app-logo>
+            <p class="text-muted small mb-0">Verwalte und teile deine Lieblingsgerichte</p>
+        </div>
+
+        <div class="col-md-5">
+            <div class="input-group shadow-sm rounded">
+                <span class="input-group-text bg-white border-end-0 text-muted">🔍</span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Rezepte suchen..."
+                    [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+            </div>
+        </div>
+
+        <div class="col-md-3 text-md-end my-2 my-md-0">
+
+            <button
+                class="btn btn-brand-teal w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold shadow-sm py-2"
+                (click)="isAddModalOpen.set(true)">
+                <i class="bi bi-plus-circle"></i> Neues Rezept
+            </button>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4 ms-auto">
+            <div class="input-group input-group-sm shadow-sm rounded">
+                <span class="input-group-text bg-light text-muted small">Sortieren nach</span>
+                <select class="form-select" [ngModel]="sortBy() + '-' + sortDirection()"
+                    (change)="onSortChange($event)">
+                    <option value="created-desc">Neueste zuerst</option>
+                    <option value="title-asc">Titel (A-Z)</option>
+                    <option value="title-desc">Titel (Z-A)</option>
+                    <option value="created-asc">Älteste zuerst</option>
+
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="mb-4 text-muted opacity-25">
+
+    <div class="row g-4 position-relative">
+
+        <div class="col-lg-8">
+            @if (recipes().length === 0) {
+            <div class="text-center py-5 bg-light rounded-3 border border-dashed mb-4">
+                <i class="bi bi-egg-fried text-muted fs-1 d-block mb-2"></i>
+                <p class="text-muted my-2">Keine Rezepte gefunden. Füge ein neues hinzu!</p>
+            </div>
+            } @else {
+            <div class="row g-3">
+                @for (recipe of recipes(); track recipe.id) {
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm border-0 hover-card">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <div class="recipe-card" (click)="openPreview(recipe)">
+                                <h5 class="card-title fw-bold text-dark mb-2 recepe-title display-inline"
+                                    (mouseenter)="onMouseEnterRecipe(recipe.id)" (mouseleave)="onMouseLeaveRecipe()">
+                                    {{ recipe.title }}
+                                </h5>
+                                <div class="description-container">
+                                    <p [class.shortened]="!isExpanded(recipe.id)">
+                                        {{ recipe.description }}
+                                    </p>
+
+                                    <button class="btn btn-link btn-sm p-0 text-decoration-none"
+                                        *ngIf="recipe.id && recipe.description && recipe.description.length > 100"
+                                        (click)="toggleExpand(recipe.id)" style="color: #0d9488;">
+                                        {{ isExpanded(recipe.id) ? 'Weniger anzeigen' : 'Mehr anzeigen' }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                                <span class="text-muted x-small">📅 {{ recipe.created | date:'mediumDate' }}</span>
+                                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                    (click)="openEmailModal(recipe)">
+                                    <i class="bi bi-envelope"></i> <span class="d-none d-sm-inline">Teilen</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 20px; z-index: 1010;">
+                <div class="card border-0 shadow-sm bg-gradient-light overflow-hidden">
+                    <div class="card-header bg-dark text-white fw-semibold py-3 border-0">
+                        ✨ Schnelle Rezept-Vorschau
+                    </div>
+
+                    <app-recipe-preview [recipe]="selectedRecipe" (close)="isPreviewOpen = false" *ngIf="isPreviewOpen">
+                    </app-recipe-preview>
+                    <div class="card-body style-preview-box">
+                        @if (previewLoading()) {
+                        <div class="d-flex justify-content-center align-items-center py-5">
+                            <div class="spinner-border text-secondary spinner-border-sm" role="status"></div>
+                            <span class="ms-2 text-muted small">Zutaten werden geladen...</span>
+                        </div>
+                        } @else if (hoveredRecipe()) {
+                        <h4 class="fw-bold text-dark mb-3">{{ hoveredRecipe()?.title }}</h4>
+
+                        <h6 class="fw-bold text-secondary text-uppercase small tracking-wider mb-2">📋 Zutaten:</h6>
+                        <ul class="list-group list-group-flush mb-3 rounded-2 shadow-xs border">
+                            @for (ing of hoveredRecipe()?.ingredients; track $index) {
+                            <li
+                                class="list-group-item d-flex justify-content-between align-items-center py-2 px-3 small">
+                                <span>{{ ing.name }}</span>
+                                <span class="badge bg-secondary rounded-pill fw-normal">{{ ing.amount }}</span>
+                            </li>
+                            }
+                        </ul>
+
+                        <h6 class="fw-bold text-secondary text-uppercase small tracking-wider mb-1">🍳 Zubereitung:</h6>
+                        <p class="small text-muted bg-white p-3 rounded border" style="white-space: pre-line;">
+                            {{ hoveredRecipe()?.description }}
+                        </p>
+                        } @else {
+                        <div class="text-center text-muted py-5 px-3">
+                            <div class="fs-1 mb-2">💡</div>
+                            <p class="small m-0">Bewege den Mauszeiger über einen Rezepttitel, um die Zutaten sofort
+                                anzuzeigen!</p>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@if (isAddModalOpen()) {
+<div class="modal fade show d-block" tabindex="-1"
+    style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <app-recipe-add (recipeAdded)="loadRecipes(); isAddModalOpen.set(false)"
+                (closeModal)="isAddModalOpen.set(false)"></app-recipe-add>
+        </div>
+    </div>
+</div>
+}
+
+@if (selectedRecipeForEmail()) {
+<div class="modal fade show d-block" tabindex="-1"
+    style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title fw-bold">Rezept teilen: "{{ selectedRecipeForEmail()?.title }}"</h5>
+                <button type="button" class="btn-close" (click)='selectedRecipeForEmail.set(null)'></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="text-muted small">Gib die E-Mail-Adresse deines Freundes ein, um das vollständige Rezept zu
+                    senden.</p>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-secondary">E-Mail-Adresse</label>
+                    <input type="email" class="form-control" placeholder="name@example.com" [(ngModel)]="friendEmail"
+                        name="friendEmail" required />
+                </div>
+                @if (emailStatusMessage) {
+                <div class="alert p-2 small m-0 text-center"
+                    [ngClass]="emailStatusMessage.includes('✅') ? 'alert-success' : 'alert-info'">
+                    {{ emailStatusMessage }}
+                </div>
+                }
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-sm btn-secondary"
+                    (click)='selectedRecipeForEmail.set(null)'>Abbrechen</button>
+                <button type="button" class="btn btn-sm btn-dark px-3" [disabled]="!friendEmail"
+                    (click)="sendEmail()">Rezept senden</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+@if (isPreviewOpen) {
+<app-recipe-preview *ngIf="isPreviewOpen" [recipe]="selectedRecipe" (close)="isPreviewOpen = false">
+</app-recipe-preview>
+}

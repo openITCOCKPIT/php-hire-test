@@ -78,6 +78,24 @@ return function (RouteBuilder $routes): void {
         $builder->fallbacks();
     });
 
+
+    $routes->scope('/api', function (RouteBuilder $builder): void {
+        $builder->setExtensions(['json']);
+
+        $builder->resources('Recipes');
+        
+        $builder->connect('/recipes/{id}/send-email',
+            ['controller' => 'Recipes', 'action' => 'sendEmail'],
+            ['_method' => 'POST', 'pass' => ['id']]
+        );
+
+        $builder->connect('/add-recipe',
+            ['controller' => 'Recipes', 'action' => 'add'],
+            ['_method' => 'POST']
+        );
+
+    });
+
     /*
      * If you need a different set of middleware or none at all,
      * open new scope and define routes there.
