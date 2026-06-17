@@ -28,10 +28,43 @@ class RecipesControllerTest extends TestCase
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $this->assertArrayHasKey('recipes', $body);
         $this->assertCount(2, $body['recipes']);
-        $this->assertSame('Chocolate cake', $body['recipes'][0]['title']);
+
+        // Find the chocolate cake regardless of sort order.
+        $titles = array_column($body['recipes'], 'title');
+        $cake = $body['recipes'][array_search('Chocolate cake', $titles, true)];
         // amount is a decimal string, not a float
-        $this->assertSame('100.00', $body['recipes'][0]['ingredients'][0]['amount']);
-        $this->assertCount(3, $body['recipes'][0]['ingredients']);
+        $this->assertSame('100.00', $cake['ingredients'][0]['amount']);
+        $this->assertCount(3, $cake['ingredients']);
+    }
+
+    public function testIndexSortsByTitleAscending(): void
+    {
+        $this->get('/recipes?sort=title&direction=ASC');
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $titles = array_column($body['recipes'], 'title');
+        $this->assertSame(['Chocolate cake', 'Pancakes'], $titles);
+    }
+
+    public function testIndexSortsByCreatedDescendingByDefault(): void
+    {
+        $this->get('/recipes');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $titles = array_column($body['recipes'], 'title');
+        // Pancakes (2026-06-16) is newer than Chocolate cake (2026-06-15).
+        $this->assertSame(['Pancakes', 'Chocolate cake'], $titles);
+    }
+
+    public function testIndexRejectsInjectedSortAndFallsBack(): void
+    {
+        $this->get('/recipes?sort=title;DROP TABLE recipes&direction=evil');
+
+        // Unknown sort/direction must not error; it falls back to the default order.
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertCount(2, $body['recipes']);
     }
 
     public function testViewReturnsSingleRecipeWithIngredients(): void

@@ -24,12 +24,29 @@ class RecipesController extends AppController
      */
     public function index(): void
     {
-        $recipes = $this->Recipes->find()
-            ->contain('Ingredients')
-            ->all();
+        $query = $this->Recipes->find()->contain('Ingredients');
+        $query->orderBy($this->sortClause());
 
-        $this->set('recipes', $recipes);
+        $this->set('recipes', $query->all());
         $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['recipes']);
+    }
+
+    /**
+     * Build a safe ORDER BY clause from the ?sort and ?direction query params.
+     *
+     * Sort fields are whitelisted: the column name cannot be parameterised, so
+     * passing the raw query value to orderBy() would be a SQL-injection vector.
+     *
+     * @return array<string, string>
+     */
+    private function sortClause(): array
+    {
+        $allowed = ['title' => 'Recipes.title', 'created' => 'Recipes.created'];
+        $column = $allowed[(string)$this->request->getQuery('sort')] ?? 'Recipes.created';
+
+        $direction = strtoupper((string)$this->request->getQuery('direction')) === 'ASC' ? 'ASC' : 'DESC';
+
+        return [$column => $direction];
     }
 
     /**
