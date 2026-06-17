@@ -31,11 +31,10 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      # CakePHP reads these directly (DATABASE_URL is parsed into the datasource).
+      DATABASE_URL: ${DATABASE_URL}
+      SECURITY_SALT: ${SECURITY_SALT}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
     volumes:
       - ./api:/var/www/html/api
     depends_on:
