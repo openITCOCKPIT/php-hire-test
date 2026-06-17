@@ -18,6 +18,8 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      # Auto-creates the test_recipes database on first volume init.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     # PHP waits for this to pass before starting, so the first request never
     # races MySQL's first-boot initialisation.
     healthcheck:
@@ -33,6 +35,7 @@ services:
     environment:
       # CakePHP reads these directly (DATABASE_URL is parsed into the datasource).
       DATABASE_URL: ${DATABASE_URL}
+      DATABASE_TEST_URL: ${DATABASE_TEST_URL}
       SECURITY_SALT: ${SECURITY_SALT}
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
     volumes:
