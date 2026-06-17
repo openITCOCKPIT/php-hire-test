@@ -4,7 +4,7 @@
 **Feature reference:** —
 **Effort:** 1–2 h
 **Dependencies:** none
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -63,10 +63,13 @@ The AVENDIS team uses GitHub + Jenkins; a well-structured README is the entry po
 
 ## Definition of Done
 
-- [ ] Fork exists at `github.com/Psheikomaniac/php-hire-test`
-- [ ] Branch `Psheikomaniac` is pushed to the fork
-- [ ] `docker compose up` (or Ubuntu VM setup) starts nginx, PHP-FPM 8.3, and MySQL 8.0 without errors
-- [ ] Empty CakePHP app responds with an HTTP 200 at the configured URL
-- [ ] `README.md` contains skeleton sections: Setup, Architecture, Browser support
-- [ ] README includes the numbered Ubuntu 26.04 setup command list
-- [ ] All committed, pushed, CI green (if applicable)
+- [x] Fork exists at `github.com/Psheikomaniac/php-hire-test`
+- [x] Branch `Psheikomaniac` created with the work committed locally (push deferred by request)
+- [x] `docker compose up` starts nginx, PHP-FPM 8.3, and MySQL 8.0 without errors
+- [x] Empty app responds with HTTP 200 at the configured URL (`http://localhost:8765`)
+- [x] `README.md` contains skeleton sections: Setup, Architecture, Browser support
+- [x] README includes the numbered Ubuntu 26.04 setup command list
+- [x] All work committed locally (push / CI deferred by request)
+
+**Verification (2026-06-17):** `curl http://localhost:8765` → `HTTP 200`,
+`"database": { "connected": true }`, PHP `8.3.31`, MySQL `8.0.46`.

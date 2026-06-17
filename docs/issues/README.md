@@ -21,7 +21,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 
 | # | Title | Effort | Status |
 |---|---|---|---|
-| [#1](01-repository-setup.md) | Set up repository & development environment | 1–2 h | ⬜ open |
+| [#1](01-repository-setup.md) | Set up repository & development environment | 1–2 h | ✅ done |
 | [#2](02-cakephp-skeleton.md) | Initialise CakePHP skeleton | 1 h | ⬜ open |
 | [#3](03-angular-project.md) | Initialise Angular project | 1–2 h | ⬜ open |
 
