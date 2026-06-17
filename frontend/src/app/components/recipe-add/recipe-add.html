@@ -1,0 +1,143 @@
+<div class="modal-header bg-white border-bottom-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-3">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+            style="animation: pot-simmer 0.6s ease-in-out infinite; transform-origin: bottom center;">
+            <style>
+                @keyframes steam-move {
+                    0% {
+                        transform: translateY(0px) scaleY(1);
+                        opacity: 0.3;
+                    }
+
+                    50% {
+                        transform: translateY(-3px) scaleY(1.15);
+                        opacity: 1;
+                        stroke: #0d9488;
+                    }
+
+                    100% {
+                        transform: translateY(0px) scaleY(1);
+                        opacity: 0.3;
+                    }
+                }
+
+                @keyframes pot-simmer {
+                    0% {
+                        transform: translate(0, 0) rotate(0deg);
+                    }
+
+                    25% {
+                        transform: translate(0.5px, 0.5px) rotate(0.5deg);
+                    }
+
+                    50% {
+                        transform: translate(0px, -0.5px) rotate(-0.5deg);
+                    }
+
+                    75% {
+                        transform: translate(-0.5px, 0px) rotate(0.2deg);
+                    }
+
+                    100% {
+                        transform: translate(0, 0) rotate(0deg);
+                    }
+                }
+
+                .live-steam {
+                    animation: steam-move 1.5s ease-in-out infinite;
+                    transform-origin: bottom center;
+                }
+            </style>
+
+            <path class="live-steam" d="M24 12C24 12 26 8 25 5M32 12C32 12 34 7 33 4M40 12C40 12 42 8 41 5"
+                stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" />
+
+            <path d="M14 24H50V44C50 48.4 46.4 52 42 52H22C17.6 52 14 48.4 14 44V24Z" fill="#1e293b" stroke="#1e293b"
+                stroke-width="2" />
+            <path d="M10 24H54" stroke="#1e293b" stroke-width="3" stroke-linecap="round" />
+            <path d="M26 24C26 18 38 18 38 24" fill="none" stroke="#0d9488" stroke-width="3" />
+            <path d="M18 56H46" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+        </svg>
+
+        <div>
+            <h5 class="modal-title fw-bold text-dark m-0">Neues Rezept hinzufügen</h5>
+            <small class="text-muted">Erstellen Sie ein neues kulinarisches Meisterwerk</small>
+        </div>
+    </div>
+    <button type="button" class="btn-close" (click)="closeModal.emit()"></button>
+</div>
+
+<div class="modal-body px-4 pb-4">
+    @if (statusMessage && !isOptimizing) {
+    <div class="alert p-2 small mb-3 text-center" [ngClass]="isError ? 'alert-danger' : 'alert-success'">
+        {{ statusMessage }}
+    </div>
+    }
+
+    <form (ngSubmit)="submitRecipe()">
+        <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Rezepttitel</label>
+            <input type="text" class="form-control border-secondary-subtle" [(ngModel)]="title"
+                placeholder="z. B. Italienische Lasagne" name="title" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Zubereitungsanleitung</label>
+            <textarea class="form-control border-secondary-subtle" rows="4"
+                placeholder="Schritt-für-Schritt-Anleitung..." [(ngModel)]="description" name="description"
+                required></textarea>
+            <div class="ai-hint">* Bitte
+                geben Sie mindestens zwei Wörter ein, um die KI-Unterstützung zu aktivieren. </div>
+            <button *ngIf="description.length > 5" type="button" class="btn mt-1 btn-outline-success btn-ai-optimize"
+                (click)="optimizeText()" [disabled]="isOptimizing || description.trim().split(/\s+/).length < 2">
+                <i class="bi bi-magic"></i>
+                {{ isOptimizing ? 'Wird optimiert...' : 'KI-Optimierung (Rezepttitel + beschreibung)' }}
+            </button>
+
+
+        </div>
+
+        <div class="mb-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label small fw-semibold text-secondary m-0">Zutatenliste</label>
+            </div>
+
+            <div style="max-height: 180px; overflow-y: auto;" class="pe-1">
+                @for (ing of ingredients(); track $index) {
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-6">
+                        <input type="text" class="form-control form-control-sm" placeholder="Zutat (z. B. Zucker)"
+                            [(ngModel)]="ing.name" name="ing-name-{{$index}}" />
+                    </div>
+                    <div class="col-5">
+                        <input type="text" class="form-control form-control-sm" placeholder="Menge (z. B. 200g)"
+                            [(ngModel)]="ing.amount" name="ing-amount-{{$index}}" />
+                    </div>
+                    <div class="col-1 text-center">
+                        <button type="button" class="btn btn-sm btn-link text-danger p-0 border-0"
+                            (click)="removeIngredientInput($index)">
+                            <i class="bi bi-trash-fill fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="d-flex justify-content-end align-items-right mb-2">
+
+                <button type="button"
+                    class="btn btn-sm btn-outline-secondary py-1 px-2 text-dark border-secondary-subtle"
+                    (click)="addIngredientInput()">
+                    ➕ Zutat hinzufügen
+                </button>
+            </div>
+        </div>
+
+        <div class="text-end border-top pt-3 mt-4">
+            <button type="button" class="btn btn-sm btn-light border me-2 px-3"
+                (click)="closeModal.emit()">Abbrechen</button>
+            <button type="submit" class="btn btn-sm btn-brand-teal px-4 fw-semibold shadow-sm">Rezept speichern</button>
+        </div>
+    </form>
+</div>

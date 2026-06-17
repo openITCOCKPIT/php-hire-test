@@ -1,0 +1,44 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+    --brand-teal: #0d9488;
+    --brand-dark: #1e293b;
+    --brand-cream: #f5f0f0;
+    --brand-border: #dee2e6;
+}
+
+body {
+    background-color: var(--brand-cream);
+    color: var(--brand-dark);
+    font-family: 'Inter', sans-serif;
+}
+
+/* You can add global styles to this file, and also import other style files */
+:root {
+    --brand-teal: #0d9488;
+    --brand-dark: #1e293b;
+    --brand-light: #f8fafc;
+    --font-family: 'Inter', sans-serif;
+}
+
+.form-control {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.6rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--brand-teal);
+    box-shadow: 0 0 0 0.2rem rgba(13, 148, 136, 0.15);
+}
+
+.btn-brand-teal {
+    background-color: var(--brand-teal);
+    color: white;
+    border-radius: 6px;
+}
+
+.btn-brand-teal:hover {
+    background-color: #0b7a70;
+    color: white;
+}

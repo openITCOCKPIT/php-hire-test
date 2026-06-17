@@ -1,84 +1,56 @@
-# We are hiring
-Check all our [vacancies](https://avendis.com/karriere/)
+# Recipe Management System
 
-# About AVENDIS GmbH
+A full-stack web application designed for a seamless recipe browsing and creation experience. Built with Angular for a reactive frontend and CakePHP for a robust backend, containerized with Docker for easy deployment and development.
 
-AVENDIS provides IT infrastructure consulting and implementation, including cloud, on‑premise and hybrid concepts. The company delivers digital improvement projects and custom software focused on modern technology platforms and early prototyping. It designs and supports communication and collaboration solutions that connect systems and users.Allgeier IT Services also integrates and operates enterprise software, offers flexible managed services and IT outsourcing, and runs a security operations center to protect customer environments. In addition, it implements and operates various open source tools for IT documentation, monitoring, asset management, and service management
 
-**We are hiring PHP developers for our Open Source Monitoring Solution [openITCOCKPIT](http://openitcockpit.io/) based on Nagios, Naemon and Prometheus.**
+# Project Structure
+The project follows a modular structure to separate concerns between the frontend and the backend:
 
-# Your task
-Your task is to create a recipe collection where a user is able to browse through existing recipes or create a new one.
-
-Recipes should be able to be sent as e-mail to a given e-mail address.
-
-**Notice: Use plain PHP or [CakePHP](http://cakephp.org/) as framework, Typescript and [Angular](https://angular.dev/)!**
+```
+.
+├── backend/            # CakePHP Application
+├── frontend/           # Angular Application
+├── docker-compose.yml  # Container orchestration
+└── README.md
+```
 
 ## Features
 
-1. Browse through existing recipes
-2. Create new recipes with ingredients
-3. Send recipes via E-Mail to a friend (optional)
-4. Sort the list of recipes
-4. Search recipes
-5. Load a recipe preview via AJAX on hover the title.
-6. Make it user friendly
+1. Browse & Search: Effortlessly find recipes from the collection.
+2. AI-Powered Optimization: Integrated AI assistant to optimize recipe titles, descriptions, and automatically extract ingredient lists.
+3. Recipe Preview: Real-time recipe preview via AJAX hover functionality.
+4. Create Recipes: Add new recipes with dynamic ingredient management.
+4. Responsive Design: Fully styled with Bootstrap 5.x for cross-browser compatibility.
 
-### Example recipe:
-*Created: 15.06.2026*
+*Prerequisites*
+Docker and Docker Compose installed on your machine.
+Node.js (for local frontend development, if not using containers).
 
-**Chocolate cake:**
+### Getting Started:
 
-100g sugar
+**1. Cloning the Repository**
+```
+git clone https://github.com/Moh-alkurdi/php-hire-test.git
+cd recipe-management
+```
 
-50g flour
-
-2 eggs
-
-150g chocolate
-
-50ml milk
-
-**Description:**
-
-Bake it at 200°C for 40 minutes.
-
-This is an example recipe for our hiring test - Om Nom Nom
+**2. Running the Application:**
+The easiest way to run the full stack is via Docker. The ```docker-compose``` setup automatically handles the database initialization and service linking.
+```docker-compose up --build```
+Once the containers are up, the application will be accessible via your browser. The database schema is automatically generated on startup, so no manual SQL import is required.
 
 
-*This is just a example we never tasted, so maybe don't bake it :)*
+# Technology Stack:
 
-# Requirements
-This are must have requirements, your application needs to fulfill:
-* PHP >= 8.3
-* MySQL >= 8.0
-* Bootstrap 5.x
-* Typescript and Angular
-* HTML5
-* GitHub
-* Supported Browsers: Firefox, Chrome and Microsoft Edge
+* Frontend: Angular (TypeScript), Bootstrap 5, RxJS.
+* Backend: CakePHP (PHP 8.3).
+* Database: MySQL 8.0.
+* DevOps: Docker & Docker Compose.
 
-# Hints
-* We love JSON :)
-* Our development environment is based on Ubuntu virtual machines (26.04 LTS). It would be great if you have some experiences using Ubuntu
-* openITCOCKPIT gets developed using GitHub and Jenkins
+# Notes for Reviewers
+* AI Integration: The system uses a prompt-engineered AI service to process recipe inputs.
+* CI/CD Ready: The project structure is optimized for automated build pipelines, including Jenkins, by maintaining clear dependency definitions *(package.json, composer.json)* :).
 
-# Nice to have (but not a must have)
-* Nagios, Naemon, Icinga or Prometheus experiences
-* Knowledge of [CakePHP](http://cakephp.org/)
-* Nginx and PHP-FPM experiences
-* Most of our developers are used to macOS or Windows as their desktop operating system
 
-# Workflow
-**Important notice: Before you start, send us your application at Bewerbung@avendis.com and wait for our feedback!**
-
-1. Fork this repository
-2. Create a new branch and name it with your GitHub username
-3. When you're done, create a pull request
-
-*If you don't want to create a pull request, send us a zip file with your local git repository*
-
-**Commit everything to the repository we need to test your code.**
-
-# License
-MIT License
+Developed by **Mohammed Alkurdi**.  
+*Danke für Ihre Zeit und Mühe. Ich freue mich auf Ihre Rückmeldung.*
