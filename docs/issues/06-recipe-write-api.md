@@ -86,9 +86,17 @@ The task does not mention editing or deleting recipes. Adding CRUD operations no
 
 **Verification (2026-06-17):** 21 tests / 60 assertions green · phpcs clean.
 
-> **Bug found & fixed during review:** `amount` above the DECIMAL(8,2) range
-> (e.g. `9999999`) returned a **500** database error because validation only
-> bounded `amount > 0`. Added `lessThanOrEqual(amount, 999999.99)`; now a clean
-> 422. The adversarial review workflow that was meant to catch this hit the
-> session limit and did not run — found via manual probing instead. See
+> **Bugs found & fixed during review (3 total):**
+> 1. `amount` over the DECIMAL(8,2) range returned a **500** (validation lacked
+>    an upper bound) → added `lessThanOrEqual(amount, 999999.99)`, now 422.
+> 2. The "at least one ingredient" guard checked the **raw** input, so
+>    `ingredients` as a bare object or a list of non-objects slipped through and
+>    persisted a recipe with zero ingredients (201) → guard now checks the
+>    **marshalled** entity; both cases return 422.
+> 3. Errors returned **HTML**, not JSON (malformed body → HTML 400, exceptions →
+>    HTML 500) → `ErrorController` now renders JSON for all errors; `view()` was
+>    simplified to throw `NotFoundException`.
+>
+> #1 was found by manual probing (the review workflow hit the session limit);
+> #2 and #3 by the re-run adversarial review. See
 > `docs/implementation/06-recipe-write-api.md`.

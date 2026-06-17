@@ -88,8 +88,51 @@ vendor/bin/phpunit        → 21 tests, 60 assertions
 vendor/bin/phpcs          → clean
 ```
 
+## Adversarial review (re-run) — three more real bugs found & fixed
+
+The four-dimension review workflow was re-run after the session limit reset (13
+agents, each finding verified by an independent skeptic). It confirmed **two
+root defects** beyond the amount-overflow one, both now fixed:
+
+### Bug 2 — the "at least one ingredient" guard was bypassable
+The guard checked the **raw** request (`empty($data['ingredients']) ||
+!is_array(...)`). But CakePHP's marshaller silently drops malformed ingredient
+entries, so two plausible payloads slipped through and persisted a recipe with
+**zero ingredients** (HTTP 201):
+- `ingredients` as a bare object: `{"name":…,"amount":…,"unit":…}` (no list wrapper)
+- `ingredients` as a list of non-objects: `["foo"]`
+
+Fix: check the **marshalled** entity (`empty($recipe->ingredients)`) instead of
+the raw input — that reflects what was actually parsed. Both cases now return
+422; two regression tests added. (Confirmed empirically: before the fix the
+probes returned 201 with `ingredients: []`.)
+
+### Bug 3 — errors returned HTML, breaking the JSON contract
+With no JSON error renderer configured, a malformed JSON body returned an
+**HTML** 400, and any uncaught exception an **HTML** 500 — an Angular
+`HttpClient` expecting JSON would fail to parse them. Fix: `ErrorController`
+now renders every uncaught exception as JSON (`{"message","url","code"}`),
+regardless of `Accept`. This also let `view()` be simplified — it throws
+`NotFoundException` again instead of hand-building the 404 (the hand-built
+version existed only to dodge the HTML-error problem the renderer now solves).
+In production the generic message hides internals; in debug the real message
+shows. Two skeleton `PagesControllerTest` cases that asserted HTML error pages
+were updated to assert the JSON error contract.
+
+**Error shapes are now consistent:** field validation → `{"errors":{field:[…]}}`
+(422); any thrown HTTP error → `{"message","url","code"}` (400/404/405/500).
+
+## Verification (after review fixes)
+
+```
+ingredients as object / ["foo"]   → 422 (was 201 with no ingredients)
+malformed JSON body               → 400 application/json (was HTML)
+GET /recipes/9999                → 404 application/json {"message":…}
+amount 9999999                   → 422 ; 999999.99 → 201 (boundary)
+vendor/bin/phpunit                → 23 tests, 65 assertions green
+vendor/bin/phpcs                  → clean
+```
+
 ## Notes carried forward
 
-- Re-run the adversarial review workflow for the write path once the session
-  limit resets, to catch anything the manual pass missed.
 - The read+write API is complete; #7 builds the Angular list against it (MVP).
