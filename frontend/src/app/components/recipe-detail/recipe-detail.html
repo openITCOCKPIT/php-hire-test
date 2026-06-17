@@ -1,0 +1,30 @@
+<a routerLink="/" class="btn btn-link px-0 mb-3">&larr; Back to list</a>
+
+@if (state() === 'loading') {
+  <div class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading…</span>
+    </div>
+  </div>
+} @else if (state() === 'notfound') {
+  <div class="alert alert-warning">No recipe found with that id.</div>
+} @else if (state() === 'error') {
+  <div class="alert alert-danger">Could not load the recipe. Please try again.</div>
+} @else if (recipe(); as r) {
+  <article>
+    <h1 class="h3">{{ r.title }}</h1>
+    <p class="text-muted">{{ r.created | date: 'dd.MM.yyyy' }}</p>
+
+    <h2 class="h5 mt-4">Ingredients</h2>
+    <ul class="list-group mb-4">
+      @for (ingredient of r.ingredients; track ingredient.id) {
+        <li class="list-group-item">{{ formatIngredient(ingredient) }}</li>
+      }
+    </ul>
+
+    @if (r.description) {
+      <h2 class="h5">Description</h2>
+      <p style="white-space: pre-line">{{ r.description }}</p>
+    }
+  </article>
+}
