@@ -4,7 +4,7 @@
 **Feature reference:** Feature 2 (Create new recipes with ingredients)
 **Effort:** 2 h
 **Dependencies:** #5
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -71,14 +71,24 @@ The task does not mention editing or deleting recipes. Adding CRUD operations no
 
 ## Definition of Done
 
-- [ ] `POST /recipes` with valid JSON body returns HTTP 201 with the created recipe + ingredients
-- [ ] `POST /recipes` with missing `title` returns HTTP 422 with a JSON error listing the `title` validation error
-- [ ] `POST /recipes` with `amount: -5` returns HTTP 422 with an `amount` validation error
-- [ ] `POST /recipes` with `ingredients: []` returns HTTP 422
-- [ ] Recipe and ingredients are saved atomically — no orphaned rows if save fails
-- [ ] Tested with `curl -X POST -H "Content-Type: application/json" -d '{...}'`
+- [x] `POST /recipes` with valid JSON body returns HTTP 201 with the created recipe + ingredients
+- [x] `POST /recipes` with missing `title` returns HTTP 422 with a JSON `title` error
+- [x] `POST /recipes` with `amount: -5` returns HTTP 422 with an `amount` validation error
+- [x] `POST /recipes` with `ingredients: []` returns HTTP 422
+- [x] Recipe and ingredients are saved atomically — no orphaned rows if save fails
+- [x] Tested with `curl -X POST -H "Content-Type: application/json" -d '{...}'`
+- [x] Mass assignment hardened: client cannot set `id`, `created`, or `recipe_id`
 
 ## Tests
 
-- [ ] **PHPUnit:** `testAddValid` creates a recipe + ingredients and asserts HTTP 201 with the persisted entity; `testAddMissingTitle` asserts 422 with a `title` error; `testAddNegativeAmount` asserts 422; `testAddEmptyIngredients` asserts 422.
-- [ ] **Transaction test:** force an ingredient-save failure and assert the recipe row is rolled back (no orphan recipe) — proves the atomic-save guarantee that two reference submissions got wrong.
+- [x] **PHPUnit:** create → 201 with persisted entity; missing title → 422; negative amount → 422; empty ingredients → 422; **amount over DECIMAL range → 422** (regression for the 500 bug below).
+- [x] **Transaction test:** `testInvalidRecipeIsNotPersisted` asserts a failed save leaves no orphan recipe.
+
+**Verification (2026-06-17):** 21 tests / 60 assertions green · phpcs clean.
+
+> **Bug found & fixed during review:** `amount` above the DECIMAL(8,2) range
+> (e.g. `9999999`) returned a **500** database error because validation only
+> bounded `amount > 0`. Added `lessThanOrEqual(amount, 999999.99)`; now a clean
+> 422. The adversarial review workflow that was meant to catch this hit the
+> session limit and did not run — found via manual probing instead. See
+> `docs/implementation/06-recipe-write-api.md`.

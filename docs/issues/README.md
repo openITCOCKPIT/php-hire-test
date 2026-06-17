@@ -31,7 +31,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 |---|---|---|---|
 | [#4](04-database-schema.md) | Database schema & migrations | 1 h | ✅ done |
 | [#5](05-recipe-read-api.md) | Recipe read API (list & detail) | 2 h | ✅ done |
-| [#6](06-recipe-write-api.md) | Recipe write API | 2 h | ⬜ open |
+| [#6](06-recipe-write-api.md) | Recipe write API | 2 h | ✅ done |
 
 ### Epic C — Frontend Core Functions
 
