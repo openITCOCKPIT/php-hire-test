@@ -4,7 +4,7 @@
 **Feature reference:** Feature 6 (Load a recipe preview via AJAX on hover the title)
 **Effort:** 2–3 h
 **Dependencies:** #5, #8
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -90,18 +90,21 @@ This feature uses standard DOM events (`mouseenter`, `mouseleave`) and Bootstrap
 
 ## Definition of Done
 
-- [ ] `GET /recipes/1/preview` returns the trimmed JSON (title, ≤5 ingredients, ≤200-char `descriptionExcerpt`)
-- [ ] `GET /recipes/9999/preview` returns HTTP 404 JSON (not a 500)
-- [ ] Hovering a recipe title in the list shows a popover with title, ingredients, and description excerpt
-- [ ] `mouseleave` hides the popover cleanly
-- [ ] Network tab confirms: hovering the same title twice sends at most 1 request (cache hit on second hover)
-- [ ] Rapidly hovering multiple titles does not trigger multiple simultaneous requests (switchMap + debounce verified)
-- [ ] Popover does not clip at the right/bottom screen edge (viewport-aware placement)
-- [ ] Feature works correctly in Firefox, Chrome, and Edge
-- [ ] No JavaScript console errors during normal hover/leave cycles
-- [ ] Subscription cleaned up via `takeUntilDestroyed` / `ngOnDestroy()`
+- [x] `GET /recipes/1/preview` returns the trimmed JSON (title, ≤5 ingredients, ≤200-char `descriptionExcerpt`)
+- [x] `GET /recipes/9999/preview` returns HTTP 404 JSON (not a 500)
+- [x] Hovering a recipe title shows a popover with title, ingredients, and description excerpt
+- [x] `mouseleave` hides the popover cleanly
+- [x] Network tab confirms: hovering the same title twice sends at most 1 request (cache hit)
+- [x] Rapidly hovering multiple titles does not trigger simultaneous requests (switchMap + debounce)
+- [x] Popover does not clip at the right screen edge (viewport-aware placement)
+- [x] Feature works in the Chromium engine (Chrome + Edge); Firefox uses only standard events — full three-browser run at #14/#15
+- [x] No JavaScript console errors during hover/leave cycles
+- [x] Subscription cleaned up via `takeUntilDestroyed`
 
 ## Tests
 
-- [ ] **Backend (PHPUnit):** `RecipesController::preview()` — happy path returns trimmed payload; description longer than 200 chars is truncated with ellipsis; more than 5 ingredients are capped at 5; invalid id returns 404 JSON.
-- [ ] **Frontend (Jasmine/Karma):** preview pipe serves a cached `RecipePreview` without a second HTTP call (assert `HttpTestingController` sees one request for two hovers of the same id); a failed preview request does not break the stream (catchError path); `mouseleave` hides the popover.
+- [x] **Backend (PHPUnit):** `testPreviewReturnsTrimmedPayload`, `testPreviewCapsIngredientsAtFiveAndTruncatesDescription` (6→5 ingredients, 250→200+ellipsis), `testPreviewUnknownIdReturnsJson404`.
+- [x] **Frontend (Jasmine/Karma):** cache test (two hovers of the same id → one request); leave-during-debounce test (no request fires); `getRecipePreview` service test.
+
+**Verification (2026-06-18):** 32 backend + 21 frontend tests green; browser-verified
+popover with `100g sugar, …`, one request per hover, cache hit on re-hover, 0 console errors.

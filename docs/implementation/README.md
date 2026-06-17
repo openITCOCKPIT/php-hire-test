@@ -29,3 +29,4 @@ implementation log to see how it played out in practice.
 | #9 | Create recipe form (Epic C complete) | [09-create-recipe-form.md](09-create-recipe-form.md) |
 | #10 | Sorting (server-side, whitelisted) | [10-sorting.md](10-sorting.md) |
 | #11 | Search (debounced, server-side LIKE) | [11-search.md](11-search.md) |
+| #12 | AJAX hover preview (centrepiece) | [12-hover-preview.md](12-hover-preview.md) |
