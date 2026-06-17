@@ -1,84 +1,138 @@
-# We are hiring
-Check all our [vacancies](https://avendis.com/karriere/)
+# Recipe Collection
 
-# About AVENDIS GmbH
+A small full-stack application for the AVENDIS coding challenge: browse, create,
+search, sort and preview recipes, and optionally send a recipe by e-mail.
 
-AVENDIS provides IT infrastructure consulting and implementation, including cloud, on‑premise and hybrid concepts. The company delivers digital improvement projects and custom software focused on modern technology platforms and early prototyping. It designs and supports communication and collaboration solutions that connect systems and users.Allgeier IT Services also integrates and operates enterprise software, offers flexible managed services and IT outsourcing, and runs a security operations center to protect customer environments. In addition, it implements and operates various open source tools for IT documentation, monitoring, asset management, and service management
+**Stack:** CakePHP 5 (JSON REST API) · Angular + TypeScript · Bootstrap 5 ·
+MySQL 8.0 · PHP 8.3 · nginx + PHP-FPM
 
-**We are hiring PHP developers for our Open Source Monitoring Solution [openITCOCKPIT](http://openitcockpit.io/) based on Nagios, Naemon and Prometheus.**
+> The work is broken into self-contained issues under
+> [`docs/issues/`](docs/issues/README.md), each documenting the reasoning behind
+> its technical decisions.
 
-# Your task
-Your task is to create a recipe collection where a user is able to browse through existing recipes or create a new one.
+---
 
-Recipes should be able to be sent as e-mail to a given e-mail address.
+## Setup
 
-**Notice: Use plain PHP or [CakePHP](http://cakephp.org/) as framework, Typescript and [Angular](https://angular.dev/)!**
+The recommended path is **Docker Compose** — it provisions the exact required
+versions (PHP 8.3, MySQL 8.0, nginx) and runs identically on any machine,
+including the Ubuntu 26.04 target. A native Ubuntu setup is documented below as
+the production-equivalent alternative.
 
-## Features
+### Option A — Docker Compose (recommended)
 
-1. Browse through existing recipes
-2. Create new recipes with ingredients
-3. Send recipes via E-Mail to a friend (optional)
-4. Sort the list of recipes
-4. Search recipes
-5. Load a recipe preview via AJAX on hover the title.
-6. Make it user friendly
+```bash
+# 1. Provide environment variables (credentials, ports)
+cp .env.example .env
 
-### Example recipe:
-*Created: 15.06.2026*
+# 2. Build and start nginx + PHP-FPM 8.3 + MySQL 8.0
+docker compose up -d --build
 
-**Chocolate cake:**
+# 3. Verify the stack (nginx -> PHP-FPM -> MySQL)
+curl http://localhost:8765
+```
 
-100g sugar
+The API is served at `http://localhost:8765`. MySQL listens on `localhost:3306`.
+Stop everything with `docker compose down` (add `-v` to also drop the database
+volume).
 
-50g flour
+### Option B — Ubuntu 26.04 LTS (native, production-like)
 
-2 eggs
+The deployment target is an Ubuntu 26.04 VM with nginx + PHP-FPM. The numbered
+commands below install the full stack natively:
 
-150g chocolate
+```bash
+# 1.  System packages up to date
+sudo apt update && sudo apt upgrade -y
 
-50ml milk
+# 2.  Tooling for adding PHP repositories
+sudo apt install -y software-properties-common
 
-**Description:**
+# 3.  PHP 8.3 repository
+sudo add-apt-repository ppa:ondrej/php -y && sudo apt update
 
-Bake it at 200°C for 40 minutes.
+# 4.  PHP 8.3 + the extensions CakePHP 5 needs
+sudo apt install -y php8.3 php8.3-fpm php8.3-mysql php8.3-mbstring \
+    php8.3-intl php8.3-xml php8.3-curl php8.3-zip
 
-This is an example recipe for our hiring test - Om Nom Nom
+# 5.  nginx web server
+sudo apt install -y nginx
 
+# 6.  MySQL 8.0 server
+sudo apt install -y mysql-server-8.0
 
-*This is just a example we never tasted, so maybe don't bake it :)*
+# 7.  Enable and start the services
+sudo systemctl enable --now php8.3-fpm nginx mysql
 
-# Requirements
-This are must have requirements, your application needs to fulfill:
-* PHP >= 8.3
-* MySQL >= 8.0
-* Bootstrap 5.x
-* Typescript and Angular
-* HTML5
-* GitHub
-* Supported Browsers: Firefox, Chrome and Microsoft Edge
+# 8.  Backend dependencies (run inside ./api once the skeleton exists, issue #2)
+#     composer install
 
-# Hints
-* We love JSON :)
-* Our development environment is based on Ubuntu virtual machines (26.04 LTS). It would be great if you have some experiences using Ubuntu
-* openITCOCKPIT gets developed using GitHub and Jenkins
+# 9.  Fallback dev server if you don't want to configure an nginx vhost:
+#     cd api && bin/cake server -p 8765
 
-# Nice to have (but not a must have)
-* Nagios, Naemon, Icinga or Prometheus experiences
-* Knowledge of [CakePHP](http://cakephp.org/)
-* Nginx and PHP-FPM experiences
-* Most of our developers are used to macOS or Windows as their desktop operating system
+# 10. Node.js 22 for the Angular frontend (issue #3)
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 
-# Workflow
-**Important notice: Before you start, send us your application at Bewerbung@avendis.com and wait for our feedback!**
+# 11. Install Node.js
+sudo apt install -y nodejs
 
-1. Fork this repository
-2. Create a new branch and name it with your GitHub username
-3. When you're done, create a pull request
+# 12. Angular CLI
+sudo npm install -g @angular/cli
+```
 
-*If you don't want to create a pull request, send us a zip file with your local git repository*
+---
 
-**Commit everything to the repository we need to test your code.**
+## Architecture
 
-# License
-MIT License
+Key decisions are summarised here and explained in full in the relevant issue
+under [`docs/issues/`](docs/issues/README.md). This section grows as features land.
+
+- **CakePHP 5 over plain PHP.** The task allows either. CakePHP provides routing,
+  an ORM, validation and JSON serialisation out of the box, and — decisively — it
+  is the framework openITCOCKPIT itself is built on, so it mirrors the real stack.
+  Plain PHP would mean re-implementing that infrastructure by hand.
+- **Docker Compose for development.** Reproducible and version-exact; the same
+  containers run on any reviewer's machine. The native Ubuntu path above documents
+  the production-equivalent nginx + PHP-FPM setup the deployment target uses.
+- **JSON REST API + Angular SPA.** A clean separation: CakePHP speaks only JSON
+  ("we love JSON"), Angular owns the UI.
+
+_To be expanded: data model (DECIMAL vs FLOAT, VARCHAR vs ENUM), server-side
+sort/search, RxJS hover preview, and the Symfony → CakePHP framework note._
+
+---
+
+## Browser support
+
+Target browsers (verified before submission): **Firefox**, **Chrome**,
+**Microsoft Edge**.
+
+_Verification matrix to be completed in issues #12, #14 and #15._
+
+---
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+<details>
+<summary>Original challenge brief (AVENDIS)</summary>
+
+Create a recipe collection where a user can browse existing recipes or create a
+new one. Recipes can be sent by e-mail to a given address. Use plain PHP or
+CakePHP, plus TypeScript and Angular.
+
+**Features:** (1) browse recipes, (2) create recipes with ingredients,
+(3) send a recipe by e-mail (optional), (4) sort the list, (5) search recipes,
+(6) load a recipe preview via AJAX on hover of the title, (7) make it user
+friendly.
+
+**Requirements:** PHP >= 8.3 · MySQL >= 8.0 · Bootstrap 5.x · TypeScript and
+Angular · HTML5 · supported browsers Firefox, Chrome, Microsoft Edge.
+
+**Workflow:** fork the repository, create a branch named after your GitHub
+username, and open a pull request when done. License: MIT.
+
+</details>
