@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RecipeList } from './recipe-list';
 import { environment } from '../../../environments/environment';
 import { Recipe } from '../../models/recipe';
@@ -84,4 +84,36 @@ describe('RecipeList', () => {
     expect(second.request.params.get('direction')).toBe('ASC');
     second.flush({ recipes: [] });
   });
+
+  it('debounces the search and issues a single request after typing settles', fakeAsync(() => {
+    const fixture = TestBed.createComponent(RecipeList);
+    const component = fixture.componentInstance as unknown as {
+      search: string;
+      onSearchChange: () => void;
+    };
+    fixture.detectChanges();
+
+    // initial load() request
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [] });
+
+    // rapid typing — three keystrokes within the debounce window
+    component.search = 'c';
+    component.onSearchChange();
+    tick(100);
+    component.search = 'ch';
+    component.onSearchChange();
+    tick(100);
+    component.search = 'choc';
+    component.onSearchChange();
+
+    // before the debounce elapses, no request has gone out
+    httpMock.expectNone((r) => r.url === url);
+
+    tick(300);
+
+    // exactly one request, for the final term
+    const req = httpMock.expectOne((r) => r.url === url);
+    expect(req.request.params.get('search')).toBe('choc');
+    req.flush({ recipes: [] });
+  }));
 });

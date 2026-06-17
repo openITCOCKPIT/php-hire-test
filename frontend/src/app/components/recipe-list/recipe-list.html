@@ -1,19 +1,29 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
   <h1 class="h3 mb-0">Recipes</h1>
-  <div class="d-flex gap-2">
-    <select
-      class="form-select form-select-sm w-auto"
-      aria-label="Sort recipes"
-      [(ngModel)]="sort"
-      (ngModelChange)="onSortChange()"
-    >
-      <option value="created-DESC">Newest first</option>
-      <option value="created-ASC">Oldest first</option>
-      <option value="title-ASC">Title A–Z</option>
-      <option value="title-DESC">Title Z–A</option>
-    </select>
-    <a routerLink="/recipes/new" class="btn btn-primary">New Recipe</a>
-  </div>
+  <a routerLink="/recipes/new" class="btn btn-primary">New Recipe</a>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <input
+    type="search"
+    class="form-control"
+    style="max-width: 20rem"
+    placeholder="Search recipes…"
+    aria-label="Search recipes"
+    [(ngModel)]="search"
+    (ngModelChange)="onSearchChange()"
+  />
+  <select
+    class="form-select w-auto"
+    aria-label="Sort recipes"
+    [(ngModel)]="sort"
+    (ngModelChange)="onSortChange()"
+  >
+    <option value="created-DESC">Newest first</option>
+    <option value="created-ASC">Oldest first</option>
+    <option value="title-ASC">Title A–Z</option>
+    <option value="title-DESC">Title Z–A</option>
+  </select>
 </div>
 
 @if (state() === 'loading') {
@@ -28,10 +38,14 @@
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="load()">Retry</button>
   </div>
 } @else if (recipes().length === 0) {
-  <div class="text-center text-muted py-5">
-    <p class="mb-3">No recipes yet.</p>
-    <a routerLink="/recipes/new" class="btn btn-primary">Create the first one</a>
-  </div>
+  @if (search.trim()) {
+    <div class="text-center text-muted py-5">No recipes match your search.</div>
+  } @else {
+    <div class="text-center text-muted py-5">
+      <p class="mb-3">No recipes yet.</p>
+      <a routerLink="/recipes/new" class="btn btn-primary">Create the first one</a>
+    </div>
+  }
 } @else {
   <div class="row g-3">
     @for (recipe of recipes(); track recipe.id) {
