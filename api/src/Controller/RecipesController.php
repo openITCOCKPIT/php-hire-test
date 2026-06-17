@@ -25,6 +25,21 @@ class RecipesController extends AppController
     public function index(): void
     {
         $query = $this->Recipes->find()->contain('Ingredients');
+
+        $search = trim((string)$this->request->getQuery('search'));
+        if ($search !== '') {
+            // Parameterised LIKE on title + description. The value is bound, so
+            // it is never concatenated into SQL; escaping % and _ makes the
+            // search match those characters literally instead of as wildcards.
+            $escaped = addcslashes($search, '%_\\');
+            $query->where([
+                'OR' => [
+                    'Recipes.title LIKE' => '%' . $escaped . '%',
+                    'Recipes.description LIKE' => '%' . $escaped . '%',
+                ],
+            ]);
+        }
+
         $query->orderBy($this->sortClause());
 
         $this->set('recipes', $query->all());

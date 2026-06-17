@@ -67,6 +67,45 @@ class RecipesControllerTest extends TestCase
         $this->assertCount(2, $body['recipes']);
     }
 
+    public function testIndexSearchMatchesTitle(): void
+    {
+        $this->get('/recipes?search=choc');
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $titles = array_column($body['recipes'], 'title');
+        $this->assertSame(['Chocolate cake'], $titles);
+    }
+
+    public function testIndexSearchMatchesDescription(): void
+    {
+        // "fry" appears only in the Pancakes description, not its title.
+        $this->get('/recipes?search=fry');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $titles = array_column($body['recipes'], 'title');
+        $this->assertSame(['Pancakes'], $titles);
+    }
+
+    public function testIndexSearchNoMatchReturnsEmpty(): void
+    {
+        $this->get('/recipes?search=zzz-nothing');
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertCount(0, $body['recipes']);
+    }
+
+    public function testIndexSearchComposesWithSort(): void
+    {
+        // Both recipes contain "a"; sorted by title ascending.
+        $this->get('/recipes?search=a&sort=title&direction=ASC');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $titles = array_column($body['recipes'], 'title');
+        $this->assertSame(['Chocolate cake', 'Pancakes'], $titles);
+    }
+
     public function testViewReturnsSingleRecipeWithIngredients(): void
     {
         $this->get('/recipes/1');
