@@ -1,11 +1,12 @@
-# Development environment for the Recipe Collection challenge.
-# Three production-like services that mirror the Ubuntu target stack:
-#   nginx   -> web server / reverse proxy
-#   php     -> PHP-FPM 8.3 running the CakePHP JSON API
-#   mysql   -> MySQL 8.0 database
+# Environment for the Recipe Collection challenge.
+#   mysql    -> MySQL 8.0 database
+#   php      -> PHP-FPM 8.3 running the CakePHP JSON API
+#   nginx    -> serves the API (FastCGI to php), exposed for dev on :8765
+#   frontend -> builds the Angular SPA and serves it + proxies /api to nginx,
+#               giving a single origin on :${APP_PORT:-8080} (no CORS in prod)
 #
-# Bring everything up with:  docker compose up -d
-# The API is then reachable at http://localhost:${NGINX_PORT:-8765}
+# Bring everything up with:  docker compose up -d --build
+# The whole app is then at http://localhost:${APP_PORT:-8080}
 services:
   mysql:
     image: mysql:8.0
@@ -53,6 +54,15 @@ services:
       - ./api:/var/www/html/api
     depends_on:
       - php
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      - nginx
 
 volumes:
   mysql-data:
