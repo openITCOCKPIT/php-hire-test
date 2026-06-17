@@ -1,43 +1,37 @@
 <?php
-declare(strict_types=1);
-
 /**
- * Temporary placeholder front controller.
+ * The Front Controller for handling every request
  *
- * Its only job is to prove the development environment is wired up correctly:
- * a request reaches nginx, is handed to PHP-FPM, and PHP can open a connection
- * to the MySQL container. A single `curl http://localhost:8765` therefore
- * verifies the whole chain at once.
+ * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
+ * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
  *
- * This file is replaced by the real CakePHP 5 front controller in issue #2.
+ * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
+ * @link          https://cakephp.org CakePHP(tm) Project
+ * @since         0.2.9
+ * @license       MIT License (https://opensource.org/licenses/mit-license.php)
  */
 
-header('Content-Type: application/json');
+// For built-in server
+if (PHP_SAPI === 'cli-server') {
+    $_SERVER['PHP_SELF'] = '/' . basename(__FILE__);
 
-$database = ['connected' => false];
-
-try {
-    $pdo = new PDO(
-        sprintf(
-            'mysql:host=%s;port=%s;dbname=%s',
-            getenv('DB_HOST') ?: 'mysql',
-            getenv('DB_PORT') ?: '3306',
-            getenv('DB_DATABASE') ?: ''
-        ),
-        getenv('DB_USERNAME') ?: '',
-        getenv('DB_PASSWORD') ?: '',
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-    $database['connected'] = (bool)$pdo->query('SELECT 1')->fetchColumn();
-} catch (Throwable $e) {
-    $database['error'] = $e->getMessage();
+    $url = parse_url(urldecode($_SERVER['REQUEST_URI']));
+    $file = __DIR__ . $url['path'];
+    if (!str_contains($url['path'], '..') && str_contains($url['path'], '.') && is_file($file)) {
+        return false;
+    }
 }
+require dirname(__DIR__) . '/vendor/autoload.php';
 
-http_response_code(200);
-echo json_encode([
-    'status' => 'ok',
-    'service' => 'recipe-collection-api',
-    'php' => PHP_VERSION,
-    'database' => $database,
-    'note' => 'placeholder front controller — replaced by CakePHP in issue #2',
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+use App\Application;
+use Cake\Http\Server;
+
+// Bind your application to the server.
+$server = new Server(new Application(dirname(__DIR__) . '/config'));
+
+// Run the request/response through the application and emit the response.
+$server->emit($server->run());
