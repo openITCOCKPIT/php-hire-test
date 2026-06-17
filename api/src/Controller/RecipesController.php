@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
 
 /**
@@ -34,14 +35,14 @@ class RecipesController extends AppController
     /**
      * GET /recipes/{id} — a single recipe with its ingredients.
      *
-     * Returns a JSON 404 for an unknown id. We build that response directly
-     * rather than throwing NotFoundException so the body is JSON in every mode
-     * (in debug mode the exception renderer would otherwise emit an HTML page).
+     * Throws NotFoundException for an unknown id; the API error renderer
+     * (App\Controller\ErrorController) turns it into a JSON 404.
      *
      * @param int $id Recipe id.
-     * @return \Cake\Http\Response|null A 404 JSON response, or null to render the recipe.
+     * @return void
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
      */
-    public function view(int $id): ?Response
+    public function view(int $id): void
     {
         $recipe = $this->Recipes->find()
             ->where(['Recipes.id' => $id])
@@ -49,13 +50,11 @@ class RecipesController extends AppController
             ->first();
 
         if ($recipe === null) {
-            return $this->jsonResponse(404, ['error' => 'Recipe not found']);
+            throw new NotFoundException('Recipe not found');
         }
 
         $this->set('recipe', $recipe);
         $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['recipe']);
-
-        return null;
     }
 
     /**

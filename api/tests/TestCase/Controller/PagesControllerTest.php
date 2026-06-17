@@ -42,32 +42,35 @@ class PagesControllerTest extends TestCase
     }
 
     /**
-     * Test that missing template renders 404 page in production
+     * Errors are rendered as JSON (not an HTML page) in production — this is a
+     * JSON-only API (see App\Controller\ErrorController).
      *
      * @return void
      */
-    public function testMissingTemplate()
+    public function testMissingTemplateRendersJsonInProduction()
     {
         Configure::write('debug', false);
         $this->get('/pages/not_existing');
 
+        // In production a missing template is reported as a 404.
         $this->assertResponseError();
-        $this->assertResponseContains('Error');
+        $this->assertContentType('application/json');
+        // Internals are hidden behind a generic message.
+        $this->assertResponseContains('Not Found');
     }
 
     /**
-     * Test that missing template in debug mode renders missing_template error page
+     * In debug mode the JSON error carries the underlying message.
      *
      * @return void
      */
-    public function testMissingTemplateInDebug()
+    public function testMissingTemplateRendersJsonInDebug()
     {
         Configure::write('debug', true);
         $this->get('/pages/not_existing');
 
         $this->assertResponseFailure();
-        $this->assertResponseContains('Missing Template');
-        $this->assertResponseContains('stack-frames');
+        $this->assertContentType('application/json');
         $this->assertResponseContains('not_existing.php');
     }
 

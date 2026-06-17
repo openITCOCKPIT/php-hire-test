@@ -55,7 +55,11 @@ class ErrorController extends AppController
     {
         parent::beforeRender($event);
 
-        $this->viewBuilder()->setTemplatePath('Error');
+        // This is a JSON-only API: render every uncaught exception as JSON
+        // (regardless of the request's Accept header) so 400/404/405/500 return
+        // a consistent JSON body instead of an HTML error page. The renderer has
+        // already set the message/url/code serialize vars.
+        $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['message', 'url', 'code']);
     }
 
     /**
