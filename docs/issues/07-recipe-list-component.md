@@ -66,3 +66,8 @@ Type definitions are cheapest to write when the API shape is first consumed. Wri
 - [ ] "New Recipe" button is visible and links to `/recipes/new` (even if the route is not implemented yet)
 - [ ] `created` date displays in `dd.MM.yyyy` format
 - [ ] `async` pipe used in the template (no manual `.subscribe()` without cleanup)
+
+## Tests
+
+- [ ] **Jasmine/Karma:** `RecipeService` spec uses `HttpTestingController` to assert `getRecipes()` calls `GET /recipes` and maps the response, and `getRecipe(id)` calls `GET /recipes/{id}`.
+- [ ] `RecipeListComponent` spec renders a card from a mocked service and displays the `created` date in `dd.MM.yyyy` format.

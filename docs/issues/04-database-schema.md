@@ -68,3 +68,8 @@ Separate migrations are independently rollback-able. If the `ingredients` schema
 - [ ] `SELECT * FROM ingredients WHERE recipe_id = 1` returns 5 rows with correct DECIMAL amounts and VARCHAR units
 - [ ] `amount` column is confirmed as `DECIMAL(8,2)` in `SHOW COLUMNS FROM ingredients`
 - [ ] Seeder is in `config/Seeds/`, not in production code paths
+
+## Tests
+
+- [ ] **Migration reversibility:** `bin/cake migrations migrate` then `rollback` runs cleanly in CI — the schema is fully reversible.
+- [ ] **PHPUnit + fixtures:** a fixture-backed test asserts the `ingredients.amount` column is `DECIMAL(8,2)` and that a stored value like `1.50` round-trips exactly (guards the DECIMAL-vs-FLOAT decision).

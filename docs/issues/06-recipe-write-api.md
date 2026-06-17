@@ -77,3 +77,8 @@ The task does not mention editing or deleting recipes. Adding CRUD operations no
 - [ ] `POST /recipes` with `ingredients: []` returns HTTP 422
 - [ ] Recipe and ingredients are saved atomically — no orphaned rows if save fails
 - [ ] Tested with `curl -X POST -H "Content-Type: application/json" -d '{...}'`
+
+## Tests
+
+- [ ] **PHPUnit:** `testAddValid` creates a recipe + ingredients and asserts HTTP 201 with the persisted entity; `testAddMissingTitle` asserts 422 with a `title` error; `testAddNegativeAmount` asserts 422; `testAddEmptyIngredients` asserts 422.
+- [ ] **Transaction test:** force an ingredient-save failure and assert the recipe row is rolled back (no orphan recipe) — proves the atomic-save guarantee that two reference submissions got wrong.

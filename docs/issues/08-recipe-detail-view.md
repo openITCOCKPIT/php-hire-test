@@ -60,3 +60,7 @@ Cards in the list view should be scannable — showing every ingredient would ma
 - [ ] "← Back to list" link navigates to `/`
 - [ ] `/recipes/9999` shows a "Recipe not found" message (not a blank page or console error)
 - [ ] Recipe cards in the list view link to the correct detail route
+
+## Tests
+
+- [ ] **Jasmine/Karma:** `RecipeDetailComponent` spec loads a recipe by route param (mocked `ActivatedRoute`) and renders the ingredient list; a not-found (404) response renders the "Recipe not found" message instead of throwing.

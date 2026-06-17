@@ -81,3 +81,8 @@ CakePHP's exception handler automatically serialises `NotFoundException` to a JS
 - [ ] `created` field is serialised as ISO 8601 string
 - [ ] `amount` is returned as a decimal string (e.g. `"100.00"`)
 - [ ] Both endpoints tested with `curl` — output matches the documented response shape
+
+## Tests
+
+- [ ] **PHPUnit (controller + fixtures):** `testIndex` asserts the list returns the seeded recipe with nested ingredients; `testView` asserts a single recipe with its 5 ingredients; `testViewNotFound` asserts HTTP 404 JSON for an unknown id.
+- [ ] Every test method has **real assertions** — no `markTestIncomplete` bake stubs left in the suite (a documented failure of an earlier challenge submission).

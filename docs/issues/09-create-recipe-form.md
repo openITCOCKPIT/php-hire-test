@@ -74,3 +74,7 @@ Navigating to the list shows the user their new recipe in context, confirming th
 - [ ] The new recipe appears in the list view after redirect
 - [ ] Server-side 422 errors are displayed inline on the relevant fields
 - [ ] Submit button is disabled while the request is in flight
+
+## Tests
+
+- [ ] **Jasmine/Karma:** the form is invalid when `title` is empty; "+ Add ingredient" / "Remove" change the `FormArray` length; a valid submit calls `RecipeService.createRecipe` with the expected payload (assert via spy + `HttpTestingController`); a server 422 response maps errors back onto the correct controls.

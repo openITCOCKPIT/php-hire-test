@@ -66,3 +66,8 @@ The list view uses Bootstrap cards (from #7), not a table. Cards have no natural
 - [ ] Angular UI shows a sort control; selecting a sort option reloads the list in the correct order
 - [ ] Active sort option is visually indicated
 - [ ] SQL injection attempt via sort param does not cause an error or data leak (verified manually)
+
+## Tests
+
+- [ ] **PHPUnit:** `testSortByTitleAsc` and `testSortByCreatedDesc` assert the returned ordering; `testSortInjectionRejected` asserts an unknown/injected `sort` value falls back to the default order without error (locks in the whitelist).
+- [ ] **Jasmine/Karma:** changing the sort control re-requests the list with the expected `sort`/`direction` query params.

@@ -58,3 +58,7 @@ The `environment` pattern is the Angular-idiomatic way to separate dev/prod conf
 - [ ] No CORS errors in the browser console
 - [ ] `environment.ts` contains `apiBaseUrl` pointing to the backend
 - [ ] Angular routing module is present with a placeholder default route
+
+## Tests
+
+- [ ] **Karma/Jasmine:** the default `ng test --watch=false` suite runs green on the generated project — proves the frontend test harness works before any component specs are added.

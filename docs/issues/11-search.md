@@ -80,3 +80,8 @@ Client-side filtering (`.filter()` on the loaded array) only searches the curren
 - [ ] Search and sort work simultaneously (e.g., search "cake", sort by date)
 - [ ] Rapid typing does not cause multiple simultaneous API requests (verified in browser Network tab)
 - [ ] Subscription is properly cleaned up on component destroy
+
+## Tests
+
+- [ ] **PHPUnit:** `testSearchMatchesTitle` returns only matching recipes; `testSearchNoMatch` returns an empty array; `testSearchComposesWithSort` asserts search + sort applied together. Searches must match the **human-readable** title/description, not an internal key (a documented bug in an earlier submission).
+- [ ] **Jasmine/Karma (`fakeAsync`/`tick`):** typing debounces and issues a single `GET /recipes?search=...`; rapid typing does **not** produce one request per keystroke (assert via `HttpTestingController`).

@@ -113,8 +113,10 @@ Issue #13 (e-mail) is the first candidate to drop if time runs short — it is e
 | `unit` data type | `VARCHAR(50)` | ENUM | No migration needed for new units |
 | Sorting / filtering | Server-side (ORM) | Client-side JS | Scales with pagination; single source of truth |
 | Search debounce | `debounceTime(300)` | No debounce | Limits API calls to ~1 per 300 ms of inactivity |
-| Hover preview operator | `switchMap` | `mergeMap`, `concatMap` | Cancels in-flight requests when mouse moves to next title |
-| Hover cache | `Map<number, Recipe>` | Re-fetch every hover | No repeated requests for the same recipe in one session |
+| Hover preview operator | `switchMap` + `debounceTime(200)` | `mergeMap`, `concatMap`, no debounce | Cancels stale requests; debounce avoids requests for titles passed over in transit |
+| Hover preview payload | Dedicated `GET /recipes/{id}/preview` | Reuse full `GET /recipes/{id}` | Trimmed payload (excerpt + ≤5 ingredients) for a high-frequency action |
+| Hover cache | `Map<number, RecipePreview>` | Re-fetch every hover | No repeated requests for the same recipe in one session |
+| Testing | PHPUnit + Karma/Jasmine, real assertions | No tests / `markTestIncomplete` stubs | None of the 4 prior challenge submissions shipped real tests — our clearest differentiator |
 
 ---
 

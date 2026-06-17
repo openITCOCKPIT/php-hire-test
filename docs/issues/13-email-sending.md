@@ -80,3 +80,8 @@ Reasoning: it is explicitly labelled "optional" in the original task, it require
 - [ ] Submitting the modal shows success confirmation and closes the modal
 - [ ] Invalid e-mail in the modal shows an inline error message
 - [ ] E-mail template includes title, created date, ingredients list, and description
+
+## Tests
+
+- [ ] **PHPUnit:** `testSendMailValid` uses CakePHP's `TestEmailTransport` to capture the mail and asserts it goes to the supplied address with the recipe in the body; `testSendMailInvalidEmail` asserts 422; `testSendMailRecipeNotFound` asserts 404. The recipient must be the **user-supplied** address — never a hardcoded one (a documented flaw in an earlier submission).
+- [ ] **Jasmine/Karma:** the modal validates the e-mail field and POSTs to `/recipes/{id}/send-mail` on submit; an invalid address shows an inline error and does **not** POST.

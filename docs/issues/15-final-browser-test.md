@@ -39,9 +39,11 @@ The README must include the following sections (stubs created in #1, now populat
   - `DECIMAL(8,2)` for ingredient amounts
   - `VARCHAR` for ingredient units
   - Server-side sort + search (ORM, whitelist)
-  - RxJS `switchMap` for hover preview
-  - Client-side cache (`Map<number, Recipe>`)
+  - RxJS `switchMap` (+ `debounceTime`) for hover preview
+  - Dedicated lightweight `GET /recipes/{id}/preview` endpoint (small hover payload)
+  - Client-side cache (`Map<number, RecipePreview>`)
   - `debounceTime(300)` for search
+  - **Test coverage (PHPUnit + Karma/Jasmine) as a deliberate differentiator** — reference submissions to this challenge shipped with no real tests; ours does not
   - Symfony→CakePHP note (see below)
 - **Note on Symfony→CakePHP** — explicitly state: "No Symfony was used in this project. The framework choice was CakePHP 5.x because the task offers CakePHP as an option and because openITCOCKPIT is built on CakePHP — using the same framework signals direct alignment with the team's stack."
 - **Browser support** — confirmed working: Firefox [version], Chrome [version], Edge [version]
@@ -85,6 +87,7 @@ A reviewer skimming the PR might assume a PHP developer used Symfony (the domina
 - [ ] README contains: project description, Ubuntu setup, Docker Compose setup, architecture decisions, Symfony→CakePHP note, browser support, MIT license
 - [ ] No `.env`, no `node_modules`, no credentials in the git history
 - [ ] Commit messages are in imperative mood, atomic, and meaningful
+- [ ] Full automated test suite is green: backend (`vendor/bin/phpunit`) and frontend (`ng test --watch=false`) both pass; the test run is noted in the PR description
 - [ ] Pull request created on GitHub: `openITCOCKPIT/php-hire-test` ← `Psheikomaniac/php-hire-test:Psheikomaniac`
 - [ ] PR description explains how to run the app and where to find the browser test results
 - [ ] All 15 issue status checkboxes in `docs/issues/README.md` are marked ✅ done

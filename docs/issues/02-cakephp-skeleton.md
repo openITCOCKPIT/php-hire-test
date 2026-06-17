@@ -49,3 +49,8 @@ CakePHP 5.x ships with dotenv support. Storing credentials in `.env` (excluded f
 - [ ] CORS headers present for `http://localhost:4200` on all API responses
 - [ ] `.env.example` committed, `.env` excluded via `.gitignore`
 - [ ] No hardcoded credentials in any committed file
+
+## Tests
+
+- [ ] **PHPUnit:** the test runner itself executes (`vendor/bin/phpunit` green on the skeleton) — establishes the backend test harness before any feature code.
+- [ ] An integration test hits `GET /status` and asserts HTTP 200 + body `{"status":"ok"}` — the first real test in the suite.
