@@ -4,7 +4,7 @@
 **Feature reference:** Feature 4 (Sort the list of recipes)
 **Effort:** 1–2 h
 **Dependencies:** #5, #7
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -60,14 +60,17 @@ The list view uses Bootstrap cards (from #7), not a table. Cards have no natural
 
 ## Definition of Done
 
-- [ ] `GET /recipes?sort=title&direction=ASC` returns recipes alphabetically (A → Z)
-- [ ] `GET /recipes?sort=created&direction=DESC` returns newest first
-- [ ] Unknown `sort` param (e.g. `?sort=injected_field`) defaults to `created DESC` without error
-- [ ] Angular UI shows a sort control; selecting a sort option reloads the list in the correct order
-- [ ] Active sort option is visually indicated
-- [ ] SQL injection attempt via sort param does not cause an error or data leak (verified manually)
+- [x] `GET /recipes?sort=title&direction=ASC` returns recipes alphabetically (A → Z)
+- [x] `GET /recipes?sort=created&direction=DESC` returns newest first
+- [x] Unknown `sort` param defaults to `created DESC` without error
+- [x] Angular UI shows a sort control; selecting an option reloads the list in order
+- [x] Active sort option is visually indicated (`<select>` shows the selected option)
+- [x] SQL injection attempt via sort param does not cause an error or data leak
 
 ## Tests
 
-- [ ] **PHPUnit:** `testSortByTitleAsc` and `testSortByCreatedDesc` assert the returned ordering; `testSortInjectionRejected` asserts an unknown/injected `sort` value falls back to the default order without error (locks in the whitelist).
-- [ ] **Jasmine/Karma:** changing the sort control re-requests the list with the expected `sort`/`direction` query params.
+- [x] **PHPUnit:** `testIndexSortsByTitleAscending`, `testIndexSortsByCreatedDescendingByDefault`, and `testIndexRejectsInjectedSortAndFallsBack` (locks in the whitelist).
+- [x] **Jasmine/Karma:** changing the sort control re-requests with the expected `sort`/`direction` params.
+
+**Verification (2026-06-17):** 25 backend + 17 frontend tests green; browser-verified
+the dropdown reorders the cards and issues `?sort=title&direction=ASC`.
