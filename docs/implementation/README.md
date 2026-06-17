@@ -20,3 +20,4 @@ implementation log to see how it played out in practice.
 |---|---|---|
 | #1 | Repository & development environment | [01-repository-setup.md](01-repository-setup.md) |
 | #2 | CakePHP skeleton & `/status` endpoint | [02-cakephp-skeleton.md](02-cakephp-skeleton.md) |
+| #3 | Angular project, Bootstrap 5, CORS slice | [03-angular-project.md](03-angular-project.md) |

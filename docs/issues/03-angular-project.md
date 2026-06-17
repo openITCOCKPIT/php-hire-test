@@ -4,7 +4,7 @@
 **Feature reference:** —
 **Effort:** 1–2 h
 **Dependencies:** #2
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -52,13 +52,16 @@ The `environment` pattern is the Angular-idiomatic way to separate dev/prod conf
 
 ## Definition of Done
 
-- [ ] `npm start` serves the app at `http://localhost:4200` without errors
-- [ ] Bootstrap 5 styles are applied (visible in the browser)
-- [ ] Browser console shows `{"status":"ok"}` from the CakePHP API
-- [ ] No CORS errors in the browser console
-- [ ] `environment.ts` contains `apiBaseUrl` pointing to the backend
-- [ ] Angular routing module is present with a placeholder default route
+- [x] `npm start` serves the app at `http://localhost:4200` without errors
+- [x] Bootstrap 5 styles are applied (visible in the browser)
+- [x] Browser shows the API status from the CakePHP `/status` endpoint
+- [x] No CORS errors in the browser console (verified via Playwright)
+- [x] `environment.ts` contains `apiBaseUrl` pointing to the backend
+- [x] Angular routing is present (`app.routes.ts`) with `<router-outlet>` in place
 
 ## Tests
 
-- [ ] **Karma/Jasmine:** the default `ng test --watch=false` suite runs green on the generated project — proves the frontend test harness works before any component specs are added.
+- [x] **Karma/Jasmine:** `ng test --watch=false --browsers=ChromeHeadless` runs green — **4 specs** (app creates, renders title, API-reachable on ok, API-unreachable on error).
+
+**Verification (2026-06-17):** Angular 20.3 (standalone) · `GET :8765/status` →
+200 from the SPA on :4200, 0 console errors · Bootstrap CSS+JS bundled · build green.
