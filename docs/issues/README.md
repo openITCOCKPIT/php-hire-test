@@ -39,7 +39,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 |---|---|---|---|
 | [#7](07-recipe-list-component.md) | RecipeService & display list | 2 h | ✅ done |
 | [#8](08-recipe-detail-view.md) | Detail view | 1–2 h | ✅ done |
-| [#9](09-create-recipe-form.md) | Create recipe (form) | 2–3 h | ⬜ open |
+| [#9](09-create-recipe-form.md) | Create recipe (form) | 2–3 h | ✅ done |
 
 ### Epic D — Advanced Features
 

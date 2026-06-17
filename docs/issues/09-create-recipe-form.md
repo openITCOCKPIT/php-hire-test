@@ -4,7 +4,7 @@
 **Feature reference:** Feature 2 (Create new recipes with ingredients)
 **Effort:** 2–3 h
 **Dependencies:** #6, #7
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -66,15 +66,20 @@ Navigating to the list shows the user their new recipe in context, confirming th
 
 ## Definition of Done
 
-- [ ] Route `/recipes/new` renders the form
-- [ ] `title` field shows validation error when submitted empty
-- [ ] At least one ingredient row is always present; "Remove" is disabled at minimum 1 row
-- [ ] "+ Add ingredient" adds a new row; each row has name, amount, unit fields with validation
-- [ ] Valid submission POSTs to `POST /recipes` and redirects to `/` on success
-- [ ] The new recipe appears in the list view after redirect
-- [ ] Server-side 422 errors are displayed inline on the relevant fields
-- [ ] Submit button is disabled while the request is in flight
+- [x] Route `/recipes/new` renders the form
+- [x] `title` field shows validation error when submitted empty
+- [x] At least one ingredient row is always present; "Remove" is disabled at 1 row
+- [x] "+ Add ingredient" adds a new row; each row has name, amount, unit with validation
+- [x] Valid submission POSTs to `POST /recipes` and redirects to `/` on success
+- [x] The new recipe appears in the list view after redirect
+- [x] Server-side 422 errors are displayed inline on the relevant fields
+- [x] Submit button is disabled while the request is in flight
 
 ## Tests
 
-- [ ] **Jasmine/Karma:** the form is invalid when `title` is empty; "+ Add ingredient" / "Remove" change the `FormArray` length; a valid submit calls `RecipeService.createRecipe` with the expected payload (assert via spy + `HttpTestingController`); a server 422 response maps errors back onto the correct controls.
+- [x] **Jasmine/Karma (5 specs):** form invalid when empty; add/remove change the `FormArray` length (min 1 kept); no POST when invalid; a valid submit POSTs the expected payload and navigates to `/`; a 422 maps the `title` error back onto the control.
+
+**Verification (2026-06-17):** full create flow browser-verified — filled a
+2-ingredient recipe, redirected to `/`, "Pancakes" appears with "2 ingredients";
+API confirms `200.00 g flour` / `300.00 ml milk` persisted; 0 console errors.
+**Epic C complete.**
