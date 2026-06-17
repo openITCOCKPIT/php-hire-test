@@ -110,6 +110,38 @@ class RecipesControllerTest extends TestCase
         $this->assertResponseContains('At least one ingredient');
     }
 
+    public function testAddIngredientsAsSingleObjectReturns422(): void
+    {
+        // A bare object instead of a list: the marshaller drops the scalar
+        // values, so without checking the marshalled entity this would persist
+        // a recipe with zero ingredients.
+        $recipes = $this->getTableLocator()->get('Recipes');
+        $before = $recipes->find()->count();
+
+        $this->post('/recipes', [
+            'title' => 'Broken',
+            'ingredients' => ['name' => 'eggs', 'amount' => 3, 'unit' => 'pcs'],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('At least one ingredient');
+        $this->assertSame($before, $recipes->find()->count(), 'No recipe should be persisted');
+    }
+
+    public function testAddIngredientsWithNonObjectElementsReturns422(): void
+    {
+        $recipes = $this->getTableLocator()->get('Recipes');
+        $before = $recipes->find()->count();
+
+        $this->post('/recipes', [
+            'title' => 'Ghost',
+            'ingredients' => ['not-an-object'],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertSame($before, $recipes->find()->count(), 'No recipe should be persisted');
+    }
+
     public function testAddAmountExceedingColumnRangeReturns422(): void
     {
         // 9999999 exceeds DECIMAL(8,2)'s max (999999.99); must be a clean 422,

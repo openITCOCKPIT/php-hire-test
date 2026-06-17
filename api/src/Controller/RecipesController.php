@@ -75,8 +75,12 @@ class RecipesController extends AppController
             'associated' => ['Ingredients'],
         ]);
 
-        // A recipe needs at least one ingredient.
-        if (empty($data['ingredients']) || !is_array($data['ingredients'])) {
+        // A recipe needs at least one ingredient. Check the MARSHALLED entity,
+        // not the raw input: the marshaller silently drops malformed ingredient
+        // entries (a bare object instead of a list, or non-object elements), so
+        // a raw-input check would let those through and persist a recipe with
+        // zero ingredients.
+        if (empty($recipe->ingredients)) {
             $recipe->setError('ingredients', ['_required' => 'At least one ingredient is required.']);
         }
 
