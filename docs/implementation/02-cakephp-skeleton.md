@@ -78,6 +78,14 @@ was left in place. Only the `/status` route was added.
   was treated as out of scope for #2.
 - Root `.gitignore` was trimmed: the CakePHP app ships its own `api/.gitignore`
   that already ignores `vendor/`, `tmp/*`, `logs/*` and `config/app_local.php`.
+- **CI workflow corrected.** The skeleton shipped GitHub workflows under
+  `api/.github/workflows/`, which GitHub Actions never reads (it only loads
+  workflows from the repository root) and which inlined a `SECURITY_SALT` value.
+  They were replaced by a root-level `.github/workflows/ci.yml` tailored to the
+  `api/` layout (PHPUnit + CodeSniffer on PHP 8.3/8.4). The salt is no longer
+  committed — Composer's post-install generates `app_local.php` with a random
+  salt in CI. The skeleton's `stale.yml` issue-closing bot was dropped as
+  inappropriate for this repository.
 
 ## Verification
 

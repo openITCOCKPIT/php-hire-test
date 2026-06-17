@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [Psheikomaniac, main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend — PHPUnit & CodeSniffer
+    runs-on: ubuntu-24.04
+    # The CakePHP application lives in api/, so every command runs there.
+    defaults:
+      run:
+        working-directory: api
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+        # Composer's post-install generates config/app_local.php (including a
+        # fresh random SECURITY_SALT), so no salt is committed or hardcoded.
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+        env:
+          DATABASE_TEST_URL: sqlite://./testdb.sqlite
+
+      - name: Run PHP CodeSniffer
+        run: vendor/bin/phpcs
