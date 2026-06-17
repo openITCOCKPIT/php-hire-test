@@ -71,6 +71,7 @@ return function (RouteBuilder $routes): void {
          * Recipe read API (issue #5).
          */
         $builder->get('/recipes', ['controller' => 'Recipes', 'action' => 'index']);
+        $builder->post('/recipes', ['controller' => 'Recipes', 'action' => 'add']);
         $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);

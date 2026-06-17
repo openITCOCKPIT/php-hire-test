@@ -56,4 +56,88 @@ class RecipesControllerTest extends TestCase
         $this->assertContentType('application/json');
         $this->assertResponseContains('Recipe not found');
     }
+
+    public function testAddCreatesRecipeWithIngredients(): void
+    {
+        $this->post('/recipes', [
+            'title' => 'Omelette',
+            'description' => 'Beat and fry.',
+            'ingredients' => [
+                ['name' => 'eggs', 'amount' => 3, 'unit' => 'pcs'],
+                ['name' => 'butter', 'amount' => 1.5, 'unit' => 'tbsp'],
+            ],
+        ]);
+
+        $this->assertResponseCode(201);
+        $this->assertContentType('application/json');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertSame('Omelette', $body['recipe']['title']);
+        $this->assertCount(2, $body['recipe']['ingredients']);
+        // amount comes back as a canonical decimal string
+        $this->assertSame('1.50', $body['recipe']['ingredients'][1]['amount']);
+
+        $this->assertSame(3, $this->getTableLocator()->get('Recipes')->find()->count());
+    }
+
+    public function testAddMissingTitleReturns422(): void
+    {
+        $this->post('/recipes', [
+            'ingredients' => [['name' => 'x', 'amount' => 1, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseCode(422);
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertArrayHasKey('title', $body['errors']);
+    }
+
+    public function testAddNegativeAmountReturns422(): void
+    {
+        $this->post('/recipes', [
+            'title' => 'Bad amount',
+            'ingredients' => [['name' => 'x', 'amount' => -5, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('greater than 0');
+    }
+
+    public function testAddEmptyIngredientsReturns422(): void
+    {
+        $this->post('/recipes', ['title' => 'No ingredients', 'ingredients' => []]);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('At least one ingredient');
+    }
+
+    public function testAddAmountExceedingColumnRangeReturns422(): void
+    {
+        // 9999999 exceeds DECIMAL(8,2)'s max (999999.99); must be a clean 422,
+        // not a 500 database error.
+        $this->post('/recipes', [
+            'title' => 'Overflow',
+            'ingredients' => [['name' => 'x', 'amount' => 9999999, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('must not exceed');
+    }
+
+    public function testInvalidRecipeIsNotPersisted(): void
+    {
+        $recipes = $this->getTableLocator()->get('Recipes');
+        $before = $recipes->find()->count();
+
+        $this->post('/recipes', [
+            'title' => 'Should not persist',
+            'ingredients' => [['name' => 'x', 'amount' => -5, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertSame(
+            $before,
+            $recipes->find()->count(),
+            'A validation failure must not leave an orphan recipe',
+        );
+    }
 }

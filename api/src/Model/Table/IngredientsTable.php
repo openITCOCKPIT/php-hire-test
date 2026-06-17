@@ -65,8 +65,12 @@ class IngredientsTable extends Table
             ->requirePresence('name', 'create')
             ->notEmptyString('name');
 
+        // Bounds match the DECIMAL(8,2) column: a value above 999999.99 would
+        // otherwise be rejected by MySQL as a 500 rather than a clean 422.
         $validator
-            ->decimal('amount')
+            ->numeric('amount')
+            ->greaterThan('amount', 0, 'Amount must be greater than 0')
+            ->lessThanOrEqual('amount', 999999.99, 'Amount must not exceed 999999.99')
             ->requirePresence('amount', 'create')
             ->notEmptyString('amount');
 
