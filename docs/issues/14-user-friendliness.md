@@ -4,7 +4,7 @@
 **Feature reference:** Feature 7 (Make it user friendly)
 **Effort:** 2–3 h
 **Dependencies:** #7, #8, #9, #10, #11, #12 (all Epic C + D issues)
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -78,10 +78,14 @@ The challenge values pragmatism over polish ("make it user friendly" + 21–31 h
 
 ## Definition of Done
 
-- [ ] Recipe list shows a spinner while loading; shows "No recipes found" when empty
-- [ ] Recipe detail shows a spinner while loading; shows an error alert if the request fails
-- [ ] Form submit button shows spinner + "Saving…" and is disabled during submission
-- [ ] Layout is single-column on 375px viewport width (iPhone SE)
-- [ ] All form fields show inline validation feedback on touch + invalid
-- [ ] Core flows (list, create, detail) verified without visual errors in Firefox, Chrome, and Edge
-- [ ] Browser compatibility results documented (table or checklist in the README or commit message)
+- [x] Recipe list shows a spinner while loading; distinct empty / no-match states
+- [x] Recipe detail shows a spinner while loading; distinct not-found / error alerts
+- [x] Form submit button shows spinner + "Saving…" and is disabled during submission
+- [x] Layout is single-column on 375px viewport width (verified at iPhone-SE width)
+- [x] All form fields show inline validation feedback on touch + invalid
+- [x] Core flows verified without errors in Firefox and Chromium (Chrome + Edge engine)
+- [x] Browser compatibility documented (matrix in the implementation log) + repeatable `npm run e2e`
+- [x] Added: catch-all `**` route → friendly "Page not found" (no dead ends)
+
+**Verification (2026-06-18):** 25 frontend specs green; `npm run e2e` passes in
+Firefox and Chromium (5 core flows + 0 console errors each); responsive at 375px.

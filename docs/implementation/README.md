@@ -31,3 +31,4 @@ implementation log to see how it played out in practice.
 | #11 | Search (debounced, server-side LIKE) | [11-search.md](11-search.md) |
 | #12 | AJAX hover preview (centrepiece) | [12-hover-preview.md](12-hover-preview.md) |
 | #13 | E-mail sending (optional) | [13-email-sending.md](13-email-sending.md) |
+| #14 | User-friendliness + cross-browser | [14-user-friendliness.md](14-user-friendliness.md) |
