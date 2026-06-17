@@ -68,6 +68,14 @@ return function (RouteBuilder $routes): void {
         $builder->get('/status', ['controller' => 'Status', 'action' => 'index']);
 
         /*
+         * Recipe read API (issue #5).
+         */
+        $builder->get('/recipes', ['controller' => 'Recipes', 'action' => 'index']);
+        $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
+
+        /*
          * Connect catchall routes for all controllers.
          *
          * The `fallbacks` method is a shortcut for
