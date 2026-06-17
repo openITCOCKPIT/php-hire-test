@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Test\TestCase\Controller;
 
+use Cake\TestSuite\EmailTrait;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
@@ -11,6 +12,7 @@ use Cake\TestSuite\TestCase;
  */
 class RecipesControllerTest extends TestCase
 {
+    use EmailTrait;
     use IntegrationTestTrait;
 
     protected array $fixtures = [
@@ -104,6 +106,35 @@ class RecipesControllerTest extends TestCase
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $titles = array_column($body['recipes'], 'title');
         $this->assertSame(['Chocolate cake', 'Pancakes'], $titles);
+    }
+
+    public function testSendMailDeliversToTheGivenAddress(): void
+    {
+        $this->post('/recipes/1/send-mail', ['email' => 'friend@example.com']);
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertTrue($body['sent']);
+        $this->assertMailCount(1);
+        $this->assertMailSentTo('friend@example.com');
+        $this->assertMailContainsHtml('Chocolate cake');
+    }
+
+    public function testSendMailInvalidEmailReturns422(): void
+    {
+        $this->post('/recipes/1/send-mail', ['email' => 'not-an-email']);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('valid e-mail');
+        $this->assertNoMailSent();
+    }
+
+    public function testSendMailUnknownRecipeReturns404(): void
+    {
+        $this->post('/recipes/9999/send-mail', ['email' => 'friend@example.com']);
+
+        $this->assertResponseCode(404);
+        $this->assertNoMailSent();
     }
 
     public function testViewReturnsSingleRecipeWithIngredients(): void

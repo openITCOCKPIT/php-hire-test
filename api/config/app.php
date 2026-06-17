@@ -4,6 +4,7 @@ use Cake\Cache\Engine\FileEngine;
 use Cake\Database\Connection;
 use Cake\Database\Driver\Mysql;
 use Cake\Log\Engine\FileLog;
+use Cake\Mailer\Transport\DebugTransport;
 use Cake\Mailer\Transport\MailTransport;
 use function Cake\Core\env;
 
@@ -221,7 +222,11 @@ return [
      */
     'EmailTransport' => [
         'default' => [
-            'className' => MailTransport::class,
+            // Default to the Debug transport (logs the email to logs/debug.log
+            // instead of sending), so the feature is verifiable in dev without a
+            // mail server. Set EMAIL_TRANSPORT_DEFAULT_CLASS=Cake\Mailer\Transport\MailTransport
+            // (or configure SMTP) in production.
+            'className' => env('EMAIL_TRANSPORT_DEFAULT_CLASS', DebugTransport::class),
             /*
              * The keys host, port, timeout, username, password, client and tls
              * are used in SMTP transports
@@ -252,7 +257,7 @@ return [
     'Email' => [
         'default' => [
             'transport' => 'default',
-            'from' => 'you@localhost',
+            'from' => env('EMAIL_FROM', 'recipes@example.com'),
             /*
              * Will by default be set to config value of App.encoding, if that exists otherwise to UTF-8.
              */

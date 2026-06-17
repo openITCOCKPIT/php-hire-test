@@ -70,6 +70,9 @@ return function (RouteBuilder $routes): void {
         $builder->get('/recipes/{id}/preview', ['controller' => 'Recipes', 'action' => 'preview'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);
+        $builder->post('/recipes/{id}/send-mail', ['controller' => 'Recipes', 'action' => 'sendMail'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
         $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);

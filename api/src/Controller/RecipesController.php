@@ -5,6 +5,9 @@ namespace App\Controller;
 
 use Cake\Http\Exception\NotFoundException;
 use Cake\Http\Response;
+use Cake\Log\Log;
+use Cake\Mailer\Mailer;
+use Cake\Validation\Validation;
 
 /**
  * Recipes API.
@@ -176,6 +179,50 @@ class RecipesController extends AppController
         $this->response = $this->response->withStatus(201);
         $this->set('recipe', $saved);
         $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['recipe']);
+
+        return null;
+    }
+
+    /**
+     * POST /recipes/{id}/send-mail — e-mail a recipe to a given address (#13).
+     *
+     * @param int $id Recipe id.
+     * @return \Cake\Http\Response|null A 422 response on an invalid e-mail, or null on success.
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function sendMail(int $id): ?Response
+    {
+        $recipe = $this->Recipes->find()
+            ->where(['Recipes.id' => $id])
+            ->contain('Ingredients')
+            ->first();
+
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $email = trim((string)$this->request->getData('email'));
+        if (!Validation::email($email)) {
+            return $this->jsonResponse(422, [
+                'errors' => ['email' => ['A valid e-mail address is required.']],
+            ]);
+        }
+
+        $mailer = new Mailer('default');
+        $mailer
+            ->setTo($email)
+            ->setSubject('Recipe: ' . $recipe->title)
+            ->setEmailFormat('html')
+            ->setViewVars(['recipe' => $recipe])
+            ->viewBuilder()->setTemplate('recipe')->setLayout('default');
+        $mailer->deliver();
+
+        // With the Debug transport nothing is actually sent; log a line so the
+        // delivery is verifiable in dev (logs/debug.log).
+        Log::info(sprintf('Recipe "%s" e-mailed to %s', $recipe->title, $email));
+
+        $this->set('sent', true);
+        $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['sent']);
 
         return null;
     }
