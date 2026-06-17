@@ -29,7 +29,8 @@ class Recipe extends Entity
     protected array $_accessible = [
         'title' => true,
         'description' => true,
-        'created' => true,
         'ingredients' => true,
+        // created is owned by the Timestamp behaviour, not client input.
+        'created' => false,
     ];
 }

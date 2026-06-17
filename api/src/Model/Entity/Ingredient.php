@@ -28,10 +28,11 @@ class Ingredient extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'recipe_id' => true,
         'name' => true,
         'amount' => true,
         'unit' => true,
-        'recipe' => true,
+        // recipe_id and recipe are owned by the association, not client input.
+        'recipe_id' => false,
+        'recipe' => false,
     ];
 }
