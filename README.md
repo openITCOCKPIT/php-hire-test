@@ -173,6 +173,12 @@ cd frontend && npm test                          # 25 specs
 cd frontend && npm run e2e                        # requires the app running
 ```
 
+**Trying the e-mail feature:** the Docker stack includes **Mailpit**, a local mail
+catcher. Open a recipe → *Share by e-mail* → enter an address → *Send*, then view
+the captured e-mail (full HTML, subject, recipient) at **http://localhost:8025**.
+Without Mailpit (leave `EMAIL_TRANSPORT_DEFAULT_URL` empty), the Debug transport
+logs each send to `logs/debug.log` instead.
+
 Tests run on every push via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ---

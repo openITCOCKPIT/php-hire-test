@@ -67,3 +67,16 @@ Send → "Recipe sent to friend@example.com."; server logged the send; 0 console
 - This was the optional, first-to-drop feature; it is complete, so nothing was
   cut. **Epic D is done.** Remaining: #14 (UX polish + cross-browser core flows)
   and #15 (full browser test, README, PR).
+
+## Follow-up — Mailpit (real inbox for viewing e-mails)
+
+The Debug transport proves a send happened but shows no rendered e-mail. Later, a
+**Mailpit** container was added to the stack so the actual e-mail is viewable in a
+web inbox (full HTML, subject, recipient). The transport switches to SMTP via
+`EMAIL_TRANSPORT_DEFAULT_URL=smtp://mailpit:1025`; leaving it empty falls back to
+the Debug transport. The web UI is at `http://localhost:8025` (8026 on this
+machine, because a native Mailpit already used 8025 — the SMTP port is internal so
+only the host web port needed changing). The PHPUnit `EmailTrait` tests are
+unaffected (they use the in-memory test transport). Verified: sending from the UI
+delivers an HTML e-mail to Mailpit including the ingredients and the
+temperature/duration metadata.

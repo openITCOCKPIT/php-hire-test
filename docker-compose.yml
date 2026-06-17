@@ -39,6 +39,8 @@ services:
       DATABASE_TEST_URL: ${DATABASE_TEST_URL}
       SECURITY_SALT: ${SECURITY_SALT}
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+      # Mail: when set (Docker stack), the Mailer sends over SMTP to Mailpit.
+      EMAIL_TRANSPORT_DEFAULT_URL: ${EMAIL_TRANSPORT_DEFAULT_URL}
     volumes:
       - ./api:/var/www/html/api
     depends_on:
@@ -63,6 +65,13 @@ services:
       - "${APP_PORT:-8080}:80"
     depends_on:
       - nginx
+
+  # Local mail catcher: the app sends to it over SMTP (:1025) and you read the
+  # captured e-mails — full HTML, subject, recipient — in the web UI (:8025).
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
 
 volumes:
   mysql-data:
