@@ -22,3 +22,4 @@ implementation log to see how it played out in practice.
 | #2 | CakePHP skeleton & `/status` endpoint | [02-cakephp-skeleton.md](02-cakephp-skeleton.md) |
 | #3 | Angular project, Bootstrap 5, CORS slice | [03-angular-project.md](03-angular-project.md) |
 | #4 | Database schema, migrations & seed | [04-database-schema.md](04-database-schema.md) |
+| #5 | Recipe read API (list & detail) | [05-recipe-read-api.md](05-recipe-read-api.md) |

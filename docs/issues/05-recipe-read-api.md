@@ -4,7 +4,7 @@
 **Feature reference:** Feature 1 (Browse through existing recipes)
 **Effort:** 2 h
 **Dependencies:** #4
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -75,14 +75,22 @@ CakePHP's exception handler automatically serialises `NotFoundException` to a JS
 
 ## Definition of Done
 
-- [ ] `GET /recipes` returns HTTP 200 with a JSON array of recipes including nested ingredients
-- [ ] `GET /recipes/1` returns HTTP 200 with the chocolate-cake recipe and its 5 ingredients
-- [ ] `GET /recipes/9999` returns HTTP 404 with a JSON error body
-- [ ] `created` field is serialised as ISO 8601 string
-- [ ] `amount` is returned as a decimal string (e.g. `"100.00"`)
-- [ ] Both endpoints tested with `curl` — output matches the documented response shape
+- [x] `GET /recipes` returns HTTP 200 with `{"recipes": [...]}` including nested ingredients
+- [x] `GET /recipes/1` returns HTTP 200 with the chocolate-cake recipe and its 5 ingredients
+- [x] `GET /recipes/9999` returns HTTP 404 with a JSON error body
+- [x] `created` field is serialised as ISO 8601 string
+- [x] `amount` is returned as a decimal string (e.g. `"100.00"`)
+- [x] Both endpoints tested with `curl` — output matches the documented response shape
+
+> **Deviation:** the rationale above leaned toward `NotFoundException` for the
+> 404. In practice CakePHP's exception renderer emits an **HTML** debug page in
+> debug mode, so `view()` returns a hand-built JSON 404 instead — reliable in
+> every mode. See `docs/implementation/05-recipe-read-api.md`.
 
 ## Tests
 
-- [ ] **PHPUnit (controller + fixtures):** `testIndex` asserts the list returns the seeded recipe with nested ingredients; `testView` asserts a single recipe with its 5 ingredients; `testViewNotFound` asserts HTTP 404 JSON for an unknown id.
-- [ ] Every test method has **real assertions** — no `markTestIncomplete` bake stubs left in the suite (a documented failure of an earlier challenge submission).
+- [x] **PHPUnit (controller + fixtures):** `testIndex` asserts the list returns recipes with nested ingredients and a decimal-string amount; `testView` asserts a single recipe with its ingredients and ISO-8601 `created`; `testViewUnknownIdReturnsJson404` asserts a JSON 404.
+- [x] Every test method has **real assertions** — no `markTestIncomplete` stubs (fixtures are records-only; schema built by the Migrator).
+
+**Verification (2026-06-17):** 15 tests / 44 assertions green · phpcs clean ·
+`curl` confirmed list (5 ingredients), detail, and JSON 404.
