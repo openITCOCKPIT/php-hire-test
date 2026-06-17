@@ -16,6 +16,8 @@ export interface Recipe {
   id: number;
   title: string;
   description: string | null;
+  temperature: number | null;
+  duration: number | null;
   created: string;
   ingredients: Ingredient[];
 }
@@ -35,9 +37,11 @@ export interface RecipeQueryParams {
   search?: string;
 }
 
-/** Payload for creating a recipe (issue #9). */
+/** Payload for creating or updating a recipe (issues #9 / #17). */
 export interface NewRecipe {
   title: string;
   description?: string;
+  temperature?: number | null;
+  duration?: number | null;
   ingredients: Array<{ name: string; amount: number; unit: string }>;
 }

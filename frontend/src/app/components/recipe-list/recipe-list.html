@@ -62,10 +62,13 @@
               >
             </h2>
             <p class="card-subtitle text-muted small mb-2">{{ recipe.created | date: 'dd.MM.yyyy' }}</p>
-            <p class="card-text small mb-0">
+            <p class="card-text small mb-1">
               {{ recipe.ingredients.length }}
               {{ recipe.ingredients.length === 1 ? 'ingredient' : 'ingredients' }}
             </p>
+            @if (recipe.duration != null) {
+              <span class="badge text-bg-light">⏱ {{ recipe.duration }} min</span>
+            }
           </div>
         </div>
       </div>

@@ -20,6 +20,17 @@
     </div>
     <p class="text-muted">{{ r.created | date: 'dd.MM.yyyy' }}</p>
 
+    @if (r.temperature != null || r.duration != null) {
+      <p class="mb-0">
+        @if (r.temperature != null) {
+          <span class="badge text-bg-light me-2">🌡 {{ r.temperature }} °C</span>
+        }
+        @if (r.duration != null) {
+          <span class="badge text-bg-light">⏱ {{ r.duration }} min</span>
+        }
+      </p>
+    }
+
     <h2 class="h5 mt-4">Ingredients</h2>
     <ul class="list-group mb-4">
       @for (ingredient of r.ingredients; track ingredient.id) {

@@ -22,6 +22,8 @@ export class RecipeForm {
   protected readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
     description: [''],
+    temperature: [null as number | null, [Validators.min(0), Validators.max(500)]],
+    duration: [null as number | null, [Validators.min(0), Validators.max(1440)]],
     ingredients: this.fb.array([this.createIngredient()]),
   });
 

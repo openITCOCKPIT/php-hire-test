@@ -18,6 +18,8 @@ describe('RecipeDetail', () => {
     id: 1,
     title: 'Chocolate cake',
     description: 'Bake it at 200°C.',
+    temperature: 200,
+    duration: 40,
     created: '2026-06-15T00:00:00+00:00',
     ingredients: [
       { id: 1, recipe_id: 1, name: 'sugar', amount: '100.00', unit: 'g' },
