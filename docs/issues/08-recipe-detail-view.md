@@ -4,7 +4,7 @@
 **Feature reference:** Feature 1 (Browse through existing recipes — full view)
 **Effort:** 1–2 h
 **Dependencies:** #7
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -54,13 +54,23 @@ Cards in the list view should be scannable — showing every ingredient would ma
 
 ## Definition of Done
 
-- [ ] Route `/recipes/1` renders the chocolate-cake detail page with title, description, date, and all 5 ingredients
-- [ ] Ingredient format is `"100g sugar"` / `"50g flour"` etc. (amount + unit + name)
-- [ ] `created` date renders in `dd.MM.yyyy` format
-- [ ] "← Back to list" link navigates to `/`
-- [ ] `/recipes/9999` shows a "Recipe not found" message (not a blank page or console error)
-- [ ] Recipe cards in the list view link to the correct detail route
+- [x] Route `/recipes/1` renders the chocolate-cake detail page with title, description, date, and all 5 ingredients
+- [x] Ingredient format is `"100g sugar"` / `"50g flour"` etc. (amount + unit + name)
+- [x] `created` date renders in `dd.MM.yyyy` format
+- [x] "← Back to list" link navigates to `/`
+- [x] `/recipes/9999` shows a "No recipe found" message (handled gracefully)
+- [x] Recipe cards in the list view link to the correct detail route
 
 ## Tests
 
-- [ ] **Jasmine/Karma:** `RecipeDetailComponent` spec loads a recipe by route param (mocked `ActivatedRoute`) and renders the ingredient list; a not-found (404) response renders the "Recipe not found" message instead of throwing.
+- [x] **Jasmine/Karma (3 specs):** `RecipeDetail` loads a recipe by route param (mocked `ActivatedRoute`), renders the formatted ingredients (`100g sugar`, `1.5l milk`), shows the not-found message on a 404, and reloads when the route id changes.
+- [x] **PHPUnit:** `testErrorResponseCarriesCorsHeader` locks in the CORS-on-error fix below.
+
+**Verification (2026-06-17):** browser-verified — detail page renders all 5
+ingredients + description; `/recipes/9999` shows "No recipe found".
+
+> **Backend bug found & fixed during this issue:** error responses (404/400/500)
+> lacked CORS headers because `CorsMiddleware` sat inside `ErrorHandlerMiddleware`,
+> so cross-origin the browser blocked the 404 and the SPA saw a network error
+> instead. Moved CORS to be the outermost middleware. See
+> `docs/implementation/08-recipe-detail-view.md`.
