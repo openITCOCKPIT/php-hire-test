@@ -40,12 +40,27 @@ async function run(name, launcher) {
     check('hover preview shows', await page.locator('.recipe-preview').isVisible());
     await page.mouse.move(0, 0);
 
-    // 4. Detail view
+    // 4. Sort (Title A–Z) re-orders the list
+    await page.selectOption('select[aria-label="Sort recipes"]', 'title-ASC');
+    await page.waitForTimeout(500);
+    const sorted = await page.locator('.card-title').allInnerTexts();
+    const isSorted = sorted.every((t, i) => i === 0 || sorted[i - 1].localeCompare(t) <= 0);
+    check('sort title A–Z orders the list', sorted.length > 1 ? isSorted : true);
+
+    // 5. Detail view
     await page.locator('.card-title a').first().click();
     await page.waitForSelector('article h1', { timeout: 5000 });
     check('detail view renders', (await page.locator('article .list-group-item').count()) > 0);
 
-    // 5. Create flow
+    // 6. Share-by-e-mail modal
+    await page.click('button:has-text("Share by e-mail")');
+    await page.waitForSelector('.modal.show', { timeout: 5000 });
+    await page.fill('#mailTo', `friend-${name}@example.com`);
+    await page.click('.modal-footer button:has-text("Send")');
+    await page.waitForSelector('.alert-success', { timeout: 5000 });
+    check('e-mail send shows success', await page.locator('.alert-success').isVisible());
+
+    // 7. Create flow
     await page.goto(`${BASE}/recipes/new`, { waitUntil: 'networkidle' });
     const unique = `XBrowser-${name}-${Math.floor(performance.now())}`;
     await page.fill('#title', unique);
