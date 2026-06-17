@@ -66,6 +66,10 @@ return function (RouteBuilder $routes): void {
          */
         $builder->get('/recipes', ['controller' => 'Recipes', 'action' => 'index']);
         $builder->post('/recipes', ['controller' => 'Recipes', 'action' => 'add']);
+        // Preview must precede /recipes/{id} so "{id}/preview" is not read as an id.
+        $builder->get('/recipes/{id}/preview', ['controller' => 'Recipes', 'action' => 'preview'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
         $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);

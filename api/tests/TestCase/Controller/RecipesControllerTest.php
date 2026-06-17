@@ -139,6 +139,48 @@ class RecipesControllerTest extends TestCase
         $this->assertHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     }
 
+    public function testPreviewReturnsTrimmedPayload(): void
+    {
+        $this->get('/recipes/1/preview');
+
+        $this->assertResponseOk();
+        $this->assertContentType('application/json');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertSame('Chocolate cake', $body['preview']['title']);
+        $this->assertArrayHasKey('descriptionExcerpt', $body['preview']);
+        $this->assertSame('100.00', $body['preview']['ingredients'][0]['amount']);
+    }
+
+    public function testPreviewCapsIngredientsAtFiveAndTruncatesDescription(): void
+    {
+        $recipes = $this->getTableLocator()->get('Recipes');
+        $recipe = $recipes->newEntity([
+            'title' => 'Big recipe',
+            'description' => str_repeat('x', 250),
+            'ingredients' => array_map(
+                fn ($i) => ['name' => "ing$i", 'amount' => 1, 'unit' => 'g'],
+                range(1, 6),
+            ),
+        ], ['associated' => ['Ingredients']]);
+        $recipes->saveOrFail($recipe);
+
+        $this->get("/recipes/{$recipe->id}/preview");
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertCount(5, $body['preview']['ingredients'], 'capped at 5');
+        $this->assertSame(201, mb_strlen($body['preview']['descriptionExcerpt']), '200 chars + ellipsis');
+        $this->assertStringEndsWith('…', $body['preview']['descriptionExcerpt']);
+    }
+
+    public function testPreviewUnknownIdReturnsJson404(): void
+    {
+        $this->get('/recipes/9999/preview');
+
+        $this->assertResponseCode(404);
+        $this->assertContentType('application/json');
+    }
+
     public function testAddCreatesRecipeWithIngredients(): void
     {
         $this->post('/recipes', [

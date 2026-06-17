@@ -90,6 +90,53 @@ class RecipesController extends AppController
     }
 
     /**
+     * GET /recipes/{id}/preview — a trimmed payload for the hover preview (#12).
+     *
+     * Deliberately smaller than the full view: the description is truncated to
+     * ~200 chars and only the first 5 ingredients are returned, because hovering
+     * is high-frequency and the popover only shows a glance.
+     *
+     * @param int $id Recipe id.
+     * @return void
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function preview(int $id): void
+    {
+        $recipe = $this->Recipes->find()
+            ->where(['Recipes.id' => $id])
+            ->contain('Ingredients')
+            ->first();
+
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $description = (string)$recipe->description;
+        $excerpt = mb_strlen($description) > 200
+            ? mb_substr($description, 0, 200) . '…'
+            : $description;
+
+        $ingredients = array_map(
+            fn ($ingredient) => [
+                'name' => $ingredient->name,
+                'amount' => $ingredient->amount,
+                'unit' => $ingredient->unit,
+            ],
+            array_slice($recipe->ingredients, 0, 5),
+        );
+
+        $preview = [
+            'id' => $recipe->id,
+            'title' => $recipe->title,
+            'ingredients' => $ingredients,
+            'descriptionExcerpt' => $excerpt,
+        ];
+
+        $this->set('preview', $preview);
+        $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['preview']);
+    }
+
+    /**
      * POST /recipes — create a recipe with its ingredients.
      *
      * Saves the recipe and its ingredients atomically (CakePHP wraps the
