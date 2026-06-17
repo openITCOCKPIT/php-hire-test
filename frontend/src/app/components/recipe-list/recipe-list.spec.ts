@@ -32,7 +32,7 @@ describe('RecipeList', () => {
     const fixture = TestBed.createComponent(RecipeList);
     fixture.detectChanges();
 
-    httpMock.expectOne(url).flush({ recipes: [recipe] });
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [recipe] });
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
@@ -47,7 +47,7 @@ describe('RecipeList', () => {
     const fixture = TestBed.createComponent(RecipeList);
     fixture.detectChanges();
 
-    httpMock.expectOne(url).flush({ recipes: [] });
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [] });
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('No recipes yet');
@@ -57,9 +57,31 @@ describe('RecipeList', () => {
     const fixture = TestBed.createComponent(RecipeList);
     fixture.detectChanges();
 
-    httpMock.expectOne(url).error(new ProgressEvent('network error'));
+    httpMock.expectOne((r) => r.url === url).error(new ProgressEvent('network error'));
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Could not load recipes');
+  });
+
+  it('requests the default sort on load and re-requests on sort change', () => {
+    const fixture = TestBed.createComponent(RecipeList);
+    const component = fixture.componentInstance as unknown as {
+      sort: string;
+      onSortChange: () => void;
+    };
+    fixture.detectChanges();
+
+    const first = httpMock.expectOne((r) => r.url === url);
+    expect(first.request.params.get('sort')).toBe('created');
+    expect(first.request.params.get('direction')).toBe('DESC');
+    first.flush({ recipes: [] });
+
+    component.sort = 'title-ASC';
+    component.onSortChange();
+
+    const second = httpMock.expectOne((r) => r.url === url);
+    expect(second.request.params.get('sort')).toBe('title');
+    expect(second.request.params.get('direction')).toBe('ASC');
+    second.flush({ recipes: [] });
   });
 });
