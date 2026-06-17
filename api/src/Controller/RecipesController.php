@@ -184,6 +184,71 @@ class RecipesController extends AppController
     }
 
     /**
+     * PUT /recipes/{id} — update a recipe and replace its ingredients (#17).
+     *
+     * Same validation and atomic-save guarantees as add(); the hasMany 'replace'
+     * save strategy deletes ingredients no longer present in the payload.
+     *
+     * @param int $id Recipe id.
+     * @return \Cake\Http\Response|null A 422 response on failure, or null to render the recipe.
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function edit(int $id): ?Response
+    {
+        $recipe = $this->Recipes->find()
+            ->where(['Recipes.id' => $id])
+            ->contain('Ingredients')
+            ->first();
+
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $data = (array)$this->request->getData();
+        $recipe = $this->Recipes->patchEntity($recipe, $data, [
+            'associated' => ['Ingredients'],
+        ]);
+
+        if (empty($recipe->ingredients)) {
+            $recipe->setError('ingredients', ['_required' => 'At least one ingredient is required.']);
+        }
+
+        if ($recipe->hasErrors() || !$this->Recipes->save($recipe)) {
+            return $this->jsonResponse(422, ['errors' => $recipe->getErrors()]);
+        }
+
+        $saved = $this->Recipes->find()
+            ->where(['Recipes.id' => $id])
+            ->contain('Ingredients')
+            ->first();
+
+        $this->set('recipe', $saved);
+        $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['recipe']);
+
+        return null;
+    }
+
+    /**
+     * DELETE /recipes/{id} — delete a recipe (its ingredients cascade away).
+     *
+     * @param int $id Recipe id.
+     * @return \Cake\Http\Response The JSON result.
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function delete(int $id): Response
+    {
+        $recipe = $this->Recipes->find()->where(['Recipes.id' => $id])->first();
+
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $this->Recipes->deleteOrFail($recipe);
+
+        return $this->jsonResponse(200, ['deleted' => true]);
+    }
+
+    /**
      * POST /recipes/{id}/send-mail — e-mail a recipe to a given address (#13).
      *
      * @param int $id Recipe id.

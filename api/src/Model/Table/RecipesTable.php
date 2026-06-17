@@ -54,6 +54,9 @@ class RecipesTable extends Table
         $this->hasMany('Ingredients', [
             'foreignKey' => 'recipe_id',
             'dependent' => true,
+            // On save, replace the whole ingredient set: editing a recipe (#17)
+            // deletes ingredients no longer present. Harmless on create.
+            'saveStrategy' => 'replace',
         ]);
     }
 

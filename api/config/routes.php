@@ -76,6 +76,12 @@ return function (RouteBuilder $routes): void {
         $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);
+        $builder->put('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'edit'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
+        $builder->delete('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'delete'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
 
         // No fallbacks(): this API only serves the explicit routes above; any
         // other path returns a JSON 404 via the error renderer.

@@ -346,6 +346,61 @@ class RecipesControllerTest extends TestCase
         $this->assertResponseContains('must not exceed');
     }
 
+    public function testEditUpdatesRecipeAndReplacesIngredients(): void
+    {
+        $this->put('/recipes/1', [
+            'title' => 'Chocolate cake (v2)',
+            'temperature' => 180,
+            'ingredients' => [['name' => 'cocoa', 'amount' => 75, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertSame('Chocolate cake (v2)', $body['recipe']['title']);
+        $this->assertSame(180, $body['recipe']['temperature']);
+        // ingredients fully replaced (was 3, now 1)
+        $this->assertCount(1, $body['recipe']['ingredients']);
+        $this->assertSame('cocoa', $body['recipe']['ingredients'][0]['name']);
+
+        // the old ingredients are gone, not orphaned
+        $remaining = $this->getTableLocator()->get('Ingredients')->find()->where(['recipe_id' => 1])->count();
+        $this->assertSame(1, $remaining);
+    }
+
+    public function testEditUnknownIdReturns404(): void
+    {
+        $this->put('/recipes/9999', [
+            'title' => 'x',
+            'ingredients' => [['name' => 'a', 'amount' => 1, 'unit' => 'g']],
+        ]);
+        $this->assertResponseCode(404);
+    }
+
+    public function testEditWithEmptyIngredientsReturns422(): void
+    {
+        $this->put('/recipes/1', ['title' => 'x', 'ingredients' => []]);
+        $this->assertResponseCode(422);
+    }
+
+    public function testDeleteRemovesRecipeAndCascadesIngredients(): void
+    {
+        $this->delete('/recipes/1');
+
+        $this->assertResponseOk();
+        $this->assertResponseContains('"deleted":true');
+
+        $recipes = $this->getTableLocator()->get('Recipes');
+        $this->assertFalse($recipes->exists(['id' => 1]));
+        $orphans = $this->getTableLocator()->get('Ingredients')->find()->where(['recipe_id' => 1])->count();
+        $this->assertSame(0, $orphans);
+    }
+
+    public function testDeleteUnknownIdReturns404(): void
+    {
+        $this->delete('/recipes/9999');
+        $this->assertResponseCode(404);
+    }
+
     public function testInvalidRecipeIsNotPersisted(): void
     {
         $recipes = $this->getTableLocator()->get('Recipes');
