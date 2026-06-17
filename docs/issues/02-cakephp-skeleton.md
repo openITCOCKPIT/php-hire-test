@@ -4,7 +4,7 @@
 **Feature reference:** —
 **Effort:** 1 h
 **Dependencies:** #1
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -44,13 +44,16 @@ CakePHP 5.x ships with dotenv support. Storing credentials in `.env` (excluded f
 
 ## Definition of Done
 
-- [ ] `GET /status` returns HTTP 200 with body `{"status":"ok"}`
-- [ ] MySQL connection is confirmed (CakePHP does not error on startup)
-- [ ] CORS headers present for `http://localhost:4200` on all API responses
-- [ ] `.env.example` committed, `.env` excluded via `.gitignore`
-- [ ] No hardcoded credentials in any committed file
+- [x] `GET /status` returns HTTP 200 with body `{"status":"ok"}`
+- [x] MySQL connection is confirmed (`migrations status` connects without error)
+- [x] CORS headers present for `http://localhost:4200` on all API responses
+- [x] `.env.example` committed, `.env` excluded via `.gitignore`
+- [x] No hardcoded credentials in any committed file
 
 ## Tests
 
-- [ ] **PHPUnit:** the test runner itself executes (`vendor/bin/phpunit` green on the skeleton) — establishes the backend test harness before any feature code.
-- [ ] An integration test hits `GET /status` and asserts HTTP 200 + body `{"status":"ok"}` — the first real test in the suite.
+- [x] **PHPUnit:** the test runner itself executes (`vendor/bin/phpunit` green — 9 tests, 25 assertions).
+- [x] An integration test hits `GET /status` and asserts HTTP 200 + body `{"status":"ok"}` (`StatusControllerTest`), plus a CORS-header assertion.
+
+**Verification (2026-06-17):** `curl /status` → `200 {"status":"ok"}` with CORS
+headers · CakePHP 5.3.6 on PHP 8.3.31 · MySQL 8.0.46 reachable · phpcs clean.
