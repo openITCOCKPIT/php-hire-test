@@ -1,84 +1,142 @@
-# We are hiring
-Check all our [vacancies](https://avendis.com/karriere/)
+# Recipe Collection
 
-# About AVENDIS GmbH
-
-AVENDIS provides IT infrastructure consulting and implementation, including cloud, on‑premise and hybrid concepts. The company delivers digital improvement projects and custom software focused on modern technology platforms and early prototyping. It designs and supports communication and collaboration solutions that connect systems and users.Allgeier IT Services also integrates and operates enterprise software, offers flexible managed services and IT outsourcing, and runs a security operations center to protect customer environments. In addition, it implements and operates various open source tools for IT documentation, monitoring, asset management, and service management
-
-**We are hiring PHP developers for our Open Source Monitoring Solution [openITCOCKPIT](http://openitcockpit.io/) based on Nagios, Naemon and Prometheus.**
-
-# Your task
-Your task is to create a recipe collection where a user is able to browse through existing recipes or create a new one.
-
-Recipes should be able to be sent as e-mail to a given e-mail address.
-
-**Notice: Use plain PHP or [CakePHP](http://cakephp.org/) as framework, Typescript and [Angular](https://angular.dev/)!**
+A recipe collection web app: REST API backend in **PHP 8.3 / MySQL 8.0**, frontend in **Angular / TypeScript / Bootstrap 5**.
 
 ## Features
 
-1. Browse through existing recipes
-2. Create new recipes with ingredients
-3. Send recipes via E-Mail to a friend (optional)
-4. Sort the list of recipes
-4. Search recipes
-5. Load a recipe preview via AJAX on hover the title.
-6. Make it user friendly
+- **Browse** — List all recipes (title, description, ingredients, temperature, duration)
+- **Create** — Create a new recipe with a dynamic ingredients list
+- **Edit / Delete** — Update or remove an existing recipe
+- **Sort** — Sort by title, creation date, or duration (asc/desc)
+- **Search** — Real-time search (title + description) with debounce
+- **Hover Preview** — Hovering over a recipe card loads a preview via a dedicated AJAX request (`/api/recipes/{id}/preview`) without blocking the UI
+- **Send by Email** — Send a recipe by email as formatted HTML via `mail()`
 
-### Example recipe:
-*Created: 15.06.2026*
+## Tech stack
 
-**Chocolate cake:**
+| Layer        | Technology                                |
+|--------------|--------------------------------------------|
+| Backend      | PHP 8.3 (no framework, PDO + custom router) |
+| Database     | MySQL 8.0                                   |
+| Frontend     | Angular 19 (standalone components), TypeScript, RxJS |
+| UI           | Bootstrap 5 + Bootstrap Icons               |
 
-100g sugar
+## Project structure
 
-50g flour
+```
+recipe-app/
+├── backend/
+│   ├── public/index.php          # Entry point + router
+│   ├── src/
+│   │   ├── Config/Database.php   # PDO connection
+│   │   ├── Controller/RecipeController.php
+│   │   └── Model/RecipeModel.php
+│   ├── composer.json
+│   ├── .env.example
+│   └── nginx.conf
+├── database/
+│   └── schema.sql                # Schema + sample data
+└── frontend/
+    ├── src/
+    │   ├── app/
+    │   │   ├── components/
+    │   │   │   ├── recipe-list/      # Browse + search + sort + preview
+    │   │   │   ├── recipe-card/      # Reusable card
+    │   │   │   ├── recipe-detail/    # Detail view + email send + delete
+    │   │   │   └── recipe-form/      # Create / Edit
+    │   │   ├── models/recipe.model.ts
+    │   │   ├── services/recipe.service.ts
+    │   │   ├── app.component.ts
+    │   │   ├── app.config.ts
+    │   │   └── app.routes.ts
+    │   ├── environments/
+    │   ├── index.html
+    │   ├── main.ts
+    │   └── styles.scss
+    ├── angular.json
+    ├── package.json
+    └── proxy.conf.json
+```
 
-2 eggs
+## Installation
 
-150g chocolate
+### Prerequisites
 
-50ml milk
+- PHP >= 8.3 with the `pdo_mysql` extension
+- MySQL >= 8.0
+- Node.js >= 18 and npm
+- A locally configured mail server (or `sendmail`) for the send-by-email feature
 
-**Description:**
+### 1. Database
 
-Bake it at 200°C for 40 minutes.
+```bash
+mysql -u root -p < database/schema.sql
+```
 
-This is an example recipe for our hiring test - Om Nom Nom
+This creates the `recipe_collection` database, the `recipes` / `ingredients` tables, and inserts 5 sample recipes.
 
+### 2. Backend
 
-*This is just a example we never tasted, so maybe don't bake it :)*
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your MySQL credentials
+composer install   # optional, no external dependencies are currently required
 
-# Requirements
-This are must have requirements, your application needs to fulfill:
-* PHP >= 8.3
-* MySQL >= 8.0
-* Bootstrap 5.x
-* Typescript and Angular
-* HTML5
-* GitHub
-* Supported Browsers: Firefox, Chrome and Microsoft Edge
+# Run the built-in PHP dev server
+php -S localhost:8080 -t public
+```
 
-# Hints
-* We love JSON :)
-* Our development environment is based on Ubuntu virtual machines (26.04 LTS). It would be great if you have some experiences using Ubuntu
-* openITCOCKPIT gets developed using GitHub and Jenkins
+The API is then available at `http://localhost:8080/api/recipes`.
 
-# Nice to have (but not a must have)
-* Nagios, Naemon, Icinga or Prometheus experiences
-* Knowledge of [CakePHP](http://cakephp.org/)
-* Nginx and PHP-FPM experiences
-* Most of our developers are used to macOS or Windows as their desktop operating system
+### 3. Frontend
 
-# Workflow
-**Important notice: Before you start, send us your application at Bewerbung@avendis.com and wait for our feedback!**
+```bash
+cd frontend
+npm install
+npm start
+```
 
-1. Fork this repository
-2. Create a new branch and name it with your GitHub username
-3. When you're done, create a pull request
+The app is served at `http://localhost:4200` and automatically proxies `/api/*` calls to `http://localhost:8080` (see `proxy.conf.json`).
 
-*If you don't want to create a pull request, send us a zip file with your local git repository*
+## API endpoints
 
-**Commit everything to the repository we need to test your code.**
+| Method  | Route                                | Description                              |
+|---------|----------------------------------------|--------------------------------------------|
+| GET     | `/api/recipes?search=&sort_by=&sort_dir=` | List recipes (search + sort)           |
+| GET     | `/api/recipes/{id}`                  | Recipe detail + ingredients               |
+| GET     | `/api/recipes/{id}/preview`          | Lightweight preview (for hover)           |
+| POST    | `/api/recipes`                       | Create a recipe                            |
+| PUT     | `/api/recipes/{id}`                  | Update a recipe                            |
+| DELETE  | `/api/recipes/{id}`                  | Delete a recipe                            |
+| POST    | `/api/recipes/{id}/send-email`       | Send the recipe by email                  |
 
-# License
-MIT License
+### Sample payload (POST/PUT)
+
+```json
+{
+  "title": "Chocolate Cake",
+  "description": "A rich and moist chocolate cake...",
+  "temperature": 200,
+  "duration": 40,
+  "ingredients": [
+    { "amount": "100g", "name": "sugar" },
+    { "amount": "2", "name": "eggs" }
+  ]
+}
+```
+
+## Implementation notes
+
+- **Security**: all SQL queries use prepared PDO statements (no SQL injection). User input in the HTML email is escaped via `htmlspecialchars`.
+- **Validation**: title and description are required on the backend (HTTP 422 with per-field error details) and on the frontend.
+- **Sorting**: strict whitelist of sortable columns on the backend to prevent any injection via the `sort_by`/`sort_dir` parameters.
+- **Hover preview**: implemented with RxJS (`debounceTime` + `switchMap`) to avoid spamming the API when quickly moving the mouse across multiple cards, and to automatically cancel stale requests.
+- **Transactions**: creating/updating a recipe and its ingredients is wrapped in a PDO transaction to guarantee data consistency.
+
+## Known limitations / possible improvements
+
+- No authentication (out of scope for this technical test)
+- Email sending uses PHP's native `mail()`; in production, an SMTP-based service (PHPMailer, Symfony Mailer, or a third-party provider) would be preferable
+- No pagination on the recipe list (acceptable for a test-sized dataset, worth adding if the collection grows)
+- No automated tests included (PHPUnit on the backend, Jasmine/Karma on the Angular side would be the natural choices)
