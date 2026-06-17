@@ -25,39 +25,50 @@ and why, including bugs found during review and how they were fixed).
 
 ## Architecture
 
+In production the SPA and API share a **single origin**: one nginx serves the
+built Angular app and proxies `/api` to the backend — so there is no CORS and one
+URL to open.
+
 ```
-┌─────────────────────────┐        JSON / HTTP        ┌──────────────────────────┐
-│  Angular SPA (frontend)  │  ───────────────────────▶ │  CakePHP API (api)        │
-│  http://localhost:4200   │  ◀─────────────────────── │  http://localhost:8765    │
-│  Bootstrap 5, RxJS       │      CORS                  │  nginx + PHP-FPM 8.3      │
-└─────────────────────────┘                            └────────────┬─────────────┘
-                                                                     │ PDO
-                                                          ┌──────────▼───────────┐
-                                                          │  MySQL 8.0            │
-                                                          └──────────────────────┘
+                          http://localhost:8080
+┌──────────────────────────────────────────────────────────┐
+│  frontend (nginx)                                          │
+│   /        → Angular SPA (Bootstrap 5, RxJS)               │
+│   /api/... → proxied ─────────────┐                        │
+└───────────────────────────────────┼────────────────────────┘
+                                     ▼
+                        ┌──────────────────────────┐
+                        │  nginx → PHP-FPM 8.3       │
+                        │  CakePHP JSON API (/api)   │
+                        └────────────┬──────────────┘
+                                     │ PDO
+                          ┌──────────▼───────────┐
+                          │  MySQL 8.0            │
+                          └──────────────────────┘
 ```
 
-Two separate parts, talking JSON over HTTP:
+- **`api/`** — CakePHP 5 as a **pure JSON REST API** under `/api`. It speaks only
+  JSON; the backend root returns a small JSON index, not a web page.
+- **`frontend/`** — the Angular single-page app. In the container it is served by
+  nginx, which also proxies `/api` to the backend (single origin, no CORS).
 
-- **`api/`** — CakePHP 5 as a **pure JSON REST API**. It speaks only JSON; opening
-  it in a browser returns a small JSON index, not a web page.
-- **`frontend/`** — the Angular single-page app. **This is the user interface** —
-  open `http://localhost:4200` to use the application. It fetches its data from
-  the API.
+> **Which URL do I open?** The whole app is **`http://localhost:8080`**.
+> During development you can instead run the Angular dev server on
+> `http://localhost:4200`, which talks cross-origin to the backend on
+> `http://localhost:8765/api`.
 
-> **Which URL do I open?** The website is **`http://localhost:4200`** (Angular).
-> `http://localhost:8765` is the backend API — useful for `curl`, not for browsing.
-
-### Endpoints
+### Endpoints (under `/api`)
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/status` | health check → `{"status":"ok"}` |
-| GET | `/recipes` | list, supports `?search=`, `?sort=title\|created`, `?direction=ASC\|DESC` |
-| GET | `/recipes/{id}` | one recipe with ingredients |
-| GET | `/recipes/{id}/preview` | trimmed payload for the hover preview |
-| POST | `/recipes` | create a recipe + ingredients |
-| POST | `/recipes/{id}/send-mail` | e-mail the recipe to an address |
+| GET | `/api/status` | health check → `{"status":"ok"}` |
+| GET | `/api/recipes` | list, supports `?search=`, `?sort=title\|created`, `?direction=ASC\|DESC` |
+| GET | `/api/recipes/{id}` | one recipe with ingredients |
+| GET | `/api/recipes/{id}/preview` | trimmed payload for the hover preview |
+| POST | `/api/recipes` | create a recipe + ingredients |
+| PUT | `/api/recipes/{id}` | update a recipe + replace ingredients |
+| DELETE | `/api/recipes/{id}` | delete a recipe (ingredients cascade) |
+| POST | `/api/recipes/{id}/send-mail` | e-mail the recipe to an address |
 
 ---
 
@@ -74,22 +85,23 @@ the production-equivalent alternative.
 # 1. Provide environment variables (credentials, ports)
 cp .env.example .env
 
-# 2. Build and start nginx + PHP-FPM 8.3 + MySQL 8.0
+# 2. Build and start everything (MySQL, PHP-FPM, the API nginx and the SPA)
 docker compose up -d --build
 
-# 3. Install backend dependencies and set up the database
+# 3. Set up the database
 docker compose exec php composer install
 docker compose exec php bin/cake.php migrations migrate
 docker compose exec php bin/cake.php seeds run RecipesSeed   # the chocolate-cake example
 
-# 4. Start the frontend (Angular dev server)
-cd frontend
-npm install
-npm start
+# 4. Open the app — a single URL, SPA + proxied API:
+#    http://localhost:8080
+```
 
-# 5. Open the app
-#    Frontend (the website):  http://localhost:4200
-#    API (JSON):              http://localhost:8765
+For **frontend development** (live reload), run the Angular dev server instead of
+using the container:
+
+```bash
+cd frontend && npm install && npm start   # http://localhost:4200 → API on :8765/api
 ```
 
 > If `localhost:3306` is already taken by a local MySQL/MariaDB, change
@@ -182,7 +194,8 @@ the key ones in brief:
 | Sorting & search | **Server-side via the ORM** | Works across the whole dataset (not just rendered rows); sort columns are whitelisted (a column name can't be a bound parameter → SQL-injection safety). |
 | Search input | **`debounceTime(300)` + `switchMap`** | One request per pause in typing; `switchMap` cancels stale requests so a slow earlier response never overwrites a newer one. |
 | Hover preview | **`switchMap` + cache + dedicated `/preview` endpoint** | The centrepiece. Debounce avoids requests for titles merely passed over; `switchMap` cancels superseded requests; a `Map` cache means re-hovering makes no second request; the dedicated endpoint keeps the high-frequency payload small. |
-| CORS | **Outermost middleware** | So error responses (404/400/500) also carry CORS headers — otherwise the browser blocks them cross-origin. |
+| CORS | **Outermost middleware** | So error responses (404/400/500) also carry CORS headers — otherwise the browser blocks them cross-origin. Only needed for the dev workflow; the container is single-origin. |
+| Deployment | **Single origin** — one nginx serves the SPA and proxies `/api` | One URL, no CORS in production. The API lives under `/api` so client routes (`/recipes/5`) and API endpoints (`/api/recipes/5`) never collide; deep-link refresh works via `try_files … /index.html`. |
 | E-mail transport | **Debug transport (env-driven)** | Verifiable in dev without a mail server (logged to `logs/debug.log`); a `.env` switch enables real SMTP in production. |
 
 ### A note on Symfony → CakePHP

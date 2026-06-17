@@ -33,3 +33,6 @@ implementation log to see how it played out in practice.
 | #13 | E-mail sending (optional) | [13-email-sending.md](13-email-sending.md) |
 | #14 | User-friendliness + cross-browser | [14-user-friendliness.md](14-user-friendliness.md) |
 | #15 | Final browser test & documentation | [15-final-browser-test.md](15-final-browser-test.md) |
+| #16 | Recipe metadata (temperature & duration) | [16-recipe-metadata.md](16-recipe-metadata.md) |
+| #17 | Edit & delete recipes | [17-edit-delete-recipes.md](17-edit-delete-recipes.md) |
+| #18 | Containerise the frontend (single origin) | [18-containerise-frontend.md](18-containerise-frontend.md) |

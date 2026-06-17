@@ -57,6 +57,17 @@ Each issue below is a self-contained implementation unit. Work through them in o
 | [#14](14-user-friendliness.md) | User-friendliness | 2–3 h | ✅ done |
 | [#15](15-final-browser-test.md) | Final browser test & documentation | 1–2 h | ✅ done |
 
+### Epic F — Post-review enrichment
+
+Added after analysing the competing submissions, to close real gaps (no AI
+feature was added — out of scope by request).
+
+| # | Title | Effort | Status |
+|---|---|---|---|
+| [#16](16-recipe-metadata.md) | Recipe metadata (temperature & duration) | 1 h | ✅ done |
+| [#17](17-edit-delete-recipes.md) | Edit & delete recipes | 2 h | ✅ done |
+| [#18](18-containerise-frontend.md) | Containerise the frontend (single origin) | 2 h | ✅ done |
+
 ---
 
 ## Critical Path
