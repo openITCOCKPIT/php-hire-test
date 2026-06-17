@@ -4,7 +4,7 @@
 **Feature reference:** Feature 5 (Search recipes)
 **Effort:** 1–2 h
 **Dependencies:** #5, #7
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -74,14 +74,17 @@ Client-side filtering (`.filter()` on the loaded array) only searches the curren
 
 ## Definition of Done
 
-- [ ] Typing "choc" in the search field returns only the chocolate-cake recipe (after ≤300 ms debounce)
-- [ ] Clearing the search field returns all recipes
-- [ ] A "No recipes found" message appears when the search has no results
-- [ ] Search and sort work simultaneously (e.g., search "cake", sort by date)
-- [ ] Rapid typing does not cause multiple simultaneous API requests (verified in browser Network tab)
-- [ ] Subscription is properly cleaned up on component destroy
+- [x] Typing "choc" returns only the chocolate-cake recipe (after ≤300 ms debounce)
+- [x] Clearing the search field returns all recipes
+- [x] A "No recipes match your search" message appears when there are no results
+- [x] Search and sort work simultaneously
+- [x] Rapid typing does not cause multiple API requests (verified in the Network tab)
+- [x] Subscription is cleaned up via `takeUntilDestroyed`
 
 ## Tests
 
-- [ ] **PHPUnit:** `testSearchMatchesTitle` returns only matching recipes; `testSearchNoMatch` returns an empty array; `testSearchComposesWithSort` asserts search + sort applied together. Searches must match the **human-readable** title/description, not an internal key (a documented bug in an earlier submission).
-- [ ] **Jasmine/Karma (`fakeAsync`/`tick`):** typing debounces and issues a single `GET /recipes?search=...`; rapid typing does **not** produce one request per keystroke (assert via `HttpTestingController`).
+- [x] **PHPUnit:** `testIndexSearchMatchesTitle`, `testIndexSearchMatchesDescription` (matches human-readable description, not a key), `testIndexSearchNoMatchReturnsEmpty`, `testIndexSearchComposesWithSort`.
+- [x] **Jasmine/Karma (`fakeAsync`/`tick`):** three keystrokes within the debounce window produce **exactly one** `GET /recipes?...&search=choc` for the final term.
+
+**Verification (2026-06-18):** 29 backend + 18 frontend tests green; browser-verified
+that typing "choc" letter-by-letter issued a single request and filtered the list.

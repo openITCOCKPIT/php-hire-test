@@ -28,3 +28,4 @@ implementation log to see how it played out in practice.
 | #8 | Detail view (+ CORS-on-error fix) | [08-recipe-detail-view.md](08-recipe-detail-view.md) |
 | #9 | Create recipe form (Epic C complete) | [09-create-recipe-form.md](09-create-recipe-form.md) |
 | #10 | Sorting (server-side, whitelisted) | [10-sorting.md](10-sorting.md) |
+| #11 | Search (debounced, server-side LIKE) | [11-search.md](11-search.md) |

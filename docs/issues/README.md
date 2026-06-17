@@ -46,7 +46,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 | # | Title | Effort | Status |
 |---|---|---|---|
 | [#10](10-sorting.md) | Sorting | 1–2 h | ✅ done |
-| [#11](11-search.md) | Search | 1–2 h | ⬜ open |
+| [#11](11-search.md) | Search | 1–2 h | ✅ done |
 | [#12](12-hover-preview.md) | AJAX hover preview *(centrepiece)* | 2–3 h | ⬜ open |
 | [#13](13-email-sending.md) | E-mail sending *(optional — first to drop)* | 1–2 h | ⬜ open |
 
