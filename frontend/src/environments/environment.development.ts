@@ -4,5 +4,7 @@
  */
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8765',
+  // Dev: the Angular dev server (:4200) talks cross-origin to the Dockerised
+  // backend (:8765); the API lives under /api.
+  apiBaseUrl: 'http://localhost:8765/api',
 };

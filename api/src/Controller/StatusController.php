@@ -39,10 +39,10 @@ class StatusController extends AppController
                 'name' => 'Recipe Collection API',
                 'documentation' => 'The user interface is the Angular app (see README).',
                 'endpoints' => [
-                    'GET /status',
-                    'GET /recipes',
-                    'GET /recipes/{id}',
-                    'POST /recipes',
+                    'GET /api/status',
+                    'GET /api/recipes',
+                    'GET /api/recipes/{id}',
+                    'POST /api/recipes',
                 ],
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }

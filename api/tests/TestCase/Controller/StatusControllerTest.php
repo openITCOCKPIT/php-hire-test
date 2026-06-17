@@ -15,7 +15,7 @@ class StatusControllerTest extends TestCase
 
     public function testStatusReturnsOkJson(): void
     {
-        $this->get('/status');
+        $this->get('/api/status');
 
         $this->assertResponseOk();
         $this->assertContentType('application/json');
@@ -24,7 +24,7 @@ class StatusControllerTest extends TestCase
 
     public function testStatusSendsCorsHeader(): void
     {
-        $this->get('/status');
+        $this->get('/api/status');
 
         $this->assertHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     }

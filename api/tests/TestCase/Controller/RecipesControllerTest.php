@@ -22,7 +22,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexReturnsRecipesWithIngredients(): void
     {
-        $this->get('/recipes');
+        $this->get('/api/recipes');
 
         $this->assertResponseOk();
         $this->assertContentType('application/json');
@@ -41,7 +41,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexSortsByTitleAscending(): void
     {
-        $this->get('/recipes?sort=title&direction=ASC');
+        $this->get('/api/recipes?sort=title&direction=ASC');
 
         $this->assertResponseOk();
         $body = (array)json_decode((string)$this->_response->getBody(), true);
@@ -51,7 +51,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexSortsByCreatedDescendingByDefault(): void
     {
-        $this->get('/recipes');
+        $this->get('/api/recipes');
 
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $titles = array_column($body['recipes'], 'title');
@@ -61,7 +61,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexRejectsInjectedSortAndFallsBack(): void
     {
-        $this->get('/recipes?sort=title;DROP TABLE recipes&direction=evil');
+        $this->get('/api/recipes?sort=title;DROP TABLE recipes&direction=evil');
 
         // Unknown sort/direction must not error; it falls back to the default order.
         $this->assertResponseOk();
@@ -71,7 +71,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexSearchMatchesTitle(): void
     {
-        $this->get('/recipes?search=choc');
+        $this->get('/api/recipes?search=choc');
 
         $this->assertResponseOk();
         $body = (array)json_decode((string)$this->_response->getBody(), true);
@@ -82,7 +82,7 @@ class RecipesControllerTest extends TestCase
     public function testIndexSearchMatchesDescription(): void
     {
         // "fry" appears only in the Pancakes description, not its title.
-        $this->get('/recipes?search=fry');
+        $this->get('/api/recipes?search=fry');
 
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $titles = array_column($body['recipes'], 'title');
@@ -91,7 +91,7 @@ class RecipesControllerTest extends TestCase
 
     public function testIndexSearchNoMatchReturnsEmpty(): void
     {
-        $this->get('/recipes?search=zzz-nothing');
+        $this->get('/api/recipes?search=zzz-nothing');
 
         $this->assertResponseOk();
         $body = (array)json_decode((string)$this->_response->getBody(), true);
@@ -101,7 +101,7 @@ class RecipesControllerTest extends TestCase
     public function testIndexSearchComposesWithSort(): void
     {
         // Both recipes contain "a"; sorted by title ascending.
-        $this->get('/recipes?search=a&sort=title&direction=ASC');
+        $this->get('/api/recipes?search=a&sort=title&direction=ASC');
 
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $titles = array_column($body['recipes'], 'title');
@@ -110,7 +110,7 @@ class RecipesControllerTest extends TestCase
 
     public function testSendMailDeliversToTheGivenAddress(): void
     {
-        $this->post('/recipes/1/send-mail', ['email' => 'friend@example.com']);
+        $this->post('/api/recipes/1/send-mail', ['email' => 'friend@example.com']);
 
         $this->assertResponseOk();
         $body = (array)json_decode((string)$this->_response->getBody(), true);
@@ -122,7 +122,7 @@ class RecipesControllerTest extends TestCase
 
     public function testSendMailInvalidEmailReturns422(): void
     {
-        $this->post('/recipes/1/send-mail', ['email' => 'not-an-email']);
+        $this->post('/api/recipes/1/send-mail', ['email' => 'not-an-email']);
 
         $this->assertResponseCode(422);
         $this->assertResponseContains('valid e-mail');
@@ -131,7 +131,7 @@ class RecipesControllerTest extends TestCase
 
     public function testSendMailUnknownRecipeReturns404(): void
     {
-        $this->post('/recipes/9999/send-mail', ['email' => 'friend@example.com']);
+        $this->post('/api/recipes/9999/send-mail', ['email' => 'friend@example.com']);
 
         $this->assertResponseCode(404);
         $this->assertNoMailSent();
@@ -139,7 +139,7 @@ class RecipesControllerTest extends TestCase
 
     public function testViewReturnsSingleRecipeWithIngredients(): void
     {
-        $this->get('/recipes/1');
+        $this->get('/api/recipes/1');
 
         $this->assertResponseOk();
         $this->assertContentType('application/json');
@@ -153,7 +153,7 @@ class RecipesControllerTest extends TestCase
 
     public function testViewUnknownIdReturnsJson404(): void
     {
-        $this->get('/recipes/9999');
+        $this->get('/api/recipes/9999');
 
         $this->assertResponseCode(404);
         $this->assertContentType('application/json');
@@ -164,7 +164,7 @@ class RecipesControllerTest extends TestCase
     {
         // Thrown-exception responses (404) must also get CORS headers, or the
         // browser blocks them and the SPA cannot read the status.
-        $this->get('/recipes/9999');
+        $this->get('/api/recipes/9999');
 
         $this->assertResponseCode(404);
         $this->assertHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -172,7 +172,7 @@ class RecipesControllerTest extends TestCase
 
     public function testPreviewReturnsTrimmedPayload(): void
     {
-        $this->get('/recipes/1/preview');
+        $this->get('/api/recipes/1/preview');
 
         $this->assertResponseOk();
         $this->assertContentType('application/json');
@@ -196,7 +196,7 @@ class RecipesControllerTest extends TestCase
         ], ['associated' => ['Ingredients']]);
         $recipes->saveOrFail($recipe);
 
-        $this->get("/recipes/{$recipe->id}/preview");
+        $this->get("/api/recipes/{$recipe->id}/preview");
 
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $this->assertCount(5, $body['preview']['ingredients'], 'capped at 5');
@@ -206,7 +206,7 @@ class RecipesControllerTest extends TestCase
 
     public function testPreviewUnknownIdReturnsJson404(): void
     {
-        $this->get('/recipes/9999/preview');
+        $this->get('/api/recipes/9999/preview');
 
         $this->assertResponseCode(404);
         $this->assertContentType('application/json');
@@ -214,7 +214,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddCreatesRecipeWithIngredients(): void
     {
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Omelette',
             'description' => 'Beat and fry.',
             'ingredients' => [
@@ -237,7 +237,7 @@ class RecipesControllerTest extends TestCase
 
     public function testViewIncludesTemperatureAndDuration(): void
     {
-        $this->get('/recipes/1');
+        $this->get('/api/recipes/1');
 
         $body = (array)json_decode((string)$this->_response->getBody(), true);
         $this->assertSame(200, $body['recipe']['temperature']);
@@ -246,7 +246,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddPersistsTemperatureAndDuration(): void
     {
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Roast',
             'temperature' => 180,
             'duration' => 90,
@@ -261,7 +261,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddRejectsOutOfRangeTemperature(): void
     {
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Too hot',
             'temperature' => 600,
             'ingredients' => [['name' => 'x', 'amount' => 1, 'unit' => 'g']],
@@ -273,7 +273,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddMissingTitleReturns422(): void
     {
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'ingredients' => [['name' => 'x', 'amount' => 1, 'unit' => 'g']],
         ]);
 
@@ -284,7 +284,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddNegativeAmountReturns422(): void
     {
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Bad amount',
             'ingredients' => [['name' => 'x', 'amount' => -5, 'unit' => 'g']],
         ]);
@@ -295,7 +295,7 @@ class RecipesControllerTest extends TestCase
 
     public function testAddEmptyIngredientsReturns422(): void
     {
-        $this->post('/recipes', ['title' => 'No ingredients', 'ingredients' => []]);
+        $this->post('/api/recipes', ['title' => 'No ingredients', 'ingredients' => []]);
 
         $this->assertResponseCode(422);
         $this->assertResponseContains('At least one ingredient');
@@ -309,7 +309,7 @@ class RecipesControllerTest extends TestCase
         $recipes = $this->getTableLocator()->get('Recipes');
         $before = $recipes->find()->count();
 
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Broken',
             'ingredients' => ['name' => 'eggs', 'amount' => 3, 'unit' => 'pcs'],
         ]);
@@ -324,7 +324,7 @@ class RecipesControllerTest extends TestCase
         $recipes = $this->getTableLocator()->get('Recipes');
         $before = $recipes->find()->count();
 
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Ghost',
             'ingredients' => ['not-an-object'],
         ]);
@@ -337,7 +337,7 @@ class RecipesControllerTest extends TestCase
     {
         // 9999999 exceeds DECIMAL(8,2)'s max (999999.99); must be a clean 422,
         // not a 500 database error.
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Overflow',
             'ingredients' => [['name' => 'x', 'amount' => 9999999, 'unit' => 'g']],
         ]);
@@ -348,7 +348,7 @@ class RecipesControllerTest extends TestCase
 
     public function testEditUpdatesRecipeAndReplacesIngredients(): void
     {
-        $this->put('/recipes/1', [
+        $this->put('/api/recipes/1', [
             'title' => 'Chocolate cake (v2)',
             'temperature' => 180,
             'ingredients' => [['name' => 'cocoa', 'amount' => 75, 'unit' => 'g']],
@@ -369,7 +369,7 @@ class RecipesControllerTest extends TestCase
 
     public function testEditUnknownIdReturns404(): void
     {
-        $this->put('/recipes/9999', [
+        $this->put('/api/recipes/9999', [
             'title' => 'x',
             'ingredients' => [['name' => 'a', 'amount' => 1, 'unit' => 'g']],
         ]);
@@ -378,13 +378,13 @@ class RecipesControllerTest extends TestCase
 
     public function testEditWithEmptyIngredientsReturns422(): void
     {
-        $this->put('/recipes/1', ['title' => 'x', 'ingredients' => []]);
+        $this->put('/api/recipes/1', ['title' => 'x', 'ingredients' => []]);
         $this->assertResponseCode(422);
     }
 
     public function testDeleteRemovesRecipeAndCascadesIngredients(): void
     {
-        $this->delete('/recipes/1');
+        $this->delete('/api/recipes/1');
 
         $this->assertResponseOk();
         $this->assertResponseContains('"deleted":true');
@@ -397,7 +397,7 @@ class RecipesControllerTest extends TestCase
 
     public function testDeleteUnknownIdReturns404(): void
     {
-        $this->delete('/recipes/9999');
+        $this->delete('/api/recipes/9999');
         $this->assertResponseCode(404);
     }
 
@@ -406,7 +406,7 @@ class RecipesControllerTest extends TestCase
         $recipes = $this->getTableLocator()->get('Recipes');
         $before = $recipes->find()->count();
 
-        $this->post('/recipes', [
+        $this->post('/api/recipes', [
             'title' => 'Should not persist',
             'ingredients' => [['name' => 'x', 'amount' => -5, 'unit' => 'g']],
         ]);

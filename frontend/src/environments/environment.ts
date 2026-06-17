@@ -5,5 +5,7 @@
  */
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://localhost:8765',
+  // Same-origin: the SPA and API are served by one nginx (issue #18); the API
+  // lives under /api.
+  apiBaseUrl: '/api',
 };

@@ -55,15 +55,18 @@ return function (RouteBuilder $routes): void {
          * website — the UI is the Angular app). Replaces the CakePHP skeleton home.
          */
         $builder->get('/', ['controller' => 'Status', 'action' => 'home']);
+    });
 
-        /*
-         * Health-check endpoint (issue #2): GET /status -> {"status":"ok"}
-         */
+    /*
+     * All resources live under /api so that, when the SPA and API are served from
+     * a single origin (issue #18), the Angular client routes (e.g. /recipes/5)
+     * and the API endpoints (/api/recipes/5) never collide.
+     */
+    $routes->scope('/api', function (RouteBuilder $builder): void {
+        // Health-check endpoint (issue #2): GET /api/status -> {"status":"ok"}
         $builder->get('/status', ['controller' => 'Status', 'action' => 'index']);
 
-        /*
-         * Recipe read API (issue #5).
-         */
+        // Recipe read API (issue #5) and write/edit/delete (#6/#17).
         $builder->get('/recipes', ['controller' => 'Recipes', 'action' => 'index']);
         $builder->post('/recipes', ['controller' => 'Recipes', 'action' => 'add']);
         // Preview must precede /recipes/{id} so "{id}/preview" is not read as an id.
