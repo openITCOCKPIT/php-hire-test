@@ -32,3 +32,4 @@ implementation log to see how it played out in practice.
 | #12 | AJAX hover preview (centrepiece) | [12-hover-preview.md](12-hover-preview.md) |
 | #13 | E-mail sending (optional) | [13-email-sending.md](13-email-sending.md) |
 | #14 | User-friendliness + cross-browser | [14-user-friendliness.md](14-user-friendliness.md) |
+| #15 | Final browser test & documentation | [15-final-browser-test.md](15-final-browser-test.md) |

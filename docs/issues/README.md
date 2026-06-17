@@ -55,7 +55,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 | # | Title | Effort | Status |
 |---|---|---|---|
 | [#14](14-user-friendliness.md) | User-friendliness | 2–3 h | ✅ done |
-| [#15](15-final-browser-test.md) | Final browser test & documentation | 1–2 h | ⬜ open |
+| [#15](15-final-browser-test.md) | Final browser test & documentation | 1–2 h | ✅ done |
 
 ---
 
