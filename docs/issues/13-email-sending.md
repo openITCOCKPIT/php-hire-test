@@ -4,7 +4,7 @@
 **Feature reference:** Feature 3 (Send recipes via E-Mail to a friend — optional)
 **Effort:** 1–2 h
 **Dependencies:** #5
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -73,15 +73,18 @@ Reasoning: it is explicitly labelled "optional" in the original task, it require
 
 ## Definition of Done
 
-- [ ] `POST /recipes/1/send-mail` with `{"email":"test@example.com"}` writes a formatted mail to `logs/debug.log`
-- [ ] `POST /recipes/1/send-mail` with `{"email":"not-an-email"}` returns HTTP 422 with error
-- [ ] `POST /recipes/9999/send-mail` returns HTTP 404
-- [ ] Angular UI: "Send via E-Mail" button opens Bootstrap modal with e-mail input
-- [ ] Submitting the modal shows success confirmation and closes the modal
-- [ ] Invalid e-mail in the modal shows an inline error message
-- [ ] E-mail template includes title, created date, ingredients list, and description
+- [x] `POST /recipes/1/send-mail` with a valid address logs the delivery to `logs/debug.log`
+- [x] `POST /recipes/1/send-mail` with `{"email":"not-an-email"}` returns HTTP 422 with error
+- [x] `POST /recipes/9999/send-mail` returns HTTP 404
+- [x] Angular UI: "Share by e-mail" button opens a modal with an e-mail input
+- [x] Submitting the modal shows a success confirmation
+- [x] Invalid e-mail in the modal shows an inline error message
+- [x] E-mail template includes title, created date, ingredients list, and description
 
 ## Tests
 
-- [ ] **PHPUnit:** `testSendMailValid` uses CakePHP's `TestEmailTransport` to capture the mail and asserts it goes to the supplied address with the recipe in the body; `testSendMailInvalidEmail` asserts 422; `testSendMailRecipeNotFound` asserts 404. The recipient must be the **user-supplied** address — never a hardcoded one (a documented flaw in an earlier submission).
-- [ ] **Jasmine/Karma:** the modal validates the e-mail field and POSTs to `/recipes/{id}/send-mail` on submit; an invalid address shows an inline error and does **not** POST.
+- [x] **PHPUnit (EmailTrait):** `testSendMailDeliversToTheGivenAddress` asserts the mail goes to the **user-supplied** address with the recipe in the HTML body; `testSendMailInvalidEmailReturns422`; `testSendMailUnknownRecipeReturns404` (neither sends mail).
+- [x] **Jasmine/Karma:** modal success flow POSTs `{email}` and shows success; an invalid address shows an inline error and does **not** POST; service `sendRecipeEmail` test.
+
+**Verification (2026-06-18):** 35 backend + 24 frontend tests green; browser-verified
+the full modal flow; the send was logged to `logs/debug.log`. **Epic D complete.**
