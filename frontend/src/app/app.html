@@ -1,0 +1,20 @@
+<div class="container py-5">
+  <h1 class="mb-4">{{ title() }}</h1>
+
+  <div
+    class="alert"
+    [class.alert-secondary]="apiStatus() === 'loading'"
+    [class.alert-success]="apiStatus() === 'ok'"
+    [class.alert-danger]="apiStatus() === 'error'"
+  >
+    @if (apiStatus() === 'loading') {
+      Checking API connection…
+    } @else if (apiStatus() === 'ok') {
+      API reachable — the backend <code>/status</code> endpoint returned "ok".
+    } @else {
+      API not reachable. Is the backend running and is CORS configured?
+    }
+  </div>
+
+  <router-outlet />
+</div>

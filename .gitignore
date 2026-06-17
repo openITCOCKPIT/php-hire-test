@@ -1,14 +1,10 @@
 # Environment / secrets
 .env
 
-# Angular / Node (added in issue #3)
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.angular/
-
 # OS / editor noise
 .DS_Store
 *.log
 
-# Note: the CakePHP app under api/ has its own api/.gitignore that handles
-# vendor/, tmp/, logs/ and config/app_local.php.
+# Note: api/ and frontend/ each ship their own .gitignore that handles their
+# dependencies and build output (vendor/, node_modules/, dist/, tmp/, logs/,
+# .angular/, config/app_local.php).
