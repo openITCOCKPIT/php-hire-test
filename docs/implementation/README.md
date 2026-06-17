@@ -24,3 +24,4 @@ implementation log to see how it played out in practice.
 | #4 | Database schema, migrations & seed | [04-database-schema.md](04-database-schema.md) |
 | #5 | Recipe read API (list & detail) | [05-recipe-read-api.md](05-recipe-read-api.md) |
 | #6 | Recipe write API (create + validation) | [06-recipe-write-api.md](06-recipe-write-api.md) |
+| #7 | RecipeService & recipe list (MVP) | [07-recipe-list-component.md](07-recipe-list-component.md) |

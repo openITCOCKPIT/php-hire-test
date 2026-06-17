@@ -4,7 +4,7 @@
 **Feature reference:** Feature 1 (Browse through existing recipes)
 **Effort:** 2 h
 **Dependencies:** #5, #3
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -60,14 +60,22 @@ Type definitions are cheapest to write when the API shape is first consumed. Wri
 
 ## Definition of Done
 
-- [ ] `RecipeService` compiles without TypeScript errors
-- [ ] `RecipeListComponent` displays the chocolate-cake recipe (from the DB seed) as a Bootstrap card
-- [ ] Route `/` renders `RecipeListComponent`
-- [ ] "New Recipe" button is visible and links to `/recipes/new` (even if the route is not implemented yet)
-- [ ] `created` date displays in `dd.MM.yyyy` format
-- [ ] `async` pipe used in the template (no manual `.subscribe()` without cleanup)
+- [x] `RecipeService` compiles without TypeScript errors
+- [x] `RecipeList` displays the chocolate-cake recipe (from the DB seed) as a Bootstrap card
+- [x] Route `/` renders `RecipeList`
+- [x] "New Recipe" button is visible and links to `/recipes/new` (route built in #9)
+- [x] `created` date displays in `dd.MM.yyyy` format
+- [x] No leaking subscription (see deviation below)
+
+> **Deviation:** the spec suggested the `async` pipe. This uses **signals**
+> (`recipes`, `state`) with a single `getRecipes()` subscription instead — the
+> modern Angular pattern, and equally leak-free (HttpClient observables complete
+> after one emission). Signals also drive the loading/error/empty states cleanly.
 
 ## Tests
 
-- [ ] **Jasmine/Karma:** `RecipeService` spec uses `HttpTestingController` to assert `getRecipes()` calls `GET /recipes` and maps the response, and `getRecipe(id)` calls `GET /recipes/{id}`.
-- [ ] `RecipeListComponent` spec renders a card from a mocked service and displays the `created` date in `dd.MM.yyyy` format.
+- [x] **Jasmine/Karma (8 specs):** `RecipeService` asserts `getRecipes()`/`getRecipe()` call the right URLs, map the envelope, and forward sort/search params; `RecipeList` asserts a card renders with `dd.MM.yyyy`, plus the empty and error states; the shell renders the navbar brand.
+
+**Verification (2026-06-17):** browser-verified via Playwright — chocolate-cake
+card with date `15.06.2026` and "5 ingredients", `GET /recipes` 200, 0 console
+errors. **MVP milestone reached.**

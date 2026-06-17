@@ -37,7 +37,7 @@ Each issue below is a self-contained implementation unit. Work through them in o
 
 | # | Title | Effort | Status |
 |---|---|---|---|
-| [#7](07-recipe-list-component.md) | RecipeService & display list | 2 h | ⬜ open |
+| [#7](07-recipe-list-component.md) | RecipeService & display list | 2 h | ✅ done |
 | [#8](08-recipe-detail-view.md) | Detail view | 1–2 h | ⬜ open |
 | [#9](09-create-recipe-form.md) | Create recipe (form) | 2–3 h | ⬜ open |
 
