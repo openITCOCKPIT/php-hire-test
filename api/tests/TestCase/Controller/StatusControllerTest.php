@@ -28,4 +28,22 @@ class StatusControllerTest extends TestCase
 
         $this->assertHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     }
+
+    public function testRootReturnsJsonApiIndex(): void
+    {
+        $this->get('/');
+
+        $this->assertResponseOk();
+        $this->assertContentType('application/json');
+        $this->assertResponseContains('Recipe Collection API');
+        $this->assertResponseContains('/recipes');
+    }
+
+    public function testUnknownRouteReturnsJson404(): void
+    {
+        $this->get('/does-not-exist');
+
+        $this->assertResponseCode(404);
+        $this->assertContentType('application/json');
+    }
 }

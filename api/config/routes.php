@@ -51,16 +51,10 @@ return function (RouteBuilder $routes): void {
 
     $routes->scope('/', function (RouteBuilder $builder): void {
         /*
-         * Here, we are connecting '/' (base path) to a controller called 'Pages',
-         * its action called 'display', and we pass a param to select the view file
-         * to use (in this case, templates/Pages/home.php)...
+         * Root: a small JSON index of the API (this backend is a JSON API, not a
+         * website — the UI is the Angular app). Replaces the CakePHP skeleton home.
          */
-        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
-
-        /*
-         * ...and connect the rest of 'Pages' controller's URLs.
-         */
-        $builder->connect('/pages/*', 'Pages::display');
+        $builder->get('/', ['controller' => 'Status', 'action' => 'home']);
 
         /*
          * Health-check endpoint (issue #2): GET /status -> {"status":"ok"}
@@ -76,20 +70,8 @@ return function (RouteBuilder $routes): void {
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);
 
-        /*
-         * Connect catchall routes for all controllers.
-         *
-         * The `fallbacks` method is a shortcut for
-         *
-         * ```
-         * $builder->connect('/{controller}', ['action' => 'index']);
-         * $builder->connect('/{controller}/{action}/*', []);
-         * ```
-         *
-         * It is NOT recommended to use fallback routes after your initial prototyping phase!
-         * See https://book.cakephp.org/5/en/development/routing.html#fallbacks-method for more information
-         */
-        $builder->fallbacks();
+        // No fallbacks(): this API only serves the explicit routes above; any
+        // other path returns a JSON 404 via the error renderer.
     });
 
     /*

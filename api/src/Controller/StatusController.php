@@ -23,4 +23,27 @@ class StatusController extends AppController
             ->withType('application/json')
             ->withStringBody((string)json_encode(['status' => 'ok']));
     }
+
+    /**
+     * GET / -> a small JSON index of the API.
+     *
+     * The backend is a JSON API, not a website — the user-facing UI is the
+     * Angular app. Hitting the root in a browser therefore returns this index
+     * rather than an HTML page, pointing at the available endpoints.
+     */
+    public function home(): Response
+    {
+        return $this->response
+            ->withType('application/json')
+            ->withStringBody((string)json_encode([
+                'name' => 'Recipe Collection API',
+                'documentation' => 'The user interface is the Angular app (see README).',
+                'endpoints' => [
+                    'GET /status',
+                    'GET /recipes',
+                    'GET /recipes/{id}',
+                    'POST /recipes',
+                ],
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
 }
