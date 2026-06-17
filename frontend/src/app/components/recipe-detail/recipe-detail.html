@@ -12,7 +12,12 @@
   <div class="alert alert-danger">Could not load the recipe. Please try again.</div>
 } @else if (recipe(); as r) {
   <article>
-    <h1 class="h3">{{ r.title }}</h1>
+    <div class="d-flex justify-content-between align-items-start">
+      <h1 class="h3">{{ r.title }}</h1>
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="openMailModal()">
+        Share by e-mail
+      </button>
+    </div>
     <p class="text-muted">{{ r.created | date: 'dd.MM.yyyy' }}</p>
 
     <h2 class="h5 mt-4">Ingredients</h2>
@@ -27,4 +32,51 @@
       <p style="white-space: pre-line">{{ r.description }}</p>
     }
   </article>
+
+  @if (mailModalOpen()) {
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title h5">Share “{{ r.title }}”</h2>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeMailModal()"></button>
+          </div>
+          <div class="modal-body">
+            @if (mailState() === 'sent') {
+              <div class="alert alert-success mb-0">Recipe sent to {{ mailTo }}.</div>
+            } @else {
+              <label for="mailTo" class="form-label">Friend’s e-mail address</label>
+              <input
+                id="mailTo"
+                type="email"
+                class="form-control"
+                [class.is-invalid]="mailError()"
+                placeholder="friend@example.com"
+                [(ngModel)]="mailTo"
+                (keyup.enter)="sendMail()"
+              />
+              @if (mailError()) {
+                <div class="invalid-feedback d-block">{{ mailError() }}</div>
+              }
+            }
+          </div>
+          <div class="modal-footer">
+            @if (mailState() === 'sent') {
+              <button type="button" class="btn btn-primary" (click)="closeMailModal()">Done</button>
+            } @else {
+              <button type="button" class="btn btn-link" (click)="closeMailModal()">Cancel</button>
+              <button type="button" class="btn btn-primary" [disabled]="mailState() === 'sending'" (click)="sendMail()">
+                @if (mailState() === 'sending') {
+                  <span class="spinner-border spinner-border-sm me-1"></span> Sending…
+                } @else {
+                  Send
+                }
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 }

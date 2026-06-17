@@ -1,16 +1,19 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RecipeService } from '../../services/recipe.service';
 import { Ingredient, Recipe } from '../../models/recipe';
 
 type LoadState = 'loading' | 'loaded' | 'notfound' | 'error';
+type MailState = 'idle' | 'sending' | 'sent' | 'error';
 
 @Component({
   selector: 'app-recipe-detail',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, FormsModule],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.scss',
 })
@@ -21,6 +24,12 @@ export class RecipeDetail implements OnInit {
 
   protected readonly recipe = signal<Recipe | null>(null);
   protected readonly state = signal<LoadState>('loading');
+
+  // E-mail share modal (#13).
+  protected readonly mailModalOpen = signal(false);
+  protected readonly mailState = signal<MailState>('idle');
+  protected readonly mailError = signal<string | null>(null);
+  protected mailTo = '';
 
   ngOnInit(): void {
     // paramMap (not snapshot) so navigating directly between detail pages reloads.
@@ -45,5 +54,41 @@ export class RecipeDetail implements OnInit {
   protected formatIngredient(ingredient: Ingredient): string {
     const amount = parseFloat(ingredient.amount);
     return `${amount}${ingredient.unit} ${ingredient.name}`;
+  }
+
+  // --- E-mail share (#13) ---
+
+  protected openMailModal(): void {
+    this.mailTo = '';
+    this.mailState.set('idle');
+    this.mailError.set(null);
+    this.mailModalOpen.set(true);
+  }
+
+  protected closeMailModal(): void {
+    this.mailModalOpen.set(false);
+  }
+
+  protected sendMail(): void {
+    const recipe = this.recipe();
+    if (!recipe) {
+      return;
+    }
+    // Client-side check; the server validates authoritatively.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.mailTo.trim())) {
+      this.mailError.set('Please enter a valid e-mail address.');
+      return;
+    }
+
+    this.mailState.set('sending');
+    this.mailError.set(null);
+    this.recipeService.sendRecipeEmail(recipe.id, this.mailTo.trim()).subscribe({
+      next: () => this.mailState.set('sent'),
+      error: (err: HttpErrorResponse) => {
+        this.mailState.set('error');
+        const serverMsg = err.status === 422 ? err.error?.errors?.email?.[0] : null;
+        this.mailError.set(serverMsg ?? 'Could not send the e-mail. Please try again.');
+      },
+    });
   }
 }

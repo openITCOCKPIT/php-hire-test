@@ -68,4 +68,13 @@ describe('RecipeService', () => {
 
     expect(result?.title).toBe('Chocolate cake');
   });
+
+  it('sendRecipeEmail(id, email) POSTs to the send-mail endpoint', () => {
+    service.sendRecipeEmail(1, 'friend@example.com').subscribe();
+
+    const req = httpMock.expectOne(`${base}/1/send-mail`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ email: 'friend@example.com' });
+    req.flush({ sent: true });
+  });
 });

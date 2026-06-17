@@ -84,4 +84,45 @@ describe('RecipeDetail', () => {
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Pancakes');
   });
+
+  it('sends the recipe by e-mail and shows a success message', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const component = fixture.componentInstance as unknown as {
+      openMailModal: () => void;
+      sendMail: () => void;
+      mailTo: string;
+      mailState: () => string;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+
+    component.openMailModal();
+    component.mailTo = 'friend@example.com';
+    component.sendMail();
+
+    const req = httpMock.expectOne(`${base}/1/send-mail`);
+    expect(req.request.body).toEqual({ email: 'friend@example.com' });
+    req.flush({ sent: true });
+
+    expect(component.mailState()).toBe('sent');
+  });
+
+  it('rejects an invalid e-mail without calling the API', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const component = fixture.componentInstance as unknown as {
+      openMailModal: () => void;
+      sendMail: () => void;
+      mailTo: string;
+      mailError: () => string | null;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+
+    component.openMailModal();
+    component.mailTo = 'not-an-email';
+    component.sendMail();
+
+    httpMock.expectNone(`${base}/1/send-mail`);
+    expect(component.mailError()).toBeTruthy();
+  });
 });

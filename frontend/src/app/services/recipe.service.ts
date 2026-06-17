@@ -52,4 +52,9 @@ export class RecipeService {
       .post<{ recipe: Recipe }>(this.baseUrl, recipe)
       .pipe(map((response) => response.recipe));
   }
+
+  /** POST /recipes/{id}/send-mail — e-mail a recipe to an address (issue #13). */
+  sendRecipeEmail(id: number, email: string): Observable<{ sent: boolean }> {
+    return this.http.post<{ sent: boolean }>(`${this.baseUrl}/${id}/send-mail`, { email });
+  }
 }
