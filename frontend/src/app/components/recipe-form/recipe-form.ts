@@ -1,9 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RecipeService } from '../../services/recipe.service';
-import { NewRecipe } from '../../models/recipe';
+import { NewRecipe, Recipe } from '../../models/recipe';
 
 @Component({
   selector: 'app-recipe-form',
@@ -11,13 +11,15 @@ import { NewRecipe } from '../../models/recipe';
   templateUrl: './recipe-form.html',
   styleUrl: './recipe-form.scss',
 })
-export class RecipeForm {
+export class RecipeForm implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
+  protected readonly editId = signal<number | null>(null);
 
   protected readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
@@ -26,6 +28,41 @@ export class RecipeForm {
     duration: [null as number | null, [Validators.min(0), Validators.max(1440)]],
     ingredients: this.fb.array([this.createIngredient()]),
   });
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
+      this.editId.set(id);
+      this.recipeService.getRecipe(id).subscribe({
+        next: (recipe) => this.populate(recipe),
+        error: () => this.submitError.set('Could not load the recipe to edit.'),
+      });
+    }
+  }
+
+  /** Fill the form (incl. rebuilding the ingredient rows) from an existing recipe. */
+  private populate(recipe: Recipe): void {
+    this.form.patchValue({
+      title: recipe.title,
+      description: recipe.description ?? '',
+      temperature: recipe.temperature,
+      duration: recipe.duration,
+    });
+    this.ingredients.clear();
+    recipe.ingredients.forEach((ingredient) => {
+      const group = this.createIngredient();
+      group.patchValue({
+        name: ingredient.name,
+        amount: parseFloat(ingredient.amount),
+        unit: ingredient.unit,
+      });
+      this.ingredients.push(group);
+    });
+    if (this.ingredients.length === 0) {
+      this.ingredients.push(this.createIngredient());
+    }
+  }
 
   protected get ingredients(): FormArray {
     return this.form.get('ingredients') as FormArray;
@@ -58,8 +95,14 @@ export class RecipeForm {
     this.submitting.set(true);
     this.submitError.set(null);
 
-    this.recipeService.createRecipe(this.form.value as NewRecipe).subscribe({
-      next: () => this.router.navigate(['/']),
+    const payload = this.form.value as NewRecipe;
+    const id = this.editId();
+    const request$ = id
+      ? this.recipeService.updateRecipe(id, payload)
+      : this.recipeService.createRecipe(payload);
+
+    request$.subscribe({
+      next: () => this.router.navigate(id ? ['/recipes', id] : ['/']),
       error: (err: HttpErrorResponse) => {
         this.submitting.set(false);
         this.applyServerErrors(err);

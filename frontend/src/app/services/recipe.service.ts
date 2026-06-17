@@ -53,6 +53,18 @@ export class RecipeService {
       .pipe(map((response) => response.recipe));
   }
 
+  /** PUT /recipes/{id} — update a recipe and replace its ingredients (issue #17). */
+  updateRecipe(id: number, recipe: NewRecipe): Observable<Recipe> {
+    return this.http
+      .put<{ recipe: Recipe }>(`${this.baseUrl}/${id}`, recipe)
+      .pipe(map((response) => response.recipe));
+  }
+
+  /** DELETE /recipes/{id} — delete a recipe (issue #17). */
+  deleteRecipe(id: number): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}`);
+  }
+
   /** POST /recipes/{id}/send-mail — e-mail a recipe to an address (issue #13). */
   sendRecipeEmail(id: number, email: string): Observable<{ sent: boolean }> {
     return this.http.post<{ sent: boolean }>(`${this.baseUrl}/${id}/send-mail`, { email });

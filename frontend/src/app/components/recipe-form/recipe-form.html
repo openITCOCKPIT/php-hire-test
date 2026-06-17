@@ -1,4 +1,4 @@
-<h1 class="h3 mb-4">New Recipe</h1>
+<h1 class="h3 mb-4">{{ editId() ? 'Edit Recipe' : 'New Recipe' }}</h1>
 
 @if (submitError()) {
   <div class="alert alert-danger">{{ submitError() }}</div>
@@ -103,7 +103,7 @@
       @if (submitting()) {
         <span class="spinner-border spinner-border-sm me-1"></span> Saving…
       } @else {
-        Save recipe
+        {{ editId() ? 'Save changes' : 'Save recipe' }}
       }
     </button>
     <a routerLink="/" class="btn btn-link">Cancel</a>

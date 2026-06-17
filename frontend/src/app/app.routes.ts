@@ -8,6 +8,7 @@ export const routes: Routes = [
   { path: '', component: RecipeList },
   // 'recipes/new' must precede 'recipes/:id' so "new" is not matched as an id.
   { path: 'recipes/new', component: RecipeForm },
+  { path: 'recipes/:id/edit', component: RecipeForm },
   { path: 'recipes/:id', component: RecipeDetail },
   // Catch-all: any unknown path renders a friendly not-found page.
   { path: '**', component: NotFound },

@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RecipeForm } from './recipe-form';
 import { environment } from '../../../environments/environment';
@@ -86,5 +86,67 @@ describe('RecipeForm', () => {
     );
 
     expect(c().form.get('title')?.hasError('server')).toBeTrue();
+  });
+});
+
+describe('RecipeForm (edit mode)', () => {
+  let httpMock: HttpTestingController;
+  let router: Router;
+  const url = `${environment.apiBaseUrl}/recipes`;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [RecipeForm],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ id: '7' }) } },
+        },
+      ],
+    }).compileComponents();
+    httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+  });
+
+  afterEach(() => httpMock.verify());
+
+  it('loads the recipe, prefills the form, and PUTs on submit', () => {
+    const navigateSpy = spyOn(router, 'navigate');
+    const fixture = TestBed.createComponent(RecipeForm);
+    fixture.detectChanges();
+
+    // ngOnInit loads the recipe to edit
+    httpMock.expectOne(`${url}/7`).flush({
+      recipe: {
+        id: 7,
+        title: 'Stew',
+        description: 'Slow',
+        temperature: 90,
+        duration: 120,
+        created: '',
+        ingredients: [
+          { id: 1, recipe_id: 7, name: 'beef', amount: '1.00', unit: 'kg' },
+          { id: 2, recipe_id: 7, name: 'water', amount: '2.00', unit: 'l' },
+        ],
+      },
+    });
+
+    const component = fixture.componentInstance as unknown as {
+      form: import('@angular/forms').FormGroup;
+      ingredients: import('@angular/forms').FormArray;
+      submit: () => void;
+    };
+    expect(component.form.get('title')?.value).toBe('Stew');
+    expect(component.ingredients.length).toBe(2);
+
+    component.submit();
+    const req = httpMock.expectOne(`${url}/7`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({ recipe: { id: 7, title: 'Stew', description: 'Slow', temperature: 90, duration: 120, created: '', ingredients: [] } });
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/recipes', 7]);
   });
 });

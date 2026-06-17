@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
@@ -107,6 +107,36 @@ describe('RecipeDetail', () => {
     req.flush({ sent: true });
 
     expect(component.mailState()).toBe('sent');
+  });
+
+  it('deletes the recipe after confirmation and navigates to the list', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate');
+    spyOn(window, 'confirm').and.returnValue(true);
+    const component = fixture.componentInstance as unknown as { deleteRecipe: () => void };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+
+    component.deleteRecipe();
+
+    const req = httpMock.expectOne(`${base}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ deleted: true });
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('does not delete when the confirmation is cancelled', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    spyOn(window, 'confirm').and.returnValue(false);
+    const component = fixture.componentInstance as unknown as { deleteRecipe: () => void };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+
+    component.deleteRecipe();
+
+    httpMock.expectNone((r) => r.method === 'DELETE');
   });
 
   it('rejects an invalid e-mail without calling the API', () => {

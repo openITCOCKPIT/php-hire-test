@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -19,6 +19,7 @@ type MailState = 'idle' | 'sending' | 'sent' | 'error';
 })
 export class RecipeDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly recipeService = inject(RecipeService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -30,6 +31,9 @@ export class RecipeDetail implements OnInit {
   protected readonly mailState = signal<MailState>('idle');
   protected readonly mailError = signal<string | null>(null);
   protected mailTo = '';
+
+  // Delete (#17).
+  protected readonly deleting = signal(false);
 
   ngOnInit(): void {
     // paramMap (not snapshot) so navigating directly between detail pages reloads.
@@ -54,6 +58,23 @@ export class RecipeDetail implements OnInit {
   protected formatIngredient(ingredient: Ingredient): string {
     const amount = parseFloat(ingredient.amount);
     return `${amount}${ingredient.unit} ${ingredient.name}`;
+  }
+
+  // --- Delete (#17) ---
+
+  protected deleteRecipe(): void {
+    const recipe = this.recipe();
+    if (!recipe || !confirm(`Delete “${recipe.title}”? This cannot be undone.`)) {
+      return;
+    }
+    this.deleting.set(true);
+    this.recipeService.deleteRecipe(recipe.id).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => {
+        this.deleting.set(false);
+        this.state.set('error');
+      },
+    });
   }
 
   // --- E-mail share (#13) ---

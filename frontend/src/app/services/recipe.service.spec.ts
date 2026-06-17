@@ -71,6 +71,28 @@ describe('RecipeService', () => {
     expect(result?.title).toBe('Chocolate cake');
   });
 
+  it('updateRecipe(id, data) PUTs and unwraps the recipe', () => {
+    let result: Recipe | undefined;
+    service
+      .updateRecipe(1, { title: 'Edited', ingredients: [{ name: 'x', amount: 1, unit: 'g' }] })
+      .subscribe((r) => (result = r));
+
+    const req = httpMock.expectOne(`${base}/1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({ recipe: { ...sampleRecipe, title: 'Edited' } });
+    expect(result?.title).toBe('Edited');
+  });
+
+  it('deleteRecipe(id) DELETEs the recipe', () => {
+    let result: { deleted: boolean } | undefined;
+    service.deleteRecipe(1).subscribe((r) => (result = r));
+
+    const req = httpMock.expectOne(`${base}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ deleted: true });
+    expect(result?.deleted).toBeTrue();
+  });
+
   it('sendRecipeEmail(id, email) POSTs to the send-mail endpoint', () => {
     service.sendRecipeEmail(1, 'friend@example.com').subscribe();
 
