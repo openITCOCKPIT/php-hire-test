@@ -57,4 +57,15 @@ describe('RecipeService', () => {
     httpMock.expectOne(`${base}/1`).flush({ recipe: sampleRecipe });
     expect(result?.id).toBe(1);
   });
+
+  it('getRecipePreview(id) calls the preview endpoint and unwraps it', () => {
+    let result: { id: number; title: string } | undefined;
+    service.getRecipePreview(1).subscribe((p) => (result = p));
+
+    const req = httpMock.expectOne(`${base}/1/preview`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ preview: { id: 1, title: 'Chocolate cake', ingredients: [], descriptionExcerpt: 'x' } });
+
+    expect(result?.title).toBe('Chocolate cake');
+  });
 });

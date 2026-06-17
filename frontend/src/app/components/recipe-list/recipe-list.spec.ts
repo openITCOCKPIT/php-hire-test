@@ -85,6 +85,54 @@ describe('RecipeList', () => {
     second.flush({ recipes: [] });
   });
 
+  it('caches the hover preview: hovering the same title twice fires one request', fakeAsync(() => {
+    const fixture = TestBed.createComponent(RecipeList);
+    const component = fixture.componentInstance as unknown as {
+      onTitleEnter: (id: number, e: MouseEvent) => void;
+      onTitleLeave: () => void;
+      preview: () => unknown;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [] });
+
+    const event = { target: document.createElement('a') } as unknown as MouseEvent;
+    const previewUrl = `${url}/1/preview`;
+    const previewBody = { preview: { id: 1, title: 'Chocolate cake', ingredients: [], descriptionExcerpt: 'x' } };
+
+    // first hover → one request after the 200ms debounce
+    component.onTitleEnter(1, event);
+    tick(200);
+    httpMock.expectOne(previewUrl).flush(previewBody);
+    expect(component.preview()).toBeTruthy();
+
+    component.onTitleLeave();
+    expect(component.preview()).toBeNull();
+
+    // second hover of the same id → served from cache, NO new request
+    component.onTitleEnter(1, event);
+    tick(200);
+    httpMock.expectNone(previewUrl);
+    expect(component.preview()).toBeTruthy();
+  }));
+
+  it('does not fetch a preview if the cursor leaves during the debounce window', fakeAsync(() => {
+    const fixture = TestBed.createComponent(RecipeList);
+    const component = fixture.componentInstance as unknown as {
+      onTitleEnter: (id: number, e: MouseEvent) => void;
+      onTitleLeave: () => void;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [] });
+
+    const event = { target: document.createElement('a') } as unknown as MouseEvent;
+    component.onTitleEnter(2, event);
+    tick(100); // leave before the 200ms debounce elapses
+    component.onTitleLeave();
+    tick(200);
+
+    httpMock.expectNone(`${url}/2/preview`);
+  }));
+
   it('debounces the search and issues a single request after typing settles', fakeAsync(() => {
     const fixture = TestBed.createComponent(RecipeList);
     const component = fixture.componentInstance as unknown as {

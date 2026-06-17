@@ -20,6 +20,14 @@ export interface Recipe {
   ingredients: Ingredient[];
 }
 
+/** Trimmed payload for the hover preview (#12) — title, ≤5 ingredients, excerpt. */
+export interface RecipePreview {
+  id: number;
+  title: string;
+  ingredients: Array<{ name: string; amount: string; unit: string }>;
+  descriptionExcerpt: string;
+}
+
 /** Query parameters for the recipe list. Extended with sort/search in #10/#11. */
 export interface RecipeQueryParams {
   sort?: 'title' | 'created';

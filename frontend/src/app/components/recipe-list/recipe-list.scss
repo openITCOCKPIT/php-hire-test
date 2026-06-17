@@ -1,3 +1,10 @@
 .card-title a {
   color: inherit;
 }
+
+.recipe-preview {
+  position: absolute;
+  z-index: 1050;
+  width: 280px;
+  pointer-events: none; // never steals the hover from the title
+}

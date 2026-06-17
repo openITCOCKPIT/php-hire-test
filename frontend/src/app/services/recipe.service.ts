@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { NewRecipe, Recipe, RecipeQueryParams } from '../models/recipe';
+import { NewRecipe, Recipe, RecipePreview, RecipeQueryParams } from '../models/recipe';
 
 /**
  * Single HTTP abstraction for recipes. Components depend on this, not on
@@ -37,6 +37,13 @@ export class RecipeService {
     return this.http
       .get<{ recipe: Recipe }>(`${this.baseUrl}/${id}`)
       .pipe(map((response) => response.recipe));
+  }
+
+  /** GET /recipes/{id}/preview — trimmed payload for the hover preview (#12). */
+  getRecipePreview(id: number): Observable<RecipePreview> {
+    return this.http
+      .get<{ preview: RecipePreview }>(`${this.baseUrl}/${id}/preview`)
+      .pipe(map((response) => response.preview));
   }
 
   /** POST /recipes — create a recipe (issue #9). */
