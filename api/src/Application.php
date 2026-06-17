@@ -63,13 +63,16 @@ class Application extends BaseApplication
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
+            // CORS is the OUTERMOST middleware so that error responses produced
+            // by the ErrorHandlerMiddleware below (404/400/500 from thrown
+            // exceptions) also receive the Access-Control-* headers on the way
+            // out — otherwise the browser blocks them and the SPA cannot read
+            // the status. It also answers CORS preflight (OPTIONS) early.
+            ->add(new CorsMiddleware())
+
             // Catch any exceptions in the lower layers,
             // and make an error page/response
             ->add(new ErrorHandlerMiddleware(Configure::read('Error'), $this))
-
-            // Allow the Angular SPA (a different origin) to call the JSON API,
-            // and answer CORS preflight (OPTIONS) requests early.
-            ->add(new CorsMiddleware())
 
             // Validate Host header to prevent Host Header Injection attacks.
             // In production, ensures App.fullBaseUrl is configured and validates

@@ -57,6 +57,16 @@ class RecipesControllerTest extends TestCase
         $this->assertResponseContains('Recipe not found');
     }
 
+    public function testErrorResponseCarriesCorsHeader(): void
+    {
+        // Thrown-exception responses (404) must also get CORS headers, or the
+        // browser blocks them and the SPA cannot read the status.
+        $this->get('/recipes/9999');
+
+        $this->assertResponseCode(404);
+        $this->assertHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    }
+
     public function testAddCreatesRecipeWithIngredients(): void
     {
         $this->post('/recipes', [
