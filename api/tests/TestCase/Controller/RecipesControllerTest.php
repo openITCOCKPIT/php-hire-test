@@ -235,6 +235,42 @@ class RecipesControllerTest extends TestCase
         $this->assertSame(3, $this->getTableLocator()->get('Recipes')->find()->count());
     }
 
+    public function testViewIncludesTemperatureAndDuration(): void
+    {
+        $this->get('/recipes/1');
+
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertSame(200, $body['recipe']['temperature']);
+        $this->assertSame(40, $body['recipe']['duration']);
+    }
+
+    public function testAddPersistsTemperatureAndDuration(): void
+    {
+        $this->post('/recipes', [
+            'title' => 'Roast',
+            'temperature' => 180,
+            'duration' => 90,
+            'ingredients' => [['name' => 'beef', 'amount' => 1, 'unit' => 'kg']],
+        ]);
+
+        $this->assertResponseCode(201);
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertSame(180, $body['recipe']['temperature']);
+        $this->assertSame(90, $body['recipe']['duration']);
+    }
+
+    public function testAddRejectsOutOfRangeTemperature(): void
+    {
+        $this->post('/recipes', [
+            'title' => 'Too hot',
+            'temperature' => 600,
+            'ingredients' => [['name' => 'x', 'amount' => 1, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('Temperature must be between');
+    }
+
     public function testAddMissingTitleReturns422(): void
     {
         $this->post('/recipes', [

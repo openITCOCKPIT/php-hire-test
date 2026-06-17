@@ -11,6 +11,8 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $title
  * @property string|null $description
+ * @property int|null $temperature
+ * @property int|null $duration
  * @property \Cake\I18n\DateTime $created
  *
  * @property \App\Model\Entity\Ingredient[] $ingredients
@@ -29,6 +31,8 @@ class Recipe extends Entity
     protected array $_accessible = [
         'title' => true,
         'description' => true,
+        'temperature' => true,
+        'duration' => true,
         'ingredients' => true,
         // created is owned by the Timestamp behaviour, not client input.
         'created' => false,

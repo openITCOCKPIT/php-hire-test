@@ -23,6 +23,8 @@ class RecipesSeed extends BaseSeed
                 'id' => 1,
                 'title' => 'Chocolate cake',
                 'description' => 'Bake it at 200°C for 40 minutes.',
+                'temperature' => 200,
+                'duration' => 40,
                 'created' => '2026-06-15 00:00:00',
             ])
             ->save();

@@ -16,12 +16,16 @@ class RecipesFixture extends TestFixture
             'id' => 1,
             'title' => 'Chocolate cake',
             'description' => 'Bake it at 200°C for 40 minutes.',
+            'temperature' => 200,
+            'duration' => 40,
             'created' => '2026-06-15 00:00:00',
         ],
         [
             'id' => 2,
             'title' => 'Pancakes',
             'description' => 'Mix, then fry both sides.',
+            'temperature' => null,
+            'duration' => 15,
             'created' => '2026-06-16 12:00:00',
         ],
     ];

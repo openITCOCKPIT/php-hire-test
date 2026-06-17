@@ -75,6 +75,18 @@ class RecipesTable extends Table
             ->scalar('description')
             ->allowEmptyString('description');
 
+        // Optional cooking metadata; bounded to the SMALLINT UNSIGNED column and
+        // to sane real-world ranges so an out-of-range value is a clean 422.
+        $validator
+            ->integer('temperature')
+            ->range('temperature', [0, 500], 'Temperature must be between 0 and 500 °C')
+            ->allowEmptyString('temperature');
+
+        $validator
+            ->integer('duration')
+            ->range('duration', [0, 1440], 'Duration must be between 0 and 1440 minutes')
+            ->allowEmptyString('duration');
+
         return $validator;
     }
 }

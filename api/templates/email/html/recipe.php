@@ -10,6 +10,12 @@
     <h1 style="color: #d35400;"><?= h($recipe->title) ?></h1>
     <p style="color: #777; font-size: 13px;">
         Created: <?= h($recipe->created->format('d.m.Y')) ?>
+        <?php if ($recipe->temperature !== null) : ?>
+            &middot; <?= h((string)$recipe->temperature) ?> °C
+        <?php endif; ?>
+        <?php if ($recipe->duration !== null) : ?>
+            &middot; <?= h((string)$recipe->duration) ?> min
+        <?php endif; ?>
     </p>
 
     <h2 style="font-size: 16px;">Ingredients</h2>
