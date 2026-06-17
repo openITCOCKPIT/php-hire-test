@@ -4,7 +4,7 @@
 **Feature reference:** —
 **Effort:** 1 h
 **Dependencies:** #2
-**Status:** ⬜ open
+**Status:** ✅ done
 
 ## Goal
 
@@ -62,14 +62,18 @@ Separate migrations are independently rollback-able. If the `ingredients` schema
 
 ## Definition of Done
 
-- [ ] `bin/cake migrations migrate` completes without errors
-- [ ] `bin/cake migrations rollback` and re-migrate both work cleanly
-- [ ] `SELECT * FROM recipes` returns the chocolate-cake row with `created = '2026-06-15'`
-- [ ] `SELECT * FROM ingredients WHERE recipe_id = 1` returns 5 rows with correct DECIMAL amounts and VARCHAR units
-- [ ] `amount` column is confirmed as `DECIMAL(8,2)` in `SHOW COLUMNS FROM ingredients`
-- [ ] Seeder is in `config/Seeds/`, not in production code paths
+- [x] `bin/cake migrations migrate` completes without errors
+- [x] `migrations rollback --target=0` then re-migrate both work cleanly (FK-safe)
+- [x] `recipes` has the chocolate-cake row with `created = '2026-06-15'`
+- [x] `ingredients` has 5 rows with correct DECIMAL amounts and VARCHAR units
+- [x] `amount` column confirmed as `decimal(8,2)` (via information_schema)
+- [x] Seeder is in `config/Seeds/`, not in production code paths
 
 ## Tests
 
-- [ ] **Migration reversibility:** `bin/cake migrations migrate` then `rollback` runs cleanly in CI — the schema is fully reversible.
-- [ ] **PHPUnit + fixtures:** a fixture-backed test asserts the `ingredients.amount` column is `DECIMAL(8,2)` and that a stored value like `1.50` round-trips exactly (guards the DECIMAL-vs-FLOAT decision).
+- [x] **Migration reversibility:** `migrate` → `rollback --target=0` → `migrate` runs cleanly — the schema is fully reversible.
+- [x] **PHPUnit against MySQL:** `SchemaTest` asserts the `amount` column is `decimal(8,2)`, that `1.50` round-trips exactly, and that deleting a recipe cascades to its ingredients (3 tests).
+
+**Verification (2026-06-17):** migrations reversible · seed = chocolate cake + 5
+ingredients · `°` stored as utf8mb4 (`C2B0`) · phpunit 12 green · phpcs clean ·
+tests run on a separate `test_recipes` DB and leave the dev DB untouched.
