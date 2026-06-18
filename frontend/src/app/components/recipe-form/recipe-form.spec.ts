@@ -145,6 +145,10 @@ describe('RecipeForm (edit mode)', () => {
     component.submit();
     const req = httpMock.expectOne(`${url}/7`);
     expect(req.request.method).toBe('PUT');
+    // the prefilled metadata is sent back on update
+    expect(req.request.body.temperature).toBe(90);
+    expect(req.request.body.duration).toBe(120);
+    expect(req.request.body.ingredients.length).toBe(2);
     req.flush({ recipe: { id: 7, title: 'Stew', description: 'Slow', temperature: 90, duration: 120, created: '', ingredients: [] } });
 
     expect(navigateSpy).toHaveBeenCalledWith(['/recipes', 7]);

@@ -367,6 +367,22 @@ class RecipesControllerTest extends TestCase
         $this->assertSame(1, $remaining);
     }
 
+    public function testEditCanClearMetadata(): void
+    {
+        // Recipe 1 starts with temperature 200, duration 40; clear them.
+        $this->put('/api/recipes/1', [
+            'title' => 'Chocolate cake',
+            'temperature' => null,
+            'duration' => null,
+            'ingredients' => [['name' => 'cocoa', 'amount' => 75, 'unit' => 'g']],
+        ]);
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertNull($body['recipe']['temperature']);
+        $this->assertNull($body['recipe']['duration']);
+    }
+
     public function testEditUnknownIdReturns404(): void
     {
         $this->put('/api/recipes/9999', [
