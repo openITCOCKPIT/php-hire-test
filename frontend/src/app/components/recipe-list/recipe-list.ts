@@ -1,10 +1,10 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap, takeUntil, tap } from 'rxjs';
 import { RecipeService } from '../../services/recipe.service';
 import { Recipe, RecipePreview, RecipeQueryParams } from '../../models/recipe';
 import { recipeImageUrl } from '../../shared/image-url';
@@ -21,7 +21,7 @@ type SortOption = 'created-DESC' | 'created-ASC' | 'title-ASC' | 'title-DESC';
 export class RecipeList implements OnInit {
   private readonly recipeService = inject(RecipeService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly searchInput$ = new Subject<string>();
+  private readonly route = inject(ActivatedRoute);
 
   // Hover preview (#12).
   private readonly hover$ = new Subject<number>();
@@ -39,42 +39,24 @@ export class RecipeList implements OnInit {
   ngOnInit(): void {
     this.setupHoverPreview();
 
-    // Debounce the search box and cancel any in-flight request when a newer
-    // term arrives (switchMap), so fast typing never floods the API or shows a
-    // stale response. distinctUntilChanged skips duplicate consecutive terms.
-    this.searchInput$
+    // The search term lives in the URL (?search=…), owned by the navbar search
+    // box (#4). React to it here: each distinct term reloads the filtered list.
+    // The first emission (with the current query) performs the initial load.
+    this.route.queryParamMap
       .pipe(
-        debounceTime(300),
+        map((params) => (params.get('search') ?? '').trim()),
         distinctUntilChanged(),
-        tap(() => this.state.set('loading')),
-        switchMap((search) =>
-          this.recipeService.getRecipes(this.params(search)).pipe(
-            catchError(() => {
-              this.state.set('error');
-              return of<Recipe[]>([]);
-            }),
-          ),
-        ),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((recipes) => {
-        this.recipes.set(recipes);
-        if (this.state() !== 'error') {
-          this.state.set('loaded');
-        }
+      .subscribe((search) => {
+        this.search = search;
+        this.load();
       });
-
-    this.load();
   }
 
-  /** Sort changes reload immediately (no debounce). */
+  /** Sort changes reload immediately. */
   protected onSortChange(): void {
     this.load();
-  }
-
-  /** Push the current term onto the debounced search stream. */
-  protected onSearchChange(): void {
-    this.searchInput$.next(this.search.trim());
   }
 
   protected load(): void {

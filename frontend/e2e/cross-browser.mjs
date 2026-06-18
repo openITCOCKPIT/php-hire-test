@@ -22,8 +22,10 @@ async function run(name, launcher) {
     await page.waitForSelector('.card', { timeout: 5000 });
     check('list renders cards', (await page.locator('.card').count()) > 0);
 
-    // 2. Search filters server-side (wait for the filtered state, not a fixed delay)
-    await page.fill('input[type=search]', 'choc');
+    // 2. Search filters server-side (open the navbar magnifier first, then wait
+    //    for the filtered state rather than a fixed delay)
+    await page.click('.navbar-search-toggle');
+    await page.fill('.navbar-search-input', 'choc');
     await page
       .waitForFunction(() => {
         const titles = [...document.querySelectorAll('.card-title')].map((e) => e.textContent || '');
@@ -31,7 +33,7 @@ async function run(name, launcher) {
       }, { timeout: 5000 })
       .then(() => check('search filters to chocolate', true))
       .catch(() => check('search filters to chocolate', false));
-    await page.fill('input[type=search]', '');
+    await page.fill('.navbar-search-input', '');
     await page.waitForFunction(() => document.querySelectorAll('.card').length >= 1, { timeout: 5000 });
 
     // 3. Hover preview popover appears

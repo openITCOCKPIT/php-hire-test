@@ -1,0 +1,23 @@
+// Collapsible navbar search (#4): the field grows out of the magnifier on
+// click and shrinks back to it when left empty.
+.navbar-search-input {
+  width: 0;
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-width: 0;
+  opacity: 0;
+  transition:
+    width 0.2s ease,
+    opacity 0.2s ease,
+    padding 0.2s ease;
+}
+
+.navbar-search.open .navbar-search-input {
+  width: 12rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-width: 1px;
+  opacity: 1;
+  margin-right: 0.5rem;
+}

@@ -1,13 +1,16 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, ParamMap, convertToParamMap, provideRouter } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { BehaviorSubject } from 'rxjs';
 import { RecipeList } from './recipe-list';
 import { environment } from '../../../environments/environment';
 import { Recipe } from '../../models/recipe';
 
 describe('RecipeList', () => {
   let httpMock: HttpTestingController;
+  // The list reads its search term from the URL; drive it via this subject.
+  let queryParamMap$: BehaviorSubject<ParamMap>;
   const url = `${environment.apiBaseUrl}/recipes`;
 
   const recipe: Recipe = {
@@ -22,9 +25,15 @@ describe('RecipeList', () => {
   };
 
   beforeEach(async () => {
+    queryParamMap$ = new BehaviorSubject<ParamMap>(convertToParamMap({}));
     await TestBed.configureTestingModule({
       imports: [RecipeList],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParamMap$.asObservable() } },
+      ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -136,35 +145,32 @@ describe('RecipeList', () => {
     httpMock.expectNone(`${url}/2/preview`);
   }));
 
-  it('debounces the search and issues a single request after typing settles', fakeAsync(() => {
+  it('reloads with the search filter when the URL ?search= changes', () => {
     const fixture = TestBed.createComponent(RecipeList);
-    const component = fixture.componentInstance as unknown as {
-      search: string;
-      onSearchChange: () => void;
-    };
     fixture.detectChanges();
 
-    // initial load() request
+    // initial load with no search term
+    const initial = httpMock.expectOne((r) => r.url === url);
+    expect(initial.request.params.has('search')).toBeFalse();
+    initial.flush({ recipes: [] });
+
+    // the navbar pushes a new term into the URL
+    queryParamMap$.next(convertToParamMap({ search: 'choc' }));
+
+    const filtered = httpMock.expectOne((r) => r.url === url);
+    expect(filtered.request.params.get('search')).toBe('choc');
+    filtered.flush({ recipes: [recipe] });
+
+    expect(fixture.componentInstance['search']).toBe('choc');
+  });
+
+  it('does not reload when the search term is unchanged', () => {
+    const fixture = TestBed.createComponent(RecipeList);
+    fixture.detectChanges();
     httpMock.expectOne((r) => r.url === url).flush({ recipes: [] });
 
-    // rapid typing — three keystrokes within the debounce window
-    component.search = 'c';
-    component.onSearchChange();
-    tick(100);
-    component.search = 'ch';
-    component.onSearchChange();
-    tick(100);
-    component.search = 'choc';
-    component.onSearchChange();
-
-    // before the debounce elapses, no request has gone out
+    // an emission with the same (empty) term must not trigger a second request
+    queryParamMap$.next(convertToParamMap({ other: 'x' }));
     httpMock.expectNone((r) => r.url === url);
-
-    tick(300);
-
-    // exactly one request, for the final term
-    const req = httpMock.expectOne((r) => r.url === url);
-    expect(req.request.params.get('search')).toBe('choc');
-    req.flush({ recipes: [] });
-  }));
+  });
 });
