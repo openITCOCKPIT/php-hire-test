@@ -67,6 +67,7 @@ feature was added — out of scope by request).
 | [#16](16-recipe-metadata.md) | Recipe metadata (temperature & duration) | 1 h | ✅ done |
 | [#17](17-edit-delete-recipes.md) | Edit & delete recipes | 2 h | ✅ done |
 | [#18](18-containerise-frontend.md) | Containerise the frontend (single origin) | 2 h | ✅ done |
+| [#19](19-recipe-image.md) | Recipe image (one hero photo) | 2–3 h | ✅ done |
 
 ---
 

@@ -36,3 +36,4 @@ implementation log to see how it played out in practice.
 | #16 | Recipe metadata (temperature & duration) | [16-recipe-metadata.md](16-recipe-metadata.md) |
 | #17 | Edit & delete recipes | [17-edit-delete-recipes.md](17-edit-delete-recipes.md) |
 | #18 | Containerise the frontend (single origin) | [18-containerise-frontend.md](18-containerise-frontend.md) |
+| #19 | Recipe image (hero photo upload) | [19-recipe-image.md](19-recipe-image.md) |
