@@ -1,0 +1,80 @@
+# Environment for the Recipe Collection challenge.
+#   mysql    -> MySQL 8.0 database
+#   php      -> PHP-FPM 8.3 running the CakePHP JSON API
+#   nginx    -> serves the API (FastCGI to php), exposed for dev on :8765
+#   frontend -> builds the Angular SPA and serves it + proxies /api to nginx,
+#               giving a single origin on :${APP_PORT:-8080} (no CORS in prod)
+#
+# Bring everything up with:  docker compose up -d --build
+# The whole app is then at http://localhost:${APP_PORT:-8080}
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # Auto-creates the test_recipes database on first volume init.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    # PHP waits for this to pass before starting, so the first request never
+    # races MySQL's first-boot initialisation.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    environment:
+      # CakePHP reads these directly (DATABASE_URL is parsed into the datasource).
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_TEST_URL: ${DATABASE_TEST_URL}
+      SECURITY_SALT: ${SECURITY_SALT}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+      # Mail: when set (Docker stack), the Mailer sends over SMTP to Mailpit.
+      EMAIL_TRANSPORT_DEFAULT_URL: ${EMAIL_TRANSPORT_DEFAULT_URL}
+    volumes:
+      - ./api:/var/www/html/api
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "${NGINX_PORT:-8765}:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./api:/var/www/html/api
+    depends_on:
+      - php
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      # Serve uploaded images at /uploads (same origin) straight from disk.
+      - ./api/webroot/uploads:/usr/share/nginx/html/uploads:ro
+    depends_on:
+      - nginx
+
+  # Local mail catcher: the app sends to it over SMTP (:1025) and you read the
+  # captured e-mails — full HTML, subject, recipient — in the web UI (:8025).
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+
+volumes:
+  mysql-data:

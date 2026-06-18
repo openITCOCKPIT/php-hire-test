@@ -1,0 +1,85 @@
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <a class="sidebar-brand navbar-brand" routerLink="/">
+      <span class="logo">🍳</span> {{ title() }}
+    </a>
+
+    <input
+      type="search"
+      class="form-control form-control-sm"
+      placeholder="Search recipes…"
+      aria-label="Search recipes"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchInput()"
+    />
+
+    <div class="sidebar-label">Duration</div>
+    <div class="filter-chips">
+      @for (d of durations; track d.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.duration() === d.value"
+          [attr.aria-pressed]="filters.duration() === d.value"
+          (click)="setDuration(d.value)"
+        >
+          {{ d.label }}
+        </button>
+      }
+    </div>
+
+    <div class="sidebar-label">Ingredients</div>
+    <div class="filter-chips">
+      @for (b of ingredientBuckets; track b.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.ingredients() === b.value"
+          [attr.aria-pressed]="filters.ingredients() === b.value"
+          (click)="setIngredients(b.value)"
+        >
+          {{ b.label }}
+        </button>
+      }
+    </div>
+
+    <div class="sidebar-label">Sort</div>
+    <div class="filter-chips">
+      @for (s of sorts; track s.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.sort() === s.value"
+          [attr.aria-pressed]="filters.sort() === s.value"
+          (click)="setSort(s.value)"
+        >
+          {{ s.label }}
+        </button>
+      }
+    </div>
+
+    <button type="button" class="filter-reset" (click)="resetFilters()">↺ Reset filters</button>
+  </aside>
+
+  <div class="app-main">
+    <header class="app-topbar">
+      <span class="topbar-crumb"><b>{{ crumb() }}</b></span>
+      <span class="flex-grow-1"></span>
+      <button
+        type="button"
+        class="icon-btn"
+        [attr.aria-pressed]="theme.theme() === 'light'"
+        aria-label="Toggle light and dark theme"
+        (click)="theme.toggle()"
+      >
+        {{ theme.theme() === 'dark' ? '🌙' : '☀️' }}
+      </button>
+      <a routerLink="/recipes/new" class="btn btn-success btn-sm">+ New Recipe</a>
+      <span class="topbar-avatar" aria-hidden="true">🍴</span>
+    </header>
+
+    <main class="app-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

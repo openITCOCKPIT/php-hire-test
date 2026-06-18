@@ -1,0 +1,13 @@
+# Environment / secrets
+.env
+
+# OS / editor noise
+.DS_Store
+*.log
+
+# Brainstorming / design tooling artifacts
+.superpowers/
+
+# Note: api/ and frontend/ each ship their own .gitignore that handles their
+# dependencies and build output (vendor/, node_modules/, dist/, tmp/, logs/,
+# .angular/, config/app_local.php).

@@ -1,0 +1,85 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0">Recipes</h1>
+    @if (state() === 'loaded') {
+      <p class="text-muted small mb-0">{{ filteredRecipes().length }} of {{ recipes().length }} shown</p>
+    }
+  </div>
+  <a routerLink="/recipes/new" class="btn btn-success">New Recipe</a>
+</div>
+
+@if (state() === 'loading') {
+  <div class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading…</span>
+    </div>
+  </div>
+} @else if (state() === 'error') {
+  <div class="alert alert-danger d-flex justify-content-between align-items-center">
+    <span>Could not load recipes. Please try again.</span>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="load()">Retry</button>
+  </div>
+} @else if (recipes().length === 0) {
+  @if (search.trim()) {
+    <div class="text-center text-muted py-5">No recipes match your search.</div>
+  } @else {
+    <div class="text-center text-muted py-5">
+      <p class="mb-3">No recipes yet.</p>
+      <a routerLink="/recipes/new" class="btn btn-success">Create the first one</a>
+    </div>
+  }
+} @else if (filteredRecipes().length === 0) {
+  <div class="text-center text-muted py-5">No recipes match these filters.</div>
+} @else {
+  <div class="row g-3">
+    @for (recipe of filteredRecipes(); track recipe.id) {
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card recipe-card h-100">
+          @if (imageUrl(recipe.image_path); as url) {
+            <img [src]="url" [alt]="recipe.title" class="card-img-top" style="height: 160px; object-fit: cover" />
+          } @else {
+            <div class="card-img-top thumb-placeholder" style="height: 160px">🍽️</div>
+          }
+          <div class="card-body">
+            <h2 class="card-title h5">
+              <a
+                [routerLink]="['/recipes', recipe.id]"
+                class="text-decoration-none stretched-link"
+                (mouseenter)="onTitleEnter(recipe.id, $event)"
+                (mouseleave)="onTitleLeave()"
+                >{{ recipe.title }}</a
+              >
+            </h2>
+            <p class="card-subtitle text-muted small mb-2">{{ recipe.created | date: 'dd.MM.yyyy' }}</p>
+            <p class="card-text small mb-1">
+              {{ recipe.ingredients.length }}
+              {{ recipe.ingredients.length === 1 ? 'ingredient' : 'ingredients' }}
+            </p>
+            @if (recipe.duration != null) {
+              <span class="badge badge-duration">⏱ {{ recipe.duration }} min</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (preview(); as p) {
+  <div class="card shadow recipe-preview" [style.top.px]="previewPos().top" [style.left.px]="previewPos().left">
+    @if (imageUrl(p.image_path); as url) {
+      <img [src]="url" [alt]="p.title" class="card-img-top" style="height: 120px; object-fit: cover" />
+    }
+    <div class="card-body p-3">
+      <h3 class="h6 mb-2">{{ p.title }}</h3>
+      <p class="small text-muted mb-2">
+        @for (ingredient of p.ingredients; track ingredient.name; let last = $last) {
+          {{ formatAmount(ingredient.amount) }}{{ ingredient.unit }} {{ ingredient.name }}{{ last ? '' : ', ' }}
+        }
+      </p>
+      @if (p.descriptionExcerpt) {
+        <p class="small mb-0">{{ p.descriptionExcerpt }}</p>
+      }
+    </div>
+  </div>
+}
