@@ -184,6 +184,14 @@ body {
   font-weight: 600;
 }
 
+/* Neutral meta badge (temperature, counts) — subtle, themed for both modes */
+.badge-meta {
+  background: var(--surface-3);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
 /* ---------- App shell ---------- */
 .app-shell {
   display: flex;
@@ -1325,9 +1333,9 @@ Replace `frontend/src/app/components/recipe-detail/recipe-detail.html` with:
               <span class="badge badge-duration">⏱ {{ r.duration }} min</span>
             }
             @if (r.temperature != null) {
-              <span class="badge text-bg-secondary">🌡 {{ r.temperature }} °C</span>
+              <span class="badge badge-meta">🌡 {{ r.temperature }} °C</span>
             }
-            <span class="badge text-bg-secondary">🧂 {{ r.ingredients.length }} ingredients</span>
+            <span class="badge badge-meta">🧂 {{ r.ingredients.length }} ingredients</span>
           </div>
         </div>
         <div class="d-flex gap-2 flex-shrink-0">
@@ -1383,12 +1391,14 @@ Replace `frontend/src/app/components/recipe-detail/recipe-detail.html` with:
         </div>
       </div>
       <div class="col-12 col-lg-8">
-        @if (r.description) {
-          <div class="panel h-100">
-            <h2 class="h5 mb-3">Description</h2>
+        <div class="panel h-100">
+          <h2 class="h5 mb-3">Description</h2>
+          @if (r.description) {
             <p class="mb-0" style="white-space: pre-line">{{ r.description }}</p>
-          </div>
-        }
+          } @else {
+            <p class="text-muted small mb-0">No description yet.</p>
+          }
+        </div>
       </div>
     </div>
 
@@ -1494,9 +1504,7 @@ Replace `frontend/src/app/components/recipe-detail/recipe-detail.html` with:
 Replace `frontend/src/app/components/recipe-detail/recipe-detail.scss` with:
 
 ```scss
-.thumb-placeholder {
-  gap: 0.5rem;
-}
+/* Detail-view styling comes from the global token layer (.panel, .thumb-placeholder, .badge-meta). */
 ```
 
 - [ ] **Step 3: Run the detail specs to verify they pass**
