@@ -38,3 +38,4 @@ implementation log to see how it played out in practice.
 | #18 | Containerise the frontend (single origin) | [18-containerise-frontend.md](18-containerise-frontend.md) |
 | #19 | Recipe image (hero photo upload) | [19-recipe-image.md](19-recipe-image.md) |
 | #20 | Personal notes per recipe | [20-recipe-notes.md](20-recipe-notes.md) |
+| #21 | UI polish & e-mail image | [21-ui-and-email-refinements.md](21-ui-and-email-refinements.md) |
