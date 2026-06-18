@@ -87,9 +87,9 @@ Replace the contents of `frontend/src/styles.scss` with:
   --text: #e8eaf0;
   --muted: #9aa0ad;
   --faint: #7e8595;
-  --accent: #8b7bf0;
+  --accent: #9888f0;
   --accent-strong: #6d5cff;
-  --accent-soft: rgba(139, 123, 240, 0.16);
+  --accent-soft: rgba(152, 136, 240, 0.16);
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.15);
   --success-text: #4ade80;
@@ -101,7 +101,7 @@ Replace the contents of `frontend/src/styles.scss` with:
   --bs-body-bg: var(--app-bg);
   --bs-body-color: var(--text);
   --bs-primary: var(--accent);
-  --bs-primary-rgb: 139, 123, 240;
+  --bs-primary-rgb: 152, 136, 240;
   --bs-success: var(--success);
   --bs-success-rgb: 34, 197, 94;
   --bs-border-color: var(--border);
@@ -123,11 +123,11 @@ Replace the contents of `frontend/src/styles.scss` with:
   --border: #e6e8ee;
   --border-soft: #eef0f3;
   --text: #1f2330;
-  --muted: #6b7080;
-  --faint: #9398a6;
-  --accent: #6d5cff;
+  --muted: #696e7c;
+  --faint: #6d7282;
+  --accent: #5a4aff;
   --accent-strong: #5847f0;
-  --accent-soft: rgba(109, 92, 255, 0.1);
+  --accent-soft: rgba(90, 74, 255, 0.1);
   --success: #16a34a;
   --success-soft: #e9f9ee;
   --success-text: #15803d;
@@ -138,7 +138,7 @@ Replace the contents of `frontend/src/styles.scss` with:
   --bs-body-bg: var(--app-bg);
   --bs-body-color: var(--text);
   --bs-primary: var(--accent);
-  --bs-primary-rgb: 109, 92, 255;
+  --bs-primary-rgb: 90, 74, 255;
   --bs-success: var(--success);
   --bs-success-rgb: 22, 163, 74;
   --bs-border-color: var(--border);
