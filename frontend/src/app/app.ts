@@ -52,6 +52,7 @@ export class App implements OnInit {
     { label: 'Newest', value: 'created-DESC' },
     { label: 'Oldest', value: 'created-ASC' },
     { label: 'A–Z', value: 'title-ASC' },
+    { label: 'Z–A', value: 'title-DESC' },
   ];
 
   ngOnInit(): void {
