@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   // Dev: the Angular dev server (:4200) talks cross-origin to the Dockerised
-  // backend (:8765); the API lives under /api.
+  // backend (:8765); the API lives under /api and images under /uploads there.
   apiBaseUrl: 'http://localhost:8765/api',
+  uploadsBaseUrl: 'http://localhost:8765',
 };

@@ -63,6 +63,9 @@ services:
       dockerfile: docker/frontend/Dockerfile
     ports:
       - "${APP_PORT:-8080}:80"
+    volumes:
+      # Serve uploaded images at /uploads (same origin) straight from disk.
+      - ./api/webroot/uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       - nginx
 

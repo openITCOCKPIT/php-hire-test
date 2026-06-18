@@ -69,4 +69,18 @@ export class RecipeService {
   sendRecipeEmail(id: number, email: string): Observable<{ sent: boolean }> {
     return this.http.post<{ sent: boolean }>(`${this.baseUrl}/${id}/send-mail`, { email });
   }
+
+  /** POST /recipes/{id}/image — upload (multipart) a hero image (issue #19). */
+  uploadRecipeImage(id: number, file: File): Observable<Recipe> {
+    const form = new FormData();
+    form.append('image', file);
+    return this.http
+      .post<{ recipe: Recipe }>(`${this.baseUrl}/${id}/image`, form)
+      .pipe(map((response) => response.recipe));
+  }
+
+  /** DELETE /recipes/{id}/image — remove the hero image (issue #19). */
+  deleteRecipeImage(id: number): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}/image`);
+  }
 }

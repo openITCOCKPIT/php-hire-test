@@ -69,7 +69,7 @@ describe('RecipeForm', () => {
     const req = httpMock.expectOne(url);
     expect(req.request.method).toBe('POST');
     expect(req.request.body.title).toBe('Pancakes');
-    req.flush({ recipe: { id: 5, title: 'Pancakes', description: 'Mix', temperature: null, duration: null, created: '', ingredients: [] } });
+    req.flush({ recipe: { id: 5, title: 'Pancakes', description: 'Mix', temperature: null, duration: null, image_path: null, created: '', ingredients: [] } });
 
     expect(navigateSpy).toHaveBeenCalledWith(['/']);
   });
@@ -149,7 +149,7 @@ describe('RecipeForm (edit mode)', () => {
     expect(req.request.body.temperature).toBe(90);
     expect(req.request.body.duration).toBe(120);
     expect(req.request.body.ingredients.length).toBe(2);
-    req.flush({ recipe: { id: 7, title: 'Stew', description: 'Slow', temperature: 90, duration: 120, created: '', ingredients: [] } });
+    req.flush({ recipe: { id: 7, title: 'Stew', description: 'Slow', temperature: 90, duration: 120, image_path: null, created: '', ingredients: [] } });
 
     expect(navigateSpy).toHaveBeenCalledWith(['/recipes', 7]);
   });

@@ -20,6 +20,7 @@ describe('RecipeDetail', () => {
     description: 'Bake it at 200°C.',
     temperature: 200,
     duration: 40,
+    image_path: null,
     created: '2026-06-15T00:00:00+00:00',
     ingredients: [
       { id: 1, recipe_id: 1, name: 'sugar', amount: '100.00', unit: 'g' },
@@ -137,6 +138,27 @@ describe('RecipeDetail', () => {
     component.deleteRecipe();
 
     httpMock.expectNone((r) => r.method === 'DELETE');
+  });
+
+  it('uploads a selected image and updates the recipe', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const component = fixture.componentInstance as unknown as {
+      onImageSelected: (e: Event) => void;
+      imageUrl: () => string | null;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [file] });
+    component.onImageSelected({ target: input } as unknown as Event);
+
+    const req = httpMock.expectOne(`${base}/1/image`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ recipe: { ...recipe, image_path: 'recipes/abc.png' } });
+
+    expect(component.imageUrl()).toContain('/uploads/recipes/abc.png');
   });
 
   it('rejects an invalid e-mail without calling the API', () => {

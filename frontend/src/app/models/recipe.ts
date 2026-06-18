@@ -18,6 +18,7 @@ export interface Recipe {
   description: string | null;
   temperature: number | null;
   duration: number | null;
+  image_path: string | null;
   created: string;
   ingredients: Ingredient[];
 }
@@ -26,6 +27,7 @@ export interface Recipe {
 export interface RecipePreview {
   id: number;
   title: string;
+  image_path: string | null;
   ingredients: Array<{ name: string; amount: string; unit: string }>;
   descriptionExcerpt: string;
 }

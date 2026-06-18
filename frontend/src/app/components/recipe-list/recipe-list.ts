@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, of, switchMap, takeUntil, tap } from 'rxjs';
 import { RecipeService } from '../../services/recipe.service';
 import { Recipe, RecipePreview, RecipeQueryParams } from '../../models/recipe';
+import { recipeImageUrl } from '../../shared/image-url';
 
 type LoadState = 'loading' | 'loaded' | 'error';
 type SortOption = 'created-DESC' | 'created-ASC' | 'title-ASC' | 'title-DESC';
@@ -90,6 +91,11 @@ export class RecipeList implements OnInit {
   /** "100.00" -> "100", "1.50" -> "1.5" (matches the detail view). */
   protected formatAmount(amount: string): number {
     return parseFloat(amount);
+  }
+
+  /** Public URL for an uploaded image, or null. */
+  protected imageUrl(imagePath: string | null): string | null {
+    return recipeImageUrl(imagePath);
   }
 
   private params(search: string): RecipeQueryParams {

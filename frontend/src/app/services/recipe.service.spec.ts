@@ -16,6 +16,7 @@ describe('RecipeService', () => {
     description: 'Bake it.',
     temperature: 200,
     duration: 40,
+    image_path: null,
     created: '2026-06-15T00:00:00+00:00',
     ingredients: [{ id: 1, recipe_id: 1, name: 'sugar', amount: '100.00', unit: 'g' }],
   };
@@ -66,7 +67,7 @@ describe('RecipeService', () => {
 
     const req = httpMock.expectOne(`${base}/1/preview`);
     expect(req.request.method).toBe('GET');
-    req.flush({ preview: { id: 1, title: 'Chocolate cake', ingredients: [], descriptionExcerpt: 'x' } });
+    req.flush({ preview: { id: 1, title: 'Chocolate cake', image_path: null, ingredients: [], descriptionExcerpt: 'x' } });
 
     expect(result?.title).toBe('Chocolate cake');
   });
@@ -81,6 +82,23 @@ describe('RecipeService', () => {
     expect(req.request.method).toBe('PUT');
     req.flush({ recipe: { ...sampleRecipe, title: 'Edited' } });
     expect(result?.title).toBe('Edited');
+  });
+
+  it('uploadRecipeImage(id, file) POSTs multipart form data', () => {
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    service.uploadRecipeImage(1, file).subscribe();
+
+    const req = httpMock.expectOne(`${base}/1/image`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBeTrue();
+    req.flush({ recipe: sampleRecipe });
+  });
+
+  it('deleteRecipeImage(id) DELETEs the image', () => {
+    service.deleteRecipeImage(1).subscribe();
+    const req = httpMock.expectOne(`${base}/1/image`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ deleted: true });
   });
 
   it('deleteRecipe(id) DELETEs the recipe', () => {

@@ -16,6 +16,7 @@ describe('RecipeList', () => {
     description: 'Bake it.',
     temperature: 200,
     duration: 40,
+    image_path: null,
     created: '2026-06-15T00:00:00+00:00',
     ingredients: [{ id: 1, recipe_id: 1, name: 'sugar', amount: '100.00', unit: 'g' }],
   };
@@ -99,7 +100,7 @@ describe('RecipeList', () => {
 
     const event = { target: document.createElement('a') } as unknown as MouseEvent;
     const previewUrl = `${url}/1/preview`;
-    const previewBody = { preview: { id: 1, title: 'Chocolate cake', ingredients: [], descriptionExcerpt: 'x' } };
+    const previewBody = { preview: { id: 1, title: 'Chocolate cake', image_path: null, ingredients: [], descriptionExcerpt: 'x' } };
 
     // first hover → one request after the 200ms debounce
     component.onTitleEnter(1, event);

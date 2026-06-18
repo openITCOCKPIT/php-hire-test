@@ -7,6 +7,7 @@ import { switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RecipeService } from '../../services/recipe.service';
 import { Ingredient, Recipe } from '../../models/recipe';
+import { recipeImageUrl } from '../../shared/image-url';
 
 type LoadState = 'loading' | 'loaded' | 'notfound' | 'error';
 type MailState = 'idle' | 'sending' | 'sent' | 'error';
@@ -35,6 +36,10 @@ export class RecipeDetail implements OnInit {
   // Delete (#17).
   protected readonly deleting = signal(false);
 
+  // Image upload (#19).
+  protected readonly imageBusy = signal(false);
+  protected readonly imageError = signal<string | null>(null);
+
   ngOnInit(): void {
     // paramMap (not snapshot) so navigating directly between detail pages reloads.
     this.route.paramMap
@@ -58,6 +63,56 @@ export class RecipeDetail implements OnInit {
   protected formatIngredient(ingredient: Ingredient): string {
     const amount = parseFloat(ingredient.amount);
     return `${amount}${ingredient.unit} ${ingredient.name}`;
+  }
+
+  // --- Image upload (#19) ---
+
+  protected imageUrl(): string | null {
+    return recipeImageUrl(this.recipe()?.image_path ?? null);
+  }
+
+  protected onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // allow re-selecting the same file later
+    const recipe = this.recipe();
+    if (!file || !recipe) {
+      return;
+    }
+
+    this.imageBusy.set(true);
+    this.imageError.set(null);
+    this.recipeService.uploadRecipeImage(recipe.id, file).subscribe({
+      next: (updated) => {
+        this.recipe.set(updated);
+        this.imageBusy.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.imageBusy.set(false);
+        this.imageError.set(err.status === 422
+          ? (err.error?.errors?.image?.[0] ?? 'Invalid image.')
+          : 'Could not upload the image. Please try again.');
+      },
+    });
+  }
+
+  protected removeImage(): void {
+    const recipe = this.recipe();
+    if (!recipe) {
+      return;
+    }
+    this.imageBusy.set(true);
+    this.imageError.set(null);
+    this.recipeService.deleteRecipeImage(recipe.id).subscribe({
+      next: () => {
+        this.recipe.set({ ...recipe, image_path: null });
+        this.imageBusy.set(false);
+      },
+      error: () => {
+        this.imageBusy.set(false);
+        this.imageError.set('Could not remove the image.');
+      },
+    });
   }
 
   // --- Delete (#17) ---
