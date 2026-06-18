@@ -1,4 +1,4 @@
-<a routerLink="/" class="btn btn-link px-0 mb-3">&larr; Back to list</a>
+<a routerLink="/" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to list</a>
 
 @if (state() === 'loading') {
   <div class="text-center py-5">
@@ -173,7 +173,7 @@
             @if (mailState() === 'sent') {
               <button type="button" class="btn btn-primary" (click)="closeMailModal()">Done</button>
             } @else {
-              <button type="button" class="btn btn-link" (click)="closeMailModal()">Cancel</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="closeMailModal()">Cancel</button>
               <button type="button" class="btn btn-primary" [disabled]="mailState() === 'sending'" (click)="sendMail()">
                 @if (mailState() === 'sending') {
                   <span class="spinner-border spinner-border-sm me-1"></span> Sending…
