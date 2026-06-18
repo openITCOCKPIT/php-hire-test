@@ -739,11 +739,10 @@ export class App implements OnInit {
     this.router.navigate(['/'], { queryParams: { search: null } });
   }
 
-  /** Filters only make sense on the list — jump there when one is changed elsewhere. */
+  /** Filters/sort only apply on the list — jump there from any other page.
+   *  Compare the path only, so an active ?search= on the list is preserved. */
   private goToList(): void {
-    if (!this.currentUrl().startsWith('/recipes') && this.currentUrl() !== '/') {
-      this.router.navigate(['/']);
-    } else if (this.currentUrl().startsWith('/recipes/')) {
+    if (this.currentUrl().split('?')[0] !== '/') {
       this.router.navigate(['/']);
     }
   }
@@ -1604,6 +1603,13 @@ git commit -m "Re-skin not-found page and finish accessibility pass"
 ```
 
 ---
+
+## Known Follow-ups (out of scope for this plan)
+
+- **Unsaved-form data loss:** the filter sidebar is always visible (approved design), so
+  changing a filter or "Reset filters" while editing the New/Edit recipe form navigates to
+  the list and discards unsaved input. A `CanDeactivate` guard with a "discard changes?"
+  confirm should be added in a follow-up PR. Not implemented here to keep scope to the redesign.
 
 ## Self-Review
 
