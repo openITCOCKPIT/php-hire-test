@@ -87,15 +87,16 @@ cp .env.example .env
 
 # 2. Build and start everything (MySQL, PHP-FPM, the API nginx and the SPA)
 docker compose up -d --build
+#    On first start the API container automatically applies the migrations and
+#    seeds a set of demo recipes — no manual database step needed.
 
-# 3. Set up the database
-docker compose exec php composer install
-docker compose exec php bin/cake.php migrations migrate
-docker compose exec php bin/cake.php seeds run RecipesSeed   # the chocolate-cake example
-
-# 4. Open the app — a single URL, SPA + proxied API:
+# 3. Open the app — a single URL, SPA + proxied API:
 #    http://localhost:8080
 ```
+
+> The seed runs once on a fresh database (tracked in `cake_seeds`), so recipes you
+> create later are preserved across restarts. To start from clean demo data again,
+> run `docker compose down -v && docker compose up -d`.
 
 For **frontend development** (live reload), run the Angular dev server instead of
 using the container:
