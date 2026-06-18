@@ -154,6 +154,24 @@ class RecipesControllerTest extends TestCase
         $this->assertMailContainsHtml('Chocolate cake');
     }
 
+    public function testSendMailEmbedsTheRecipeImageWhenPresent(): void
+    {
+        // Give recipe 1 a hero image first.
+        $this->configRequest(['files' => ['image' => $this->pngUpload()]]);
+        $this->post('/api/recipes/1/image');
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->uploadedFiles[] = $body['recipe']['image_path'];
+
+        $this->post('/api/recipes/1/send-mail', ['email' => 'friend@example.com']);
+        $this->assertResponseOk();
+
+        $this->assertMailCount(1);
+        // The image is embedded inline (cid) and referenced from the HTML body.
+        $this->assertMailContainsHtml('cid:recipe-image');
+        $this->assertMailContainsAttachment('recipe.png');
+    }
+
     public function testSendMailInvalidEmailReturns422(): void
     {
         $this->post('/api/recipes/1/send-mail', ['email' => 'not-an-email']);

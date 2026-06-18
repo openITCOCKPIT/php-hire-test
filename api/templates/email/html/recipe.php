@@ -4,6 +4,7 @@
  *
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Recipe $recipe
+ * @var string|null $imageCid Content id of the inline image, or null.
  */
 ?>
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -17,6 +18,11 @@
             &middot; <?= h((string)$recipe->duration) ?> min
         <?php endif; ?>
     </p>
+
+    <?php if (!empty($imageCid)) : ?>
+        <img src="cid:<?= h($imageCid) ?>" alt="<?= h($recipe->title) ?>"
+             style="max-width: 100%; border-radius: 6px; margin: 8px 0;">
+    <?php endif; ?>
 
     <h2 style="font-size: 16px;">Ingredients</h2>
     <ul>

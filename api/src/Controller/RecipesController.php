@@ -359,6 +359,37 @@ class RecipesController extends AppController
     }
 
     /**
+     * Attach a recipe's uploaded image to the mailer as an inline (cid) part.
+     *
+     * @param \Cake\Mailer\Mailer $mailer The mailer to attach to.
+     * @param string|null $imagePath The stored relative path (e.g. recipes/<file>).
+     * @return string|null The content id to reference in the template, or null when there is no image.
+     */
+    private function attachRecipeImage(Mailer $mailer, ?string $imagePath): ?string
+    {
+        if ($imagePath === null) {
+            return null;
+        }
+        $full = WWW_ROOT . 'uploads' . DS . str_replace('/', DS, $imagePath);
+        if (!is_file($full)) {
+            return null;
+        }
+
+        $extension = pathinfo($full, PATHINFO_EXTENSION);
+        $mimeType = array_search($extension, self::ALLOWED_IMAGE_TYPES, true) ?: 'application/octet-stream';
+        $contentId = 'recipe-image';
+        $mailer->setAttachments([
+            'recipe.' . $extension => [
+                'file' => $full,
+                'mimetype' => $mimeType,
+                'contentId' => $contentId,
+            ],
+        ]);
+
+        return $contentId;
+    }
+
+    /**
      * POST /recipes/{id}/send-mail — e-mail a recipe to a given address (#13).
      *
      * @param int $id Recipe id.
@@ -386,9 +417,15 @@ class RecipesController extends AppController
         $mailer = new Mailer('default');
         $mailer
             ->setTo($email)
-            ->setSubject('Recipe: ' . $recipe->title)
+            ->setSubject('Recipe: ' . $recipe->title);
+
+        // Embed the hero image inline (cid) when present, so it always shows in
+        // the e-mail without depending on a publicly reachable URL.
+        $imageCid = $this->attachRecipeImage($mailer, $recipe->image_path);
+
+        $mailer
             ->setEmailFormat('html')
-            ->setViewVars(['recipe' => $recipe])
+            ->setViewVars(['recipe' => $recipe, 'imageCid' => $imageCid])
             ->viewBuilder()->setTemplate('recipe')->setLayout('default');
         $mailer->deliver();
 
