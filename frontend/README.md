@@ -1,59 +1,31 @@
-# Frontend
+# Recipe Collection — Frontend (Angular 20)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.29.
+The Angular single-page app for the Recipe Collection (Bootstrap 5, RxJS,
+standalone components, signals). See the [project README](../README.md) for the
+full picture.
 
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Develop
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # dev server at http://localhost:4200 (talks to the API on :8765/api)
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The API base URL comes from `src/environments/` — `/api` in production (the SPA is
+served behind the same nginx as the API), `http://localhost:8765/api` in dev.
+
+## Test
 
 ```bash
-ng generate --help
+npm test           # Karma/Jasmine unit specs (headless Chrome)
+npm run e2e        # cross-browser smoke test (Firefox + Chromium); needs the app running
 ```
 
-## Building
-
-To build the project run:
+## Build
 
 ```bash
-ng build
+npm run build      # production bundle in dist/frontend/browser/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+In Docker the build is served by nginx (`docker/frontend/`), which also proxies
+`/api` to the backend — a single origin, no CORS.

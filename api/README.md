@@ -1,58 +1,34 @@
-# CakePHP Application Skeleton
+# Recipe Collection — API (CakePHP 5)
 
-![Build Status](https://github.com/cakephp/app/actions/workflows/ci.yml/badge.svg?branch=5.x)
-[![Total Downloads](https://img.shields.io/packagist/dt/cakephp/app.svg?style=flat-square)](https://packagist.org/packages/cakephp/app)
-[![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
+The JSON REST backend for the Recipe Collection. See the
+[project README](../README.md) for setup, architecture and the full picture.
 
-A skeleton for creating applications with [CakePHP](https://cakephp.org) 5.x.
+## Endpoints (served under `/api`)
 
-The framework source code can be found here: [cakephp/cakephp](https://github.com/cakephp/cakephp).
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/status` | health check → `{"status":"ok"}` |
+| GET | `/api/recipes` | list (`?search=`, `?sort=title\|created`, `?direction=ASC\|DESC`) |
+| GET | `/api/recipes/{id}` | one recipe with ingredients |
+| GET | `/api/recipes/{id}/preview` | trimmed payload for the hover preview |
+| POST | `/api/recipes` | create a recipe + ingredients |
+| PUT | `/api/recipes/{id}` | update a recipe + replace ingredients |
+| DELETE | `/api/recipes/{id}` | delete a recipe (ingredients cascade) |
+| POST | `/api/recipes/{id}/send-mail` | e-mail the recipe to an address |
 
-## Installation
+## Schema
 
-1. Download [Composer](https://getcomposer.org/doc/00-intro.md) or update `composer self-update`.
-2. Run `php composer.phar create-project --prefer-dist cakephp/app [app_name]`.
+- `recipes` — `id`, `title`, `description`, `temperature` (°C, nullable),
+  `duration` (min, nullable), `created`
+- `ingredients` — `id`, `recipe_id` (FK, `ON DELETE CASCADE`), `name`,
+  `amount` `DECIMAL(8,2)`, `unit` `VARCHAR(50)`
 
-If Composer is installed globally, run
-
-```bash
-composer create-project --prefer-dist cakephp/app
-```
-
-In case you want to use a custom app dir name (e.g. `/myapp/`):
-
-```bash
-composer create-project --prefer-dist cakephp/app myapp
-```
-
-You can now either use your machine's webserver to view the default home page, or start
-up the built-in webserver with:
+## Common commands
 
 ```bash
-bin/cake server -p 8765
+# from the repo root, inside the php container:
+docker compose exec php bin/cake.php migrations migrate
+docker compose exec php bin/cake.php seeds run RecipesSeed   # chocolate-cake example
+docker compose exec php vendor/bin/phpunit                   # tests (separate MySQL test DB)
+docker compose exec php vendor/bin/phpcs                     # coding standard
 ```
-
-Then visit `http://localhost:8765` to see the welcome page.
-
-## Demo app
-
-Check out the [5.x-demo branch](https://github.com/cakephp/app/tree/5.x-demo), which contains demo migrations and a seeder.
-See the [README](https://github.com/cakephp/app/blob/5.x-demo/README.md) on how to get it running.
-
-## Update
-
-Since this skeleton is a starting point for your application and various files
-would have been modified as per your needs, there isn't a way to provide
-automated upgrades, so you have to do any updates manually.
-
-## Configuration
-
-Read and edit the environment specific `config/app_local.php` and set up the
-`'Datasources'` and any other configuration relevant for your application.
-Other environment agnostic settings can be changed in `config/app.php`.
-
-## Layout
-
-The app skeleton uses [Milligram](https://milligram.io/) (v1.3) minimalist CSS
-framework by default. You can, however, replace it with any other library or
-custom styles.

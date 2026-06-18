@@ -163,11 +163,11 @@ For native setups, point `api/`'s `DATABASE_URL` (via `.env` or
 
 ```bash
 # Backend (PHPUnit + CodeSniffer) — runs against a separate MySQL test database
-docker compose exec php vendor/bin/phpunit      # 35 tests
+docker compose exec php vendor/bin/phpunit      # 44 tests
 docker compose exec php vendor/bin/phpcs
 
 # Frontend (Karma + Jasmine, headless Chrome)
-cd frontend && npm test                          # 25 specs
+cd frontend && npm test                          # 30 specs
 
 # Cross-browser smoke test of all core flows in Firefox + Chromium
 cd frontend && npm run e2e                        # requires the app running
@@ -179,7 +179,9 @@ the captured e-mail (full HTML, subject, recipient) at **http://localhost:8025**
 Without Mailpit (leave `EMAIL_TRANSPORT_DEFAULT_URL` empty), the Debug transport
 logs each send to `logs/debug.log` instead.
 
-Tests run on every push via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+The backend (PHPUnit + phpcs) and frontend (Karma) unit tests run on every push
+via GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)); the
+cross-browser e2e smoke test is run locally (it needs the full stack running).
 
 ---
 
