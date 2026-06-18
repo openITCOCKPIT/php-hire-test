@@ -702,6 +702,7 @@ export class App implements OnInit {
     { label: 'Newest', value: 'created-DESC' },
     { label: 'Oldest', value: 'created-ASC' },
     { label: 'A–Z', value: 'title-ASC' },
+    { label: 'Z–A', value: 'title-DESC' },
   ];
 
   ngOnInit(): void {
@@ -1610,6 +1611,10 @@ git commit -m "Re-skin not-found page and finish accessibility pass"
   changing a filter or "Reset filters" while editing the New/Edit recipe form navigates to
   the list and discards unsaved input. A `CanDeactivate` guard with a "discard changes?"
   confirm should be added in a follow-up PR. Not implemented here to keep scope to the redesign.
+- **`load()` has no in-flight cancellation:** `resetFilters()` (sets sort + navigates) can fire
+  two concurrent list loads when a non-default sort AND an active search are both cleared at once.
+  The two requests build identical params, so the race is benign (one redundant request, no wrong
+  data). A `switchMap`/`exhaustMap` over a load trigger would tighten it — deferred as minor.
 
 ## Self-Review
 
