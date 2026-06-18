@@ -93,6 +93,8 @@ Replace the contents of `frontend/src/styles.scss` with:
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.15);
   --success-text: #4ade80;
+  --success-strong: #16a34a;
+  --success-ink: #04140a;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
 
   /* Map onto Bootstrap */
@@ -129,6 +131,8 @@ Replace the contents of `frontend/src/styles.scss` with:
   --success: #16a34a;
   --success-soft: #e9f9ee;
   --success-text: #15803d;
+  --success-strong: #1a9e48;
+  --success-ink: #04140a;
   --shadow: 0 6px 18px rgba(30, 30, 60, 0.07);
 
   --bs-body-bg: var(--app-bg);
@@ -157,18 +161,20 @@ body {
 /* Visible violet focus ring everywhere */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--app-bg), 0 0 0 4px var(--accent);
   border-color: var(--accent);
 }
 
 /* Positive primary action = green (New recipe, Save, Send) */
 .btn-success {
-  --bs-btn-color: #fff;
-  --bs-btn-hover-color: #fff;
+  --bs-btn-color: var(--success-ink);
+  --bs-btn-hover-color: var(--success-ink);
   --bs-btn-bg: var(--success);
   --bs-btn-border-color: var(--success);
-  --bs-btn-hover-bg: var(--success);
-  --bs-btn-hover-border-color: var(--success);
+  --bs-btn-hover-bg: var(--success-strong);
+  --bs-btn-hover-border-color: var(--success-strong);
+  --bs-btn-active-bg: var(--success-strong);
+  --bs-btn-active-border-color: var(--success-strong);
 }
 
 /* Duration / "ok" badge */
