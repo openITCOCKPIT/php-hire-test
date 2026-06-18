@@ -115,6 +115,14 @@ body {
   font-weight: 600;
 }
 
+/* Neutral meta badge (temperature, counts) — subtle, themed for both modes */
+.badge-meta {
+  background: var(--surface-3);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
 /* ---------- App shell ---------- */
 .app-shell {
   display: flex;
