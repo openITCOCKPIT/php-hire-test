@@ -46,6 +46,19 @@ frontend/src/environments/*                         # uploadsBaseUrl
   `Laminas\Diactoros\UploadedFile`; passing the file in the POST data does not work
   (the data is cast to strings). A `tearDown` removes any files the tests wrote.
 
+## Follow-up — image in the create/edit form
+
+The upload endpoint needs an existing recipe id, so the first cut only offered
+upload on the detail page — confusing when creating ("why can't I add a photo
+now?"). The form now has a "Photo (optional)" field that holds the chosen file and
+shows a local preview (`URL.createObjectURL`); on submit it **saves the recipe,
+then uploads the image to the new id** (a `switchMap` second step over the
+existing endpoint — no backend change), then navigates. An image failure does not
+block navigation (the recipe is already saved). In edit mode the existing photo is
+shown and can be replaced or removed (remove deletes it on save). Verified in the
+browser: creating "Apfelkuchen" with a chosen photo persists the recipe with its
+`image_path` and the photo appears on the list card.
+
 ## Verification
 
 ```

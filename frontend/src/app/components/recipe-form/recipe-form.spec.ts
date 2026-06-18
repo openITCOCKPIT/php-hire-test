@@ -74,6 +74,35 @@ describe('RecipeForm', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/']);
   });
 
+  it('creates the recipe then uploads the chosen image, then navigates', () => {
+    const navigateSpy = spyOn(router, 'navigate');
+    const comp = component as unknown as { onImageSelected: (e: Event) => void };
+
+    c().form.patchValue({ title: 'Pancakes', description: 'Mix' });
+    c().ingredients.at(0).patchValue({ name: 'flour', amount: 200, unit: 'g' });
+
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+    const input = document.createElement('input');
+    Object.defineProperty(input, 'files', { value: [file] });
+    comp.onImageSelected({ target: input } as unknown as Event);
+
+    c().submit();
+
+    // 1) the recipe is created
+    const createReq = httpMock.expectOne(url);
+    expect(createReq.request.method).toBe('POST');
+    createReq.flush({
+      recipe: { id: 5, title: 'Pancakes', description: 'Mix', temperature: null, duration: null, image_path: null, created: '', ingredients: [] },
+    });
+
+    // 2) the image is uploaded to the new recipe
+    const imgReq = httpMock.expectOne(`${url}/5/image`);
+    expect(imgReq.request.method).toBe('POST');
+    imgReq.flush({ recipe: { id: 5, image_path: 'recipes/abc.png' } });
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
+
   it('maps a 422 title error back onto the title control', () => {
     c().form.patchValue({ title: 'x' });
     c().ingredients.at(0).patchValue({ name: 'flour', amount: 200, unit: 'g' });

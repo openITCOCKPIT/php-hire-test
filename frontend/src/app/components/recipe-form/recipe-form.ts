@@ -1,9 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { RecipeService } from '../../services/recipe.service';
 import { NewRecipe, Recipe } from '../../models/recipe';
+import { recipeImageUrl } from '../../shared/image-url';
 
 @Component({
   selector: 'app-recipe-form',
@@ -11,7 +13,7 @@ import { NewRecipe, Recipe } from '../../models/recipe';
   templateUrl: './recipe-form.html',
   styleUrl: './recipe-form.scss',
 })
-export class RecipeForm implements OnInit {
+export class RecipeForm implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
@@ -20,6 +22,12 @@ export class RecipeForm implements OnInit {
   protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
   protected readonly editId = signal<number | null>(null);
+
+  // Image (#19): selected file held until the recipe is saved, then uploaded.
+  protected readonly existingImage = signal<string | null>(null);
+  protected readonly previewUrl = signal<string | null>(null);
+  private selectedImage: File | null = null;
+  private removeExistingImage = false;
 
   protected readonly form = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
@@ -41,8 +49,49 @@ export class RecipeForm implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.revokePreview();
+  }
+
+  // --- Image selection (#19) ---
+
+  /** The image to show: a freshly chosen file's preview, or the existing one. */
+  protected imageUrl(): string | null {
+    return this.previewUrl() ?? recipeImageUrl(this.existingImage());
+  }
+
+  protected onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+    if (!file) {
+      return;
+    }
+    this.revokePreview();
+    this.selectedImage = file;
+    this.removeExistingImage = false;
+    this.previewUrl.set(URL.createObjectURL(file));
+  }
+
+  protected clearImage(): void {
+    this.revokePreview();
+    this.selectedImage = null;
+    // In edit mode, a recipe that had an image must have it deleted on save.
+    this.removeExistingImage = this.editId() !== null && this.existingImage() !== null;
+    this.existingImage.set(null);
+  }
+
+  private revokePreview(): void {
+    const url = this.previewUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.previewUrl.set(null);
+    }
+  }
+
   /** Fill the form (incl. rebuilding the ingredient rows) from an existing recipe. */
   private populate(recipe: Recipe): void {
+    this.existingImage.set(recipe.image_path);
     this.form.patchValue({
       title: recipe.title,
       description: recipe.description ?? '',
@@ -101,13 +150,32 @@ export class RecipeForm implements OnInit {
       ? this.recipeService.updateRecipe(id, payload)
       : this.recipeService.createRecipe(payload);
 
-    request$.subscribe({
-      next: () => this.router.navigate(id ? ['/recipes', id] : ['/']),
-      error: (err: HttpErrorResponse) => {
-        this.submitting.set(false);
-        this.applyServerErrors(err);
-      },
-    });
+    // Save the recipe, then upload the chosen image to its id (a second step,
+    // since the upload endpoint needs an existing recipe). An image failure does
+    // not block navigation — the recipe is already saved.
+    request$
+      .pipe(
+        switchMap((saved) => {
+          if (this.selectedImage) {
+            return this.recipeService
+              .uploadRecipeImage(saved.id, this.selectedImage)
+              .pipe(map(() => saved), catchError(() => of(saved)));
+          }
+          if (this.removeExistingImage) {
+            return this.recipeService
+              .deleteRecipeImage(saved.id)
+              .pipe(map(() => saved), catchError(() => of(saved)));
+          }
+          return of(saved);
+        }),
+      )
+      .subscribe({
+        next: () => this.router.navigate(id ? ['/recipes', id] : ['/']),
+        error: (err: HttpErrorResponse) => {
+          this.submitting.set(false);
+          this.applyServerErrors(err);
+        },
+      });
   }
 
   /** Map a 422 {"errors": {...}} body back onto the form controls. */

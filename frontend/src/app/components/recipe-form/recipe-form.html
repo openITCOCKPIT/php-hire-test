@@ -47,6 +47,27 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <label class="form-label d-block">Photo (optional)</label>
+    @if (imageUrl(); as url) {
+      <img [src]="url" alt="Recipe photo" class="img-fluid rounded mb-2" style="max-height: 200px" />
+    }
+    <div class="d-flex gap-2 align-items-center">
+      <label class="btn btn-outline-secondary btn-sm mb-0">
+        {{ imageUrl() ? 'Change photo' : 'Choose photo' }}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          class="d-none"
+          (change)="onImageSelected($event)"
+        />
+      </label>
+      @if (imageUrl()) {
+        <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearImage()">Remove</button>
+      }
+    </div>
+  </div>
+
   <h2 class="h5">Ingredients</h2>
   <div formArrayName="ingredients">
     @for (group of ingredients.controls; track group; let i = $index) {
