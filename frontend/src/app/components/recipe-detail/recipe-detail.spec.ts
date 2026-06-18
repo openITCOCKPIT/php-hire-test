@@ -43,7 +43,11 @@ describe('RecipeDetail', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    // ngOnInit also loads notes after the recipe; flush any pending notes GET.
+    httpMock.match((r) => r.url.endsWith('/notes')).forEach((req) => req.flush({ notes: [] }));
+    httpMock.verify();
+  });
 
   it('loads and renders the recipe with formatted ingredients', () => {
     const fixture = TestBed.createComponent(RecipeDetail);
@@ -159,6 +163,52 @@ describe('RecipeDetail', () => {
     req.flush({ recipe: { ...recipe, image_path: 'recipes/abc.png' } });
 
     expect(component.imageUrl()).toContain('/uploads/recipes/abc.png');
+  });
+
+  it('loads notes and adds a new one', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const component = fixture.componentInstance as unknown as {
+      notes: () => { id: number; body: string }[];
+      noteBody: string;
+      addNote: () => void;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+    httpMock.expectOne(`${base}/1/notes`).flush({
+      notes: [{ id: 1, recipe_id: 1, author: 'Anna', body: 'Less sugar', created: '' }],
+    });
+    expect(component.notes().length).toBe(1);
+
+    component.noteBody = 'New note';
+    component.addNote();
+
+    const req = httpMock.expectOne(`${base}/1/notes`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ body: 'New note' });
+    req.flush({ note: { id: 2, recipe_id: 1, author: null, body: 'New note', created: '' } });
+
+    expect(component.notes().length).toBe(2);
+    expect(component.noteBody).toBe('');
+  });
+
+  it('deletes a note', () => {
+    const fixture = TestBed.createComponent(RecipeDetail);
+    const component = fixture.componentInstance as unknown as {
+      notes: () => { id: number }[];
+      deleteNote: (id: number) => void;
+    };
+    fixture.detectChanges();
+    httpMock.expectOne(`${base}/1`).flush({ recipe });
+    httpMock.expectOne(`${base}/1/notes`).flush({
+      notes: [{ id: 5, recipe_id: 1, author: null, body: 'x', created: '' }],
+    });
+
+    component.deleteNote(5);
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/notes/5`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ deleted: true });
+
+    expect(component.notes().length).toBe(0);
   });
 
   it('rejects an invalid e-mail without calling the API', () => {

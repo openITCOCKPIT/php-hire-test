@@ -89,6 +89,56 @@
       <h2 class="h5">Description</h2>
       <p style="white-space: pre-line">{{ r.description }}</p>
     }
+
+    <h2 class="h5 mt-4">Notes</h2>
+    @if (notes().length === 0) {
+      <p class="text-muted small">No notes yet.</p>
+    } @else {
+      <ul class="list-group mb-3">
+        @for (note of notes(); track note.id) {
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <div style="white-space: pre-line">{{ note.body }}</div>
+              <div class="text-muted small">
+                {{ note.author || 'Anonymous' }} · {{ note.created | date: 'dd.MM.yyyy' }}
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger ms-2"
+              aria-label="Delete note"
+              (click)="deleteNote(note.id)"
+            >
+              &times;
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <form (ngSubmit)="addNote()" class="mb-2">
+      <input
+        type="text"
+        class="form-control form-control-sm mb-2"
+        style="max-width: 16rem"
+        placeholder="Your name (optional)"
+        [(ngModel)]="noteAuthor"
+        name="noteAuthor"
+      />
+      <textarea
+        class="form-control mb-2"
+        rows="2"
+        placeholder="Add a note…"
+        [(ngModel)]="noteBody"
+        name="noteBody"
+      ></textarea>
+      <button type="submit" class="btn btn-secondary btn-sm" [disabled]="!noteBody.trim() || noteSaving()">
+        @if (noteSaving()) {
+          <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        Add note
+      </button>
+    </form>
   </article>
 
   @if (mailModalOpen()) {

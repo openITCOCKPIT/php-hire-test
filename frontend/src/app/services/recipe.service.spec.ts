@@ -101,6 +101,22 @@ describe('RecipeService', () => {
     req.flush({ deleted: true });
   });
 
+  it('getNotes / addNote / deleteNote hit the right endpoints', () => {
+    service.getNotes(1).subscribe();
+    httpMock.expectOne(`${base}/1/notes`).flush({ notes: [] });
+
+    service.addNote(1, { author: 'Me', body: 'Tasty' }).subscribe();
+    const addReq = httpMock.expectOne(`${base}/1/notes`);
+    expect(addReq.request.method).toBe('POST');
+    expect(addReq.request.body).toEqual({ author: 'Me', body: 'Tasty' });
+    addReq.flush({ note: { id: 1, recipe_id: 1, author: 'Me', body: 'Tasty', created: '' } });
+
+    service.deleteNote(1).subscribe();
+    const delReq = httpMock.expectOne(`${environment.apiBaseUrl}/notes/1`);
+    expect(delReq.request.method).toBe('DELETE');
+    delReq.flush({ deleted: true });
+  });
+
   it('deleteRecipe(id) DELETEs the recipe', () => {
     let result: { deleted: boolean } | undefined;
     service.deleteRecipe(1).subscribe((r) => (result = r));

@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RecipeService } from '../../services/recipe.service';
-import { Ingredient, Recipe } from '../../models/recipe';
+import { Ingredient, Note, Recipe } from '../../models/recipe';
 import { recipeImageUrl } from '../../shared/image-url';
 
 type LoadState = 'loading' | 'loaded' | 'notfound' | 'error';
@@ -40,6 +40,12 @@ export class RecipeDetail implements OnInit {
   protected readonly imageBusy = signal(false);
   protected readonly imageError = signal<string | null>(null);
 
+  // Notes (#20).
+  protected readonly notes = signal<Note[]>([]);
+  protected readonly noteSaving = signal(false);
+  protected noteAuthor = '';
+  protected noteBody = '';
+
   ngOnInit(): void {
     // paramMap (not snapshot) so navigating directly between detail pages reloads.
     this.route.paramMap
@@ -54,9 +60,44 @@ export class RecipeDetail implements OnInit {
         next: (recipe) => {
           this.recipe.set(recipe);
           this.state.set('loaded');
+          this.loadNotes(recipe.id);
         },
         error: (err) => this.state.set(err?.status === 404 ? 'notfound' : 'error'),
       });
+  }
+
+  // --- Notes (#20) ---
+
+  private loadNotes(recipeId: number): void {
+    this.recipeService.getNotes(recipeId).subscribe({
+      next: (notes) => this.notes.set(notes),
+      error: () => this.notes.set([]),
+    });
+  }
+
+  protected addNote(): void {
+    const recipe = this.recipe();
+    const body = this.noteBody.trim();
+    if (!recipe || !body) {
+      return;
+    }
+    this.noteSaving.set(true);
+    const author = this.noteAuthor.trim();
+    this.recipeService.addNote(recipe.id, author ? { author, body } : { body }).subscribe({
+      next: (note) => {
+        this.notes.update((current) => [note, ...current]);
+        this.noteAuthor = '';
+        this.noteBody = '';
+        this.noteSaving.set(false);
+      },
+      error: () => this.noteSaving.set(false),
+    });
+  }
+
+  protected deleteNote(noteId: number): void {
+    this.recipeService.deleteNote(noteId).subscribe({
+      next: () => this.notes.update((current) => current.filter((n) => n.id !== noteId)),
+    });
   }
 
   /** "100.00" -> "100", "1.50" -> "1.5" for cleaner display. */

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { NewRecipe, Recipe, RecipePreview, RecipeQueryParams } from '../models/recipe';
+import { NewRecipe, Note, Recipe, RecipePreview, RecipeQueryParams } from '../models/recipe';
 
 /**
  * Single HTTP abstraction for recipes. Components depend on this, not on
@@ -82,5 +82,24 @@ export class RecipeService {
   /** DELETE /recipes/{id}/image — remove the hero image (issue #19). */
   deleteRecipeImage(id: number): Observable<{ deleted: boolean }> {
     return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}/image`);
+  }
+
+  /** GET /recipes/{id}/notes — personal notes, newest first (issue #20). */
+  getNotes(recipeId: number): Observable<Note[]> {
+    return this.http
+      .get<{ notes: Note[] }>(`${this.baseUrl}/${recipeId}/notes`)
+      .pipe(map((response) => response.notes));
+  }
+
+  /** POST /recipes/{id}/notes — add a note (issue #20). */
+  addNote(recipeId: number, note: { author?: string; body: string }): Observable<Note> {
+    return this.http
+      .post<{ note: Note }>(`${this.baseUrl}/${recipeId}/notes`, note)
+      .pipe(map((response) => response.note));
+  }
+
+  /** DELETE /notes/{id} — delete a note (issue #20). */
+  deleteNote(noteId: number): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${environment.apiBaseUrl}/notes/${noteId}`);
   }
 }

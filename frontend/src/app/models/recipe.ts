@@ -23,6 +23,15 @@ export interface Recipe {
   ingredients: Ingredient[];
 }
 
+/** A personal note attached to a recipe (#20). */
+export interface Note {
+  id: number;
+  recipe_id: number;
+  author: string | null;
+  body: string;
+  created: string;
+}
+
 /** Trimmed payload for the hover preview (#12) — title, ≤5 ingredients, excerpt. */
 export interface RecipePreview {
   id: number;
