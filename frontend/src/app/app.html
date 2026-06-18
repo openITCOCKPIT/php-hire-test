@@ -1,35 +1,85 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" routerLink="/">{{ title() }}</a>
+<div class="app-shell">
+  <aside class="app-sidebar">
+    <a class="sidebar-brand navbar-brand" routerLink="/">
+      <span class="logo">🍳</span> {{ title() }}
+    </a>
 
-    <div class="navbar-search d-flex align-items-center ms-auto" [class.open]="searchOpen()">
-      <input
-        #searchInput
-        type="search"
-        class="form-control form-control-sm navbar-search-input"
-        placeholder="Search recipes…"
-        aria-label="Search recipes"
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchInput()"
-        (blur)="onSearchBlur()"
-        (keyup.escape)="closeSearch()"
-      />
+    <input
+      type="search"
+      class="form-control form-control-sm"
+      placeholder="Search recipes…"
+      aria-label="Search recipes"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchInput()"
+    />
+
+    <div class="sidebar-label">Duration</div>
+    <div class="filter-chips">
+      @for (d of durations; track d.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.duration() === d.value"
+          [attr.aria-pressed]="filters.duration() === d.value"
+          (click)="setDuration(d.value)"
+        >
+          {{ d.label }}
+        </button>
+      }
+    </div>
+
+    <div class="sidebar-label">Ingredients</div>
+    <div class="filter-chips">
+      @for (b of ingredientBuckets; track b.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.ingredients() === b.value"
+          [attr.aria-pressed]="filters.ingredients() === b.value"
+          (click)="setIngredients(b.value)"
+        >
+          {{ b.label }}
+        </button>
+      }
+    </div>
+
+    <div class="sidebar-label">Sort</div>
+    <div class="filter-chips">
+      @for (s of sorts; track s.value) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="filters.sort() === s.value"
+          [attr.aria-pressed]="filters.sort() === s.value"
+          (click)="setSort(s.value)"
+        >
+          {{ s.label }}
+        </button>
+      }
+    </div>
+
+    <button type="button" class="filter-reset" (click)="resetFilters()">↺ Reset filters</button>
+  </aside>
+
+  <div class="app-main">
+    <header class="app-topbar">
+      <span class="topbar-crumb"><b>{{ crumb() }}</b></span>
+      <span class="flex-grow-1"></span>
       <button
         type="button"
-        class="btn btn-outline-light btn-sm navbar-search-toggle d-flex align-items-center"
-        aria-label="Search recipes"
-        (click)="toggleSearch()"
+        class="icon-btn"
+        [attr.aria-pressed]="theme.theme() === 'light'"
+        aria-label="Toggle light and dark theme"
+        (click)="theme.toggle()"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path
-            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
-          />
-        </svg>
+        {{ theme.theme() === 'dark' ? '🌙' : '☀️' }}
       </button>
-    </div>
-  </div>
-</nav>
+      <a routerLink="/recipes/new" class="btn btn-success btn-sm">+ New Recipe</a>
+      <span class="topbar-avatar" aria-hidden="true">🍴</span>
+    </header>
 
-<main class="container py-4">
-  <router-outlet />
-</main>
+    <main class="app-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

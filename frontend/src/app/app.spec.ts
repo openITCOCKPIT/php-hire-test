@@ -4,6 +4,7 @@ import { Router, provideRouter } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { App } from './app';
 import { routes } from './app.routes';
+import { RecipeFilterService } from './services/recipe-filter.service';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -13,13 +14,12 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  /** Access protected members for testing. */
   const members = (fixture: ReturnType<typeof TestBed.createComponent<App>>) =>
     fixture.componentInstance as unknown as {
-      searchOpen: () => boolean;
       searchTerm: string;
-      toggleSearch: () => void;
       onSearchInput: () => void;
+      setDuration: (v: string) => void;
+      resetFilters: () => void;
     };
 
   it('should create the app', () => {
@@ -27,21 +27,11 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render the brand title in the navbar', () => {
+  it('renders the brand title', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.navbar-brand')?.textContent).toContain('Recipe Collection');
-  });
-
-  it('keeps the search field collapsed until the magnifier is clicked', () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-    const app = members(fixture);
-
-    expect(app.searchOpen()).toBeFalse();
-    app.toggleSearch();
-    expect(app.searchOpen()).toBeTrue();
   });
 
   it('navigates to the filtered list after typing settles', fakeAsync(() => {
@@ -71,4 +61,35 @@ describe('App', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(['/'], { queryParams: { search: null } });
   }));
+
+  it('updates the filter service when a duration chip is chosen', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    members(fixture).setDuration('lt15');
+    expect(TestBed.inject(RecipeFilterService).duration()).toBe('lt15');
+  });
+
+  it('preserves an active search: changing a filter while on /?search= does not navigate', () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    (fixture.componentInstance as unknown as { currentUrl: { set(v: string): void } }).currentUrl.set(
+      '/?search=cake',
+    );
+    members(fixture).setDuration('lt15');
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
+  it('navigates to the list when a filter changes from a detail page', () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    (fixture.componentInstance as unknown as { currentUrl: { set(v: string): void } }).currentUrl.set(
+      '/recipes/5',
+    );
+    members(fixture).setDuration('lt15');
+    expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
 });
