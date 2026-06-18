@@ -1,20 +1,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">Recipes</h1>
-  <a routerLink="/recipes/new" class="btn btn-primary">New Recipe</a>
-</div>
-
-<div class="d-flex flex-wrap gap-2 mb-4">
-  <select
-    class="form-select w-auto"
-    aria-label="Sort recipes"
-    [(ngModel)]="sort"
-    (ngModelChange)="onSortChange()"
-  >
-    <option value="created-DESC">Newest first</option>
-    <option value="created-ASC">Oldest first</option>
-    <option value="title-ASC">Title A–Z</option>
-    <option value="title-DESC">Title Z–A</option>
-  </select>
+  <div>
+    <h1 class="h3 mb-0">Recipes</h1>
+    @if (state() === 'loaded') {
+      <p class="text-muted small mb-0">{{ filteredRecipes().length }} of {{ recipes().length }} shown</p>
+    }
+  </div>
+  <a routerLink="/recipes/new" class="btn btn-success">New Recipe</a>
 </div>
 
 @if (state() === 'loading') {
@@ -34,16 +25,20 @@
   } @else {
     <div class="text-center text-muted py-5">
       <p class="mb-3">No recipes yet.</p>
-      <a routerLink="/recipes/new" class="btn btn-primary">Create the first one</a>
+      <a routerLink="/recipes/new" class="btn btn-success">Create the first one</a>
     </div>
   }
+} @else if (filteredRecipes().length === 0) {
+  <div class="text-center text-muted py-5">No recipes match these filters.</div>
 } @else {
   <div class="row g-3">
-    @for (recipe of recipes(); track recipe.id) {
+    @for (recipe of filteredRecipes(); track recipe.id) {
       <div class="col-12 col-md-6 col-lg-4">
-        <div class="card h-100">
+        <div class="card recipe-card h-100">
           @if (imageUrl(recipe.image_path); as url) {
             <img [src]="url" [alt]="recipe.title" class="card-img-top" style="height: 160px; object-fit: cover" />
+          } @else {
+            <div class="card-img-top thumb-placeholder" style="height: 160px">🍽️</div>
           }
           <div class="card-body">
             <h2 class="card-title h5">
@@ -61,7 +56,7 @@
               {{ recipe.ingredients.length === 1 ? 'ingredient' : 'ingredients' }}
             </p>
             @if (recipe.duration != null) {
-              <span class="badge text-bg-light">⏱ {{ recipe.duration }} min</span>
+              <span class="badge badge-duration">⏱ {{ recipe.duration }} min</span>
             }
           </div>
         </div>
@@ -71,11 +66,7 @@
 }
 
 @if (preview(); as p) {
-  <div
-    class="card shadow recipe-preview"
-    [style.top.px]="previewPos().top"
-    [style.left.px]="previewPos().left"
-  >
+  <div class="card shadow recipe-preview" [style.top.px]="previewPos().top" [style.left.px]="previewPos().left">
     @if (imageUrl(p.image_path); as url) {
       <img [src]="url" [alt]="p.title" class="card-img-top" style="height: 120px; object-fit: cover" />
     }

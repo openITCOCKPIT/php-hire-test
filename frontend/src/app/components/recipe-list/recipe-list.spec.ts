@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { RecipeList } from './recipe-list';
 import { environment } from '../../../environments/environment';
 import { Recipe } from '../../models/recipe';
+import { RecipeFilterService } from '../../services/recipe-filter.service';
 
 describe('RecipeList', () => {
   let httpMock: HttpTestingController;
@@ -36,6 +37,7 @@ describe('RecipeList', () => {
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
+    TestBed.inject(RecipeFilterService).reset();
   });
 
   afterEach(() => httpMock.verify());
@@ -75,12 +77,8 @@ describe('RecipeList', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Could not load recipes');
   });
 
-  it('requests the default sort on load and re-requests on sort change', () => {
+  it('requests the default sort on load and re-requests when the sort filter changes', () => {
     const fixture = TestBed.createComponent(RecipeList);
-    const component = fixture.componentInstance as unknown as {
-      sort: string;
-      onSortChange: () => void;
-    };
     fixture.detectChanges();
 
     const first = httpMock.expectOne((r) => r.url === url);
@@ -88,8 +86,8 @@ describe('RecipeList', () => {
     expect(first.request.params.get('direction')).toBe('DESC');
     first.flush({ recipes: [] });
 
-    component.sort = 'title-ASC';
-    component.onSortChange();
+    TestBed.inject(RecipeFilterService).sort.set('title-ASC');
+    fixture.detectChanges();
 
     const second = httpMock.expectOne((r) => r.url === url);
     expect(second.request.params.get('sort')).toBe('title');
@@ -172,5 +170,36 @@ describe('RecipeList', () => {
     // an emission with the same (empty) term must not trigger a second request
     queryParamMap$.next(convertToParamMap({ other: 'x' }));
     httpMock.expectNone((r) => r.url === url);
+  });
+
+  it('applies the duration filter client-side without a new request', () => {
+    const quick = { ...recipe, id: 1, duration: 10 };
+    const slow = { ...recipe, id: 2, duration: 90 };
+    const fixture = TestBed.createComponent(RecipeList);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [quick, slow] });
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.card').length).toBe(2);
+
+    TestBed.inject(RecipeFilterService).duration.set('lt15');
+    fixture.detectChanges();
+
+    httpMock.expectNone((r) => r.url === url);
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.card').length).toBe(1);
+  });
+
+  it('shows a no-match message when filters exclude every recipe', () => {
+    const fixture = TestBed.createComponent(RecipeList);
+    fixture.detectChanges();
+    httpMock.expectOne((r) => r.url === url).flush({ recipes: [{ ...recipe, duration: 5 }] });
+    fixture.detectChanges();
+
+    TestBed.inject(RecipeFilterService).duration.set('gt60');
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('No recipes match');
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.card').length).toBe(0);
   });
 });
