@@ -37,3 +37,4 @@ implementation log to see how it played out in practice.
 | #17 | Edit & delete recipes | [17-edit-delete-recipes.md](17-edit-delete-recipes.md) |
 | #18 | Containerise the frontend (single origin) | [18-containerise-frontend.md](18-containerise-frontend.md) |
 | #19 | Recipe image (hero photo upload) | [19-recipe-image.md](19-recipe-image.md) |
+| #20 | Personal notes per recipe | [20-recipe-notes.md](20-recipe-notes.md) |
