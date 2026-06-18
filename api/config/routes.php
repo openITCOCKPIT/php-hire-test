@@ -92,6 +92,17 @@ return function (RouteBuilder $routes): void {
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);
 
+        // Personal notes (#20).
+        $builder->get('/recipes/{recipeId}/notes', ['controller' => 'Notes', 'action' => 'index'])
+            ->setPatterns(['recipeId' => '\d+'])
+            ->setPass(['recipeId']);
+        $builder->post('/recipes/{recipeId}/notes', ['controller' => 'Notes', 'action' => 'add'])
+            ->setPatterns(['recipeId' => '\d+'])
+            ->setPass(['recipeId']);
+        $builder->delete('/notes/{id}', ['controller' => 'Notes', 'action' => 'delete'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
+
         // No fallbacks(): this API only serves the explicit routes above; any
         // other path returns a JSON 404 via the error renderer.
     });

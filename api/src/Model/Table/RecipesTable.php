@@ -58,6 +58,12 @@ class RecipesTable extends Table
             // deletes ingredients no longer present. Harmless on create.
             'saveStrategy' => 'replace',
         ]);
+
+        // Personal notes (#20); deleted with their recipe.
+        $this->hasMany('Notes', [
+            'foreignKey' => 'recipe_id',
+            'dependent' => true,
+        ]);
     }
 
     /**
