@@ -1,1 +1,284 @@
-/* You can add global styles to this file, and also import other style files */
+/* Cockpit design system — token layer over Bootstrap 5.3.
+   Overriding --bs-* variables re-themes Bootstrap components in both modes. */
+
+:root {
+  --r-card: 10px;
+  --r-control: 9px;
+  --r-pill: 999px;
+}
+
+/* ---------- DARK (default) ---------- */
+[data-bs-theme='dark'] {
+  --app-bg: #0f1117;
+  --surface: #171a24;
+  --surface-2: #1a1e2b;
+  --surface-3: #1d2130;
+  --border: #262b3b;
+  --border-soft: #232735;
+  --text: #e8eaf0;
+  --muted: #9aa0ad;
+  --faint: #7e8595;
+  --accent: #8b7bf0;
+  --accent-strong: #6d5cff;
+  --accent-soft: rgba(139, 123, 240, 0.16);
+  --success: #22c55e;
+  --success-soft: rgba(34, 197, 94, 0.15);
+  --success-text: #4ade80;
+  --success-strong: #16a34a;
+  --success-ink: #04140a;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+
+  /* Map onto Bootstrap */
+  --bs-body-bg: var(--app-bg);
+  --bs-body-color: var(--text);
+  --bs-primary: var(--accent);
+  --bs-primary-rgb: 139, 123, 240;
+  --bs-success: var(--success);
+  --bs-success-rgb: 34, 197, 94;
+  --bs-border-color: var(--border);
+  --bs-secondary-color: var(--muted);
+  --bs-tertiary-bg: var(--surface-3);
+  --bs-card-bg: var(--surface-2);
+  --bs-card-border-color: var(--border);
+  --bs-emphasis-color: var(--text);
+  --bs-link-color: var(--accent);
+  --bs-link-hover-color: var(--accent-strong);
+}
+
+/* ---------- LIGHT ---------- */
+[data-bs-theme='light'] {
+  --app-bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #ffffff;
+  --surface-3: #f1f2f5;
+  --border: #e6e8ee;
+  --border-soft: #eef0f3;
+  --text: #1f2330;
+  --muted: #6b7080;
+  --faint: #9398a6;
+  --accent: #6d5cff;
+  --accent-strong: #5847f0;
+  --accent-soft: rgba(109, 92, 255, 0.1);
+  --success: #16a34a;
+  --success-soft: #e9f9ee;
+  --success-text: #15803d;
+  --success-strong: #1a9e48;
+  --success-ink: #04140a;
+  --shadow: 0 6px 18px rgba(30, 30, 60, 0.07);
+
+  --bs-body-bg: var(--app-bg);
+  --bs-body-color: var(--text);
+  --bs-primary: var(--accent);
+  --bs-primary-rgb: 109, 92, 255;
+  --bs-success: var(--success);
+  --bs-success-rgb: 22, 163, 74;
+  --bs-border-color: var(--border);
+  --bs-secondary-color: var(--muted);
+  --bs-tertiary-bg: var(--surface-3);
+  --bs-card-bg: var(--surface-2);
+  --bs-card-border-color: var(--border);
+  --bs-emphasis-color: var(--text);
+  --bs-link-color: var(--accent);
+  --bs-link-hover-color: var(--accent-strong);
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible violet focus ring everywhere */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--app-bg), 0 0 0 4px var(--accent);
+  border-color: var(--accent);
+}
+
+/* Positive primary action = green (New recipe, Save, Send) */
+.btn-success {
+  --bs-btn-color: var(--success-ink);
+  --bs-btn-hover-color: var(--success-ink);
+  --bs-btn-bg: var(--success);
+  --bs-btn-border-color: var(--success);
+  --bs-btn-hover-bg: var(--success-strong);
+  --bs-btn-hover-border-color: var(--success-strong);
+  --bs-btn-active-bg: var(--success-strong);
+  --bs-btn-active-border-color: var(--success-strong);
+}
+
+/* Duration / "ok" badge */
+.badge-duration {
+  background: var(--success-soft);
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+/* ---------- App shell ---------- */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+.app-sidebar {
+  width: 240px;
+  flex: none;
+  background: var(--surface);
+  border-right: 1px solid var(--border-soft);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 22px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+}
+.app-content {
+  flex: 1;
+  padding: 22px 24px 32px;
+}
+
+.sidebar-brand {
+  font-weight: 700;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 4px 6px 10px;
+}
+.sidebar-brand .logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+}
+.sidebar-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 14px 0 8px;
+  padding: 0 4px;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.filter-chip {
+  font-size: 12px;
+  padding: 6px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+.filter-chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.filter-reset {
+  margin-top: auto;
+  font-size: 12.5px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+
+.topbar-crumb {
+  font-size: 13px;
+  color: var(--muted);
+}
+.topbar-crumb b {
+  color: var(--text);
+}
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-control);
+  border: 1px solid var(--border);
+  background: var(--surface-3);
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- Content panels (detail view) ---------- */
+.panel {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 18px 20px;
+}
+
+/* Themed gradient placeholder when a recipe has no photo */
+.thumb-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
+  color: var(--faint);
+}
+
+/* Card hover lift */
+.recipe-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+/* Sidebar collapses to a horizontal filter bar on small screens */
+@media (max-width: 992px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .app-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .filter-reset {
+    margin-top: 0;
+  }
+}
