@@ -2,6 +2,12 @@
   color: inherit;
 }
 
+// The whole card is a click target (Bootstrap stretched-link on the title),
+// so show the pointer cursor across the entire card, not just the title.
+.card {
+  cursor: pointer;
+}
+
 .recipe-preview {
   position: absolute;
   z-index: 1050;
