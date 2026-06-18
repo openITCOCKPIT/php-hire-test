@@ -13,6 +13,7 @@ use Cake\ORM\Entity;
  * @property string|null $description
  * @property int|null $temperature
  * @property int|null $duration
+ * @property string|null $image_path
  * @property \Cake\I18n\DateTime $created
  *
  * @property \App\Model\Entity\Ingredient[] $ingredients
@@ -34,7 +35,9 @@ class Recipe extends Entity
         'temperature' => true,
         'duration' => true,
         'ingredients' => true,
-        // created is owned by the Timestamp behaviour, not client input.
+        // created is owned by the Timestamp behaviour, image_path by the upload
+        // endpoint — neither is mass-assignable from request JSON.
         'created' => false,
+        'image_path' => false,
     ];
 }

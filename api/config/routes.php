@@ -76,6 +76,12 @@ return function (RouteBuilder $routes): void {
         $builder->post('/recipes/{id}/send-mail', ['controller' => 'Recipes', 'action' => 'sendMail'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);
+        $builder->post('/recipes/{id}/image', ['controller' => 'Recipes', 'action' => 'uploadImage'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
+        $builder->delete('/recipes/{id}/image', ['controller' => 'Recipes', 'action' => 'deleteImage'])
+            ->setPatterns(['id' => '\d+'])
+            ->setPass(['id']);
         $builder->get('/recipes/{id}', ['controller' => 'Recipes', 'action' => 'view'])
             ->setPatterns(['id' => '\d+'])
             ->setPass(['id']);

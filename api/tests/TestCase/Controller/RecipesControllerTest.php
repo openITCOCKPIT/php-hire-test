@@ -6,6 +6,7 @@ namespace App\Test\TestCase\Controller;
 use Cake\TestSuite\EmailTrait;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
+use Laminas\Diactoros\UploadedFile;
 
 /**
  * @uses \App\Controller\RecipesController
@@ -19,6 +20,39 @@ class RecipesControllerTest extends TestCase
         'app.Recipes',
         'app.Ingredients',
     ];
+
+    /**
+     * Uploaded image files created during a test, cleaned up in tearDown.
+     *
+     * @var list<string>
+     */
+    private array $uploadedFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->uploadedFiles as $relative) {
+            $full = WWW_ROOT . 'uploads' . DS . str_replace('/', DS, $relative);
+            if (is_file($full)) {
+                unlink($full);
+            }
+        }
+        $this->uploadedFiles = [];
+        parent::tearDown();
+    }
+
+    /**
+     * Build a one-pixel PNG temp file and wrap it as an uploaded file.
+     */
+    private function pngUpload(): UploadedFile
+    {
+        $png = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+        );
+        $tmp = tempnam(sys_get_temp_dir(), 'png');
+        file_put_contents($tmp, $png);
+
+        return new UploadedFile($tmp, strlen($png), UPLOAD_ERR_OK, 'photo.png', 'image/png');
+    }
 
     public function testIndexReturnsRecipesWithIngredients(): void
     {
@@ -415,6 +449,91 @@ class RecipesControllerTest extends TestCase
     {
         $this->delete('/api/recipes/9999');
         $this->assertResponseCode(404);
+    }
+
+    public function testUploadImageStoresFileAndSetsPath(): void
+    {
+        $this->configRequest(['files' => ['image' => $this->pngUpload()]]);
+        $this->post('/api/recipes/1/image');
+
+        $this->assertResponseOk();
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $path = $body['recipe']['image_path'];
+        $this->uploadedFiles[] = $path;
+
+        $this->assertMatchesRegularExpression('#^recipes/[0-9a-f]{32}\.png$#', $path);
+        $this->assertFileExists(WWW_ROOT . 'uploads' . DS . str_replace('/', DS, $path));
+        // the response is a complete recipe, ingredients included
+        $this->assertCount(3, $body['recipe']['ingredients']);
+    }
+
+    public function testUploadImageRejectsNonImageType(): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'txt');
+        file_put_contents($tmp, 'not an image');
+        $file = new UploadedFile($tmp, 12, UPLOAD_ERR_OK, 'note.txt', 'text/plain');
+
+        $this->configRequest(['files' => ['image' => $file]]);
+        $this->post('/api/recipes/1/image');
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('JPEG, PNG or WebP');
+    }
+
+    public function testUploadImageRejectsSpoofedContent(): void
+    {
+        // Text claiming to be a PNG: passes the media-type check, fails getimagesize.
+        $tmp = tempnam(sys_get_temp_dir(), 'fake');
+        file_put_contents($tmp, 'this is not really a png');
+        $file = new UploadedFile($tmp, 24, UPLOAD_ERR_OK, 'fake.png', 'image/png');
+
+        $this->configRequest(['files' => ['image' => $file]]);
+        $this->post('/api/recipes/1/image');
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('not a valid image');
+    }
+
+    public function testUploadImageTooLargeReturns422(): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'big');
+        $fh = fopen($tmp, 'w');
+        fseek($fh, 5 * 1024 * 1024); // 5 MB + 1 byte
+        fwrite($fh, '0');
+        fclose($fh);
+        $file = new UploadedFile($tmp, (int)filesize($tmp), UPLOAD_ERR_OK, 'big.png', 'image/png');
+
+        $this->configRequest(['files' => ['image' => $file]]);
+        $this->post('/api/recipes/1/image');
+
+        $this->assertResponseCode(422);
+        $this->assertResponseContains('5 MB');
+    }
+
+    public function testUploadImageUnknownIdReturns404(): void
+    {
+        $this->configRequest(['files' => ['image' => $this->pngUpload()]]);
+        $this->post('/api/recipes/9999/image');
+        $this->assertResponseCode(404);
+    }
+
+    public function testDeleteImageRemovesFileAndClearsPath(): void
+    {
+        $this->configRequest(['files' => ['image' => $this->pngUpload()]]);
+        $this->post('/api/recipes/1/image');
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $path = $body['recipe']['image_path'];
+        $full = WWW_ROOT . 'uploads' . DS . str_replace('/', DS, $path);
+        $this->assertFileExists($full);
+
+        $this->delete('/api/recipes/1/image');
+
+        $this->assertResponseOk();
+        $this->assertFileDoesNotExist($full);
+
+        $this->get('/api/recipes/1');
+        $body = (array)json_decode((string)$this->_response->getBody(), true);
+        $this->assertNull($body['recipe']['image_path']);
     }
 
     public function testInvalidRecipeIsNotPersisted(): void

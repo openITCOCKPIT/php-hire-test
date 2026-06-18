@@ -21,6 +21,22 @@ use Cake\Validation\Validation;
 class RecipesController extends AppController
 {
     /**
+     * Maximum upload size for a recipe image (5 MB).
+     */
+    private const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+    /**
+     * Accepted image media types mapped to the stored file extension.
+     *
+     * @var array<string, string>
+     */
+    private const ALLOWED_IMAGE_TYPES = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    /**
      * GET /recipes — list all recipes with their ingredients.
      *
      * @return void
@@ -131,6 +147,7 @@ class RecipesController extends AppController
         $preview = [
             'id' => $recipe->id,
             'title' => $recipe->title,
+            'image_path' => $recipe->image_path,
             'ingredients' => $ingredients,
             'descriptionExcerpt' => $excerpt,
         ];
@@ -246,6 +263,99 @@ class RecipesController extends AppController
         $this->Recipes->deleteOrFail($recipe);
 
         return $this->jsonResponse(200, ['deleted' => true]);
+    }
+
+    /**
+     * POST /recipes/{id}/image — upload (or replace) the recipe's hero image (#19).
+     *
+     * @param int $id Recipe id.
+     * @return \Cake\Http\Response|null A 422 response on an invalid file, or null on success.
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function uploadImage(int $id): ?Response
+    {
+        $recipe = $this->Recipes->find()
+            ->where(['Recipes.id' => $id])
+            ->contain('Ingredients')
+            ->first();
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $file = $this->request->getUploadedFile('image');
+        if ($file === null || $file->getError() !== UPLOAD_ERR_OK) {
+            return $this->jsonResponse(422, ['errors' => ['image' => ['No image was uploaded.']]]);
+        }
+        if ($file->getSize() > self::MAX_IMAGE_BYTES) {
+            return $this->jsonResponse(422, ['errors' => ['image' => ['Image must be 5 MB or smaller.']]]);
+        }
+        $extension = self::ALLOWED_IMAGE_TYPES[(string)$file->getClientMediaType()] ?? null;
+        if ($extension === null) {
+            return $this->jsonResponse(422, ['errors' => ['image' => ['Only JPEG, PNG or WebP images are allowed.']]]);
+        }
+
+        $dir = WWW_ROOT . 'uploads' . DS . 'recipes';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $filename = bin2hex(random_bytes(16)) . '.' . $extension;
+        $target = $dir . DS . $filename;
+        $file->moveTo($target);
+
+        // Real-content check: getimagesize returns false for a non-image whose
+        // media type was spoofed. Reject and clean up if so.
+        if (getimagesize($target) === false) {
+            @unlink($target);
+
+            return $this->jsonResponse(422, ['errors' => ['image' => ['The file is not a valid image.']]]);
+        }
+
+        $this->deleteImageFile($recipe->image_path);
+        $recipe->image_path = 'recipes/' . $filename;
+        $this->Recipes->saveOrFail($recipe);
+
+        $this->set('recipe', $recipe);
+        $this->viewBuilder()->setClassName('Json')->setOption('serialize', ['recipe']);
+
+        return null;
+    }
+
+    /**
+     * DELETE /recipes/{id}/image — remove the recipe's hero image (#19).
+     *
+     * @param int $id Recipe id.
+     * @return \Cake\Http\Response The JSON result.
+     * @throws \Cake\Http\Exception\NotFoundException When the recipe does not exist.
+     */
+    public function deleteImage(int $id): Response
+    {
+        $recipe = $this->Recipes->find()->where(['Recipes.id' => $id])->first();
+        if ($recipe === null) {
+            throw new NotFoundException('Recipe not found');
+        }
+
+        $this->deleteImageFile($recipe->image_path);
+        $recipe->image_path = null;
+        $this->Recipes->saveOrFail($recipe);
+
+        return $this->jsonResponse(200, ['deleted' => true]);
+    }
+
+    /**
+     * Delete an uploaded image file from disk, if present.
+     *
+     * @param string|null $imagePath The stored relative path (e.g. recipes/<file>).
+     * @return void
+     */
+    private function deleteImageFile(?string $imagePath): void
+    {
+        if ($imagePath === null) {
+            return;
+        }
+        $full = WWW_ROOT . 'uploads' . DS . str_replace('/', DS, $imagePath);
+        if (is_file($full)) {
+            @unlink($full);
+        }
     }
 
     /**
