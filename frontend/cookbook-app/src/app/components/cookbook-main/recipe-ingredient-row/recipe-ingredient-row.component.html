@@ -1,0 +1,17 @@
+<div class="row cookbook-form-ingredient-row">
+    <div class="col-4">
+        <input class="form-control" [(ngModel)]="ingredient.ingredientName" [value]="ingredient.ingredientName" placeholder="Name der Zutat *">
+    </div>
+
+    <div class="col-3">
+        <input class="form-control" [(ngModel)]="ingredient.unitOfMeasure" [value]="ingredient.unitOfMeasure" placeholder="Maßeinheit">
+    </div>
+
+    <div class="col-4">
+        <input class="form-control" type="number" min="0" [(ngModel)]="ingredient.amount" [value]="ingredient.amount" placeholder="Menge *">
+    </div>
+
+    <div class="col-1">
+       <button type="button" class="btn btn-primary" (click)="removeIngredient.emit(ingredient)">Zutat Entfernen</button>
+    </div>
+</div>

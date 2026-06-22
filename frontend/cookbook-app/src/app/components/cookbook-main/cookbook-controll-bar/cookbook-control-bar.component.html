@@ -1,0 +1,80 @@
+<div class="control-bar row">
+    <div class="col-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Rezept Suchen" [(ngModel)]="searchValue" (ngModelChange)="searchRecipe.emit(searchValue)">
+            <span class="input-group-text">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+               Rezepte nach Kategorie filtern
+            </button>
+
+            <ul class="dropdown-menu">
+                <li (click)="onChooseFilter('')">
+                    <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter.trim() === ''">
+                        Alle anzeigen
+                        <i *ngIf="chooseCategoryFilter.trim() === ''" class="fas fa-check-circle"></i>
+                    </a>
+                </li>
+
+                <li (click)="onChooseFilter('vorspeise')">
+                    <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter === 'vorspeise'">
+                        Vorspeisen
+                        <i *ngIf="chooseCategoryFilter.trim() === 'vorspeise'" class="fas fa-check-circle"></i>
+                    </a>
+                </li>
+
+                <li (click)="onChooseFilter('hauptgericht')">
+                    <a class="dropdown-item"  [class.choosen-control]="chooseCategoryFilter === 'hauptgericht'">
+                        Hauptgerichte
+                        <i *ngIf="chooseCategoryFilter.trim() === 'hauptgericht'" class="fas fa-check-circle"></i>
+                    </a>
+                </li>
+
+                <li (click)="onChooseFilter('dessert')">
+                    <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter === 'dessert'">
+                        Desserts
+                        <i *ngIf="chooseCategoryFilter.trim() === 'dessert'" class="fas fa-check-circle"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Rezepte sortieren
+            </button>
+
+            <ul class="dropdown-menu">
+                <li *ngIf="chooseSortField !== 'title' || chooseSortDir === 'desc'" (click)="onChooseSortFieldAndDir('title', 'asc')">
+                    <a class="dropdown-item">Rezepte aufsteigend nach Titel sortieren</a>
+                </li>
+
+                <li *ngIf="chooseSortField === 'title' && chooseSortDir !== 'desc'" (click)="onChooseSortFieldAndDir('title', 'desc')">
+                    <a class="dropdown-item">Rezepte absteigend nach Titel sortieren</a>
+                </li>
+
+                <li *ngIf="chooseSortField !== 'createdDate' || chooseSortDir === 'desc'" (click)="onChooseSortFieldAndDir('createdDate', 'asc')">
+                    <a class="dropdown-item">Rezepte aufsteigend nach Erstellungsdatum sortieren</a>
+                </li>
+
+                <li *ngIf="chooseSortField === 'createdDate' && chooseSortDir !== 'desc'" (click)="onChooseSortFieldAndDir('createdDate', 'desc')">
+                    <a class="dropdown-item">Rezepte absteigend nach Erstellungsdatum sortieren</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <button class="btn btn-primary" type="button" (click)="onCreateNewRecipe()">
+            Neues Rezept erstellen
+        </button>
+    </div>
+</div>

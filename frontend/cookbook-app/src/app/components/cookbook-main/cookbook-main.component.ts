@@ -1,0 +1,67 @@
+import { Component, OnInit } from '@angular/core';
+import {CookbookService} from "../../../services/cookbook.service";
+import {CookbookDummyService} from "../../../services/cookbook-dummy.service";
+import {AppService} from "../../../services/app-service.service";
+import {Recipe} from "../../../model/recipe";
+
+@Component({
+  selector: 'app-cookbook-main',
+  templateUrl: './cookbook-main.component.html'
+})
+export class CookbookMainComponent implements OnInit {
+  public recipeList: Recipe[];
+  public sortedRecipeList: Recipe[];
+  public filteredRecipeList: Recipe[];
+  public sortDirection: string = 'asc';
+  public sortField: string = 'title';
+  public searchRecipe: string = '';
+  public categoryFilter: string = '';
+
+  constructor(public appService: AppService, public cookbookService: CookbookService, public cookbookDummyService: CookbookDummyService) {
+  }
+
+  ngOnInit(){
+    this.appService.openPageLoading();
+
+    this.cookbookDummyService.loadAllRecipes().then((recipes: Recipe[]) => {
+      this.recipeList = recipes;
+      this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByTitle(this.recipeList, 'asc'));
+      this.filteredRecipeList = Object.assign([], this.sortedRecipeList);
+
+      this.appService.closePageLoading();
+    });
+  }
+
+  public onSearchRecipe(search: string) {
+    this.searchRecipe = search.trim();
+    this.filteredRecipeList = this.cookbookService.searchRecipe(Object.assign([], this.recipeList), search);
+
+    this.onSort(this.sortField, this.sortDirection);
+    this.onFilter(this.categoryFilter);
+  }
+
+  public onSort(field: string, direction: string) {
+    this.sortField  = field;
+    this.sortDirection = direction;
+
+    switch (field) {
+      case 'title':
+        this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByTitle(this.filteredRecipeList, direction))
+        break;
+      case 'createdDate':
+        this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByCreatedDate(this.filteredRecipeList, direction))
+        break;
+    }
+  }
+
+  public onFilter(category: string) {
+    this.categoryFilter = category;
+
+    if(category.trim() !== '') {
+      this.filteredRecipeList = Object.assign([], this.cookbookDummyService.filterRecipes(this.sortedRecipeList, category));
+    } else if(this.searchRecipe.trim() === '') {
+      this.filteredRecipeList = Object.assign([], this.recipeList);
+      this.onSort(this.sortField, this.sortDirection);
+    }
+  }
+}

@@ -1,1 +1,125 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@import '@angular/material/theming';
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/@fortawesome/fontawesome-free/css/all.min";
+
+@include mat.core();
+
+:root {
+  --main-color: #956e3d;
+  --main-color-bg: #e6d9c4;
+  --contend-area: #dab992;
+  --font-color-main: #503511;
+  --contend-area-highlight: #503511;
+  --font-color-highlight: #dab992;
+}
+
+body {
+  background-color: var(--main-color-bg);
+  font-family: Onest;
+  font-size: 13pt;
+  caret-color: transparent;
+}
+
+input, textarea {
+  caret-color: var(--font-color-main);
+}
+
+.mat-dialog-container {
+  box-shadow: 0 11px 15px -7px #0003, 0 24px 38px 3px #00000024, 0 9px 46px 8px #0000001f;
+  background: #fff;
+  color: #000000de;
+}
+
+.system-msg mat-dialog-container{
+  padding: 0;
+}
+
+#cookbook-main {
+  display: grid;
+  grid-template-rows: 7% auto 4%;
+  grid-column-gap: 0.3em;
+  height: 100vh;
+  color: var(--font-color-main);
+}
+
+#cookbook-main .cookbook-navbar {
+  background-color: var(--contend-area);
+}
+
+#cookbook-main .control-bar {
+  background-color: var(--contend-area);
+  padding: 3em;
+  margin: 0.4em 0 0;
+}
+
+#cookbook-main .cookbook-row {
+  box-shadow: 0 11px 15px -7px #0003, 0 24px 38px 3px #00000024, 0 9px 46px 8px #0000001f;
+  background-color: var(--contend-area);
+  padding: 3em;
+  margin: 0.4em 0;
+  position: relative;
+  color: var(--font-color-main);
+}
+
+#cookbook-main .cookbook-row:last-child {
+  margin-bottom: 0;
+}
+
+#cookbook-main .cookbook-details-preview-hidden {
+  height: 0;
+  transition: 0.3s;
+  overflow: hidden;
+}
+
+#cookbook-main .cookbook-details-preview {
+  transition: 0.3s;
+}
+
+#cookbook-main .cookbook-btn-round {
+  border-radius: 100%;
+  background-color: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+  border: unset;
+}
+
+#cookbook-main .cookbook-edit-btn i {
+  border-radius: 100%;
+  color: var(--font-color-highlight)
+}
+
+
+#cookbook-main .cookbook-form .row {
+  margin: 0.4em 0;
+}
+
+#cookbook-main .cookbook-form-header .row.form-title {
+  background-color: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+  font-family: Sacramento;
+  font-size: 33pt;
+}
+
+#cookbook-main .cookbook-form-header .row.form-body {
+  background-color: var(--contend-area);
+  color: var(--font-color-main);
+}
+
+
+
+// Font ---------------------------------------------------------------------------------------------------------------
+
+@font-face {
+  font-family: 'Sacramento';
+  font-style: normal;
+  font-weight: 400;
+  src: url('assets/fonts/sacramento-v17-latin_latin-ext-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Onest';
+  font-style: normal;
+  src: url('assets/fonts/onest-v9-latin_latin-ext-100.woff2') format('woff2');
+}

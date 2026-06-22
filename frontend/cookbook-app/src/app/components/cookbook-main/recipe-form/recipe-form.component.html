@@ -1,0 +1,93 @@
+<app-main-layout>
+    <div id="cookbook-form">
+        <ng-container *ngIf="!appService.loading">
+            <div class="row form-title">
+                <div class="col-12 text-center">
+                    <ng-container *ngIf="recipe.id > 0">
+                        {{recipe.title}} bearbeiten
+                    </ng-container>
+
+                    <ng-container *ngIf="recipe.id === 0">
+                        Neues Rezept erstellen
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="row form-body">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label for="recipe-titel" class="form-label">Rezept Titel <span class="form-required">*</span></label>
+                        <input class="form-control" id="recipe-titel" [value]="editRecipe.title" [(ngModel)]="editRecipe.title">
+                        <div class="form-text">Der Name des Rezepts</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label for="recipe-category" class="form-label">Rezept Kategorie <span class="form-required">*</span></label>
+                        <select class="form-select" id="recipe-category" [(ngModel)]="editRecipe.category">
+                            <option>Bitte auswählen</option>
+                            <option [selected]="editRecipe.category === 'vorspeise'" value="vorspeise">Vorspeise</option>
+                            <option [selected]="editRecipe.category === 'hauptgericht'" value="hauptgericht">Hauptgericht</option>
+                            <option [selected]="editRecipe.category === 'dessert'" value="dessert">Dessert</option>
+                        </select>
+                        <div class="form-text">Hier können sie Auswählen welche Kategorie das Rezept hat</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label for="recipe-description" class="form-label">Anleitung <span class="form-required">*</span></label>
+                        <textarea class="form-control text-area-input"[(ngModel)]="editRecipe.description"></textarea>
+                        <div class="form-text">Beschreibung der Herstellung</div>
+                    </div>
+                </div>
+
+                <div class="col-12 ingredients-area">
+                    <div class="row ingredients-header">
+                        <div class="col-11">
+                            <h3>Zutaten</h3>
+                        </div>
+
+                        <div class="col-1">
+                            <button class="cookbook-btn-round" (click)="onAddIngredient()">
+                                <i class="fa-solid fa-circle-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="editRecipe.ingredients.length > 0">
+                        <ng-container *ngFor="let ingredient of editRecipe.ingredients">
+                            <app-recipe-ingredient-row
+                                    [ingredient]="ingredient"
+                                    (removeIngredient)="onRemoveIngredient($event)">
+                            </app-recipe-ingredient-row>
+                        </ng-container>
+                    </ng-container>
+                </div>
+
+                <div class="col-12">
+                    <div class="row">
+                        <div [class.col-4]="editRecipe.id === 0" [class.col-3]="editRecipe.id > 0">
+                            <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onSaveRecipe()">
+                                Rezept speichern
+                            </button>
+                        </div>
+
+                        <div *ngIf="editRecipe.id > 0" class="col-3">
+                            <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onDeleteRecipe()">
+                                Rezept löschen
+                            </button>
+                        </div>
+
+                        <div [class.col-4]="editRecipe.id === 0" [class.col-3]="editRecipe.id > 0">
+                            <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onCloseForm()">
+                                Zurück zur Rezeptliste
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</app-main-layout>
