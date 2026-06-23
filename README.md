@@ -12,6 +12,9 @@ Your task is to create a recipe collection where a user is able to browse throug
 
 Recipes should be able to be sent as e-mail to a given e-mail address.
 
+
+**While AI usage is not forbidden, we ask you to limit it to research purpose only. Please do not submit fully AI generated code. 🧠 + 🤖**
+
 **Notice: Use plain PHP or [CakePHP](http://cakephp.org/) as framework, Typescript and [Angular](https://angular.dev/)!**
 
 ## Features
