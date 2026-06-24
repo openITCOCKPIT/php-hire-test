@@ -1,0 +1,15 @@
+{
+  "name": "marekpeters35/cookbook_service",
+  "description": "cookbook_service",
+  "authors": [
+    {
+      "name": "mpeters",
+      "email": "marekpeters35@gmail.con"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "cookbook_service\\": ""
+    }
+  }
+}

@@ -1,11 +1,35 @@
 import { Injectable } from '@angular/core';
 import {AppService} from "./app-service.service";
 import {Recipe} from "../model/recipe";
+import {HttpClient} from "@angular/common/http";
 import * as moment from "moment";
 
 @Injectable()
 export class CookbookService {
-    constructor(appService: AppService) {
+    constructor(private appService: AppService, private http: HttpClient) {
+    }
+
+    public testRequestGet() {
+        const url: string = AppService.generateApplicationUrl();
+
+        const options: any = {
+            params: {
+                action: 'halloService',
+            }
+        };
+        const promise = this.http.get(url, options).toPromise();
+        promise.then(()=>{}).catch((error) => console.error(error));
+    }
+
+    public testRequestPost() {
+        const params: any = {
+            action: 'halloService',
+        };
+
+        const url = AppService.generateApplicationUrl();
+        const promise = this.http.post(url, JSON.stringify(params)).toPromise();
+        promise.then(()=>{}).catch((error) => console.error(error));
+
     }
 
     public searchRecipe(recipeList: Recipe[], recipeName: string ) {

@@ -1,0 +1,169 @@
+<?php
+
+namespace cookbook_service\model;
+
+class recipe
+{
+    /**
+     * @var int
+     */
+    private $id = 0;
+    /**
+     * @var string
+     */
+    private $title = '';
+    /**
+     * @var string
+     */
+    private $category = '';
+    /**
+     * @var string
+     */
+    private $description = '';
+    /**
+     * @var ingredient[]
+     */
+    private $ingredients = [];
+    /**
+     * @var \DateTime
+     */
+    private $createdAt;
+    /**
+     * @var bool
+     */
+    private $deleted = false;
+
+    /**
+     * @return int
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId(int $id) {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle(string $title){
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCategory() {
+        return $this->category;
+    }
+
+    /**
+     * @param string $category
+     * @return $this
+     */
+    public function setCategory(string $category) {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(string $description) {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return ingredient[]
+     */
+    public function getIngredients() {
+        return $this->ingredients;
+    }
+
+    /**
+     * @param ingredient[] $ingredients
+     * @return $this
+     */
+    public function setIngredients(array $ingredients) {
+        $this->ingredients = $ingredients;
+        return $this;
+    }
+
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(): \DateTime {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param string $rawDate
+     * @return $this
+     */
+    public function setCreatedAt(string $rawDate) {
+        $rawDateSplit = explode('-', $rawDate);
+        $this->createdAt = (new \DateTime())->setDate($rawDateSplit[0], $rawDate[1], $rawDate[2]);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeleted() {
+        return $this->deleted;
+    }
+
+    /**
+     * @param bool $deleted
+     * @return $this
+     */
+    public function setDeleted(bool $deleted) {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function export() {
+        $ingredients = array_map(function (ingredient $ingredient) {
+            return $ingredient->export();
+        }, $this->ingredients);
+
+        return [
+          'id' => $this->getId(),
+          'title'=> $this->getTitle(),
+          'category' => $this->getCategory(),
+          'ingredients'=> $this->getIngredients(),
+          'description' => $this->getDescription(),
+          'created' => $this->getCreatedAt()->format('Y-m-d'),
+          'deleted' => $this->isDeleted()? 0: 1
+        ];
+    }
+}

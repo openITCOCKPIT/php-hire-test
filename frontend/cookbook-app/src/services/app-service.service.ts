@@ -19,7 +19,7 @@ export class AppService {
       private dialog: MatDialog) {
   }
 
-  public static generateApplicationUrl(route: string) {
+  public static generateApplicationUrl() {
     if (document.domain === 'localhost') {
       AppService.protocol = 'http';
       AppService.port = 4567;
@@ -27,9 +27,9 @@ export class AppService {
     }
 
     if (AppService.port === undefined) {
-      return AppService.protocol + '://' + AppService.host + route;
+      return AppService.protocol + '://' + AppService.host;
     } else {
-      return AppService.protocol + '://' + AppService.host + ':' + AppService.port + route;
+      return AppService.protocol + '://' + AppService.host + ':' + AppService.port;
     }
   }
 
