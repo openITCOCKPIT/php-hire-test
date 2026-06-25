@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {CookbookService} from "../../../services/cookbook.service";
-import {CookbookDummyService} from "../../../services/cookbook-dummy.service";
 import {AppService} from "../../../services/app-service.service";
 import {Recipe} from "../../../model/recipe";
 
@@ -17,15 +16,15 @@ export class CookbookMainComponent implements OnInit {
   public searchRecipe: string = '';
   public categoryFilter: string = '';
 
-  constructor(public appService: AppService, public cookbookService: CookbookService, public cookbookDummyService: CookbookDummyService) {
+  constructor(public appService: AppService, public cookbookService: CookbookService) {
   }
 
   ngOnInit(){
     this.appService.openPageLoading();
 
-    this.cookbookDummyService.loadAllRecipes().then((recipes: Recipe[]) => {
+    this.cookbookService.loadAllRecipes().then((recipes: Recipe[]) => {
       this.recipeList = recipes;
-      this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByTitle(this.recipeList, 'asc'));
+      this.sortedRecipeList = Object.assign([], this.cookbookService.sortRecipesByTitle(this.recipeList, 'asc'));
       this.filteredRecipeList = Object.assign([], this.sortedRecipeList);
 
       this.appService.closePageLoading();
@@ -46,10 +45,10 @@ export class CookbookMainComponent implements OnInit {
 
     switch (field) {
       case 'title':
-        this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByTitle(this.filteredRecipeList, direction))
+        this.sortedRecipeList = Object.assign([], this.cookbookService.sortRecipesByTitle(this.filteredRecipeList, direction))
         break;
       case 'createdDate':
-        this.sortedRecipeList = Object.assign([], this.cookbookDummyService.sortRecipesByCreatedDate(this.filteredRecipeList, direction))
+        this.sortedRecipeList = Object.assign([], this.cookbookService.sortRecipesByCreatedDate(this.filteredRecipeList, direction))
         break;
     }
   }
@@ -58,7 +57,7 @@ export class CookbookMainComponent implements OnInit {
     this.categoryFilter = category;
 
     if(category.trim() !== '') {
-      this.filteredRecipeList = Object.assign([], this.cookbookDummyService.filterRecipes(this.sortedRecipeList, category));
+      this.filteredRecipeList = Object.assign([], this.cookbookService.filterRecipes(this.sortedRecipeList, category));
     } else if(this.searchRecipe.trim() === '') {
       this.filteredRecipeList = Object.assign([], this.recipeList);
       this.onSort(this.sortField, this.sortDirection);

@@ -19,6 +19,30 @@ export class Recipe {
         return copy;
     }
 
+    public static import(rawRecipe: any) {
+        const recipe: Recipe = new Recipe();
+        recipe.id = parseInt(rawRecipe.id);
+
+        recipe.title = rawRecipe.title;
+        recipe.category = rawRecipe.category;
+        recipe.description = rawRecipe.description;
+
+        if (rawRecipe.ingredients.length > 0) {
+            recipe.ingredients = rawRecipe.ingredients.map((rawIngredient: any) => {
+                return Ingredient.import(rawIngredient);
+            });
+        }
+
+        return recipe;
+    }
+
+    public static createDummyForLoading(recipeId: number) {
+        const recipe: Recipe = new Recipe();
+        recipe.id = recipeId;
+
+        return recipe;
+    }
+
     public isValid() {
         const title: boolean = (this.title.trim() !== '');
         const description: boolean = (this.description.trim() !== '');

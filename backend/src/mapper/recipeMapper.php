@@ -11,7 +11,7 @@ class recipeMapper extends baseMapper
      * @return recipe[]
      */
     public function loadRecipeList() {
-        $sql = 'SELECT * FROM recipe WHERE deleted=0 ORDER BY title ASC';
+        $sql = 'SELECT id, title, category, createdAt FROM recipe WHERE deleted=0 ORDER BY title ASC';
 
         $stmt = $this->getPdo()->prepare($sql);
         $stmt->execute();
@@ -46,6 +46,50 @@ class recipeMapper extends baseMapper
         }
 
         return $this->convertRawRecipe($rawRecipe);
+    }
+
+    /**
+     * @param recipe $recipe
+     * @return int
+     * @throws cookbookException
+     */
+    public function createRecipe(Recipe $recipe) {
+        $sql = 'INSERT INTO recipe (title, category, description, createdAt) 
+                VALUES            (:title, :category, :description, :createdAt)';
+
+        $stmt = $this->getPdo()->prepare($sql);
+        $stmt->bindValue('title', $recipe->getTitle());
+        $stmt->bindValue('category', $recipe->getCategory());
+        $stmt->bindValue('description', $recipe->getDescription());
+        $stmt->bindValue('createdAt', $recipe->getCreatedAt()->format('Y-m-d'));
+
+        if(!$stmt->execute()) {
+            throw new cookbookException('Cant create recipe!', 400);
+        }
+
+        return intval($this->getPdo()->lastInsertId());
+    }
+
+    /**
+     * @param recipe $recipe
+     * @return $this
+     * @throws cookbookException
+     */
+    public function updateRecipe(Recipe $recipe) {
+        $sql = 'UPDATE recipe  SET title=:title, category=:category, description=:description
+                WHERE id=:id';
+
+        $stmt = $this->getPdo()->prepare($sql);
+        $stmt->bindValue('title', $recipe->getTitle());
+        $stmt->bindValue('category', $recipe->getCategory());
+        $stmt->bindValue('description', $recipe->getDescription());
+        $stmt->bindValue('id', $recipe->getId(), \PDO::PARAM_INT);
+
+        if(!$stmt->execute()) {
+            throw new cookbookException('Cant update recipe!', 400);
+        }
+
+        return $this;
     }
 
     /**

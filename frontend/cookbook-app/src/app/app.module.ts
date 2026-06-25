@@ -6,8 +6,6 @@ import {AppComponent} from './app.component';
 import {AppService} from "../services/app-service.service";
 import {HttpClientModule} from "@angular/common/http";
 import {CookbookService} from "../services/cookbook.service";
-import {CookbookDummyService} from "../services/cookbook-dummy.service";
-import {PageLoadingComponent} from './components/shared-components/page-loading/page-loading.component';
 import {SharedComponentsModule} from "./modules/shared-componens/shared-components.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
@@ -24,8 +22,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
   ],
   providers: [
       AppService,
-      CookbookService,
-      CookbookDummyService,
+      CookbookService
   ],
   bootstrap: [AppComponent]
 })

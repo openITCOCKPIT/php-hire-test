@@ -35,7 +35,7 @@ class recipeController extends baseController
      */
     public function recipeDetails(array $data) {
         if(!array_key_exists('recipeId', $data) || intval($data['recipeId']) === 0) {
-            return $this->responseError(406, 'Missing requiered param recipeId');
+            return $this->responseError(406, 'Missing incomining recipeId!');
         }
 
         try {
@@ -53,7 +53,23 @@ class recipeController extends baseController
      * @return string
      */
     public function createRecipe(array $data) {
-        return '';
+       if (!isset($data['recipe'])) {
+           return $this->responseError(406, 'Missing incomining recipe!');
+       }
+       $recipe = (new recipe())->import($data['recipe']);
+
+       if (!$recipe->isValid()) {
+           return $this->responseError(406, 'Recipe is not valid!');
+       }
+
+       try {
+            $recipe->setId($this->getRecipeMapper()->createRecipe($recipe));
+            $this->getIngredientMapper()->createIngredientsForRecipe($recipe);
+
+            return $this->responseJson(['newRecipeId'=>$recipe->getId()]);
+       } catch (cookbookException $cookbookException) {
+            return $this->responseError(intval($cookbookException->getCode()), $cookbookException->getMessage());
+       }
     }
 
     /**
@@ -61,7 +77,32 @@ class recipeController extends baseController
      * @return string
      */
     public function editRecipe(array $data) {
-        return '';
+        if(!isset($data['recipe'])) {
+            return $this->responseError(406, 'Missing incomining recipe!');
+        }
+        $recipe = (new recipe())->import($data['recipe']);
+
+        if ($recipe->getId() === 0) {
+            return $this->responseError(404, 'Cant recipe id at incoming data!');
+        }
+        try {
+            $existRecipe = $this->getRecipeMapper()->loadRecipeById($recipe->getId());
+
+            if ($existRecipe->getId() === 0 || $existRecipe->getId() !== $recipe->getId()) {
+                return $this->responseError(404, 'Cant find recipe with given id!');
+            }
+
+            if (!$recipe->isValid()) {
+                return $this->responseError(406, 'Recipe is not valid!');
+            }
+
+            $this->getRecipeMapper()->updateRecipe($recipe);
+            $this->getIngredientMapper()->replaceRecipeIngredients($recipe);
+
+            return $this->responseJson(['success'=> true]);
+        } catch (cookbookException $cookbookException) {
+            return $this->responseError(intval($cookbookException->getCode()), $cookbookException->getMessage());
+        }
     }
 
     /**
@@ -69,16 +110,26 @@ class recipeController extends baseController
      * @return string
      */
     public function deleteRecipe(array $data){
-        if (!array_key_exists('recipeId', $data)) {
-            return $this->responseError(406, 'Missing requiered param recipeId');
+        if(!isset($data['recipeId'])) {
+            return $this->responseError(406, 'Missing incomining recipe id!');
         }
 
         try {
-             $recipe = $this->getRecipeMapper()->loadRecipeById((int) $data['recipeId']);
-             $this->getIngredientMapper()->deleteAllIngredientsForRecipe($recipe->getId());
-             $this->getRecipeMapper()->deleteRecipe($recipe->getId());
+            $recipe = $this->getRecipeMapper()->loadRecipeById(intval($data['recipeId']));
 
-             return $this->responseJson(['success' => true]);
+            if ($recipe->getId() === 0) {
+                return $this->responseError(404, 'Cant recipe id at incoming data!');
+            }
+            $existRecipe = $this->getRecipeMapper()->loadRecipeById($recipe->getId());
+
+            if ($existRecipe->getId() === 0 || $existRecipe->getId() !== $recipe->getId()) {
+                return $this->responseError(404, 'Cant find recipe with given id!');
+            }
+
+            $this->getIngredientMapper()->deleteAllIngredientsForRecipe($recipe->getId());
+            $this->getRecipeMapper()->deleteRecipe($recipe->getId());
+
+            return $this->responseJson(['success' => true]);
         } catch (cookbookException $cookbookException) {
             return $this->responseError(intval($cookbookException->getCode()), $cookbookException->getMessage());
         }

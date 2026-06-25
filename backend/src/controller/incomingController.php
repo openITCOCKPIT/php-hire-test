@@ -14,21 +14,31 @@ class incomingController extends baseController {
     private $setupController;
 
     function __construct() {
+        $this->getSetupController()->testConnection();
+    }
+
+    /**
+     * @throws cookbookException
+     * @return string
+     */
+    public function routeIncomingRequest() {
+        // CORS HEADER for external service
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST');
         header("Access-Control-Allow-Headers: X-Requested-With");
 
-        $_POST = json_decode(file_get_contents('php://input'), true);
-    }
+        $data = [];
+        $action = 'nothing';
 
-    /**
-     * @param string $action
-     * @param array $data
-     * @throws cookbookException
-     * @return string
-     */
-    public function routeIncomingRequest(string $action, array $data = []) {
-        $this->getSetupController()->testConnection();
+        $_POST = json_decode(file_get_contents('php://input'), true);
+
+        if (isset($_POST['action'])) {
+            $action = $_POST['action'];
+            $data = $_POST;
+        } elseif (isset($_GET['action'])) {
+            $action = $_GET['action'];
+            $data = $_GET;
+        }
 
         return match ($action) {
             'halloService' => $this->responseJson(['success'=> true]),
@@ -38,7 +48,7 @@ class incomingController extends baseController {
             'editRecipe' => $this->getRecipeController()->editRecipe($data),
             'deleteRecipe' => $this->getRecipeController()->deleteRecipe($data),
             'setupExampleRecipes' => $this->getSetupController()->setupExampleRecipes(),
-            default => $this->responseError(404, 'The given request was not found'),
+            default => $this->responseError(405, 'The given request is not registerd'),
         };
     }
 

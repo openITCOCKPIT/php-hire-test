@@ -11,13 +11,4 @@ export class WelcomePageComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
-  onTestGet() {
-    this.cookbookService.testRequestGet();
-  }
-
-  onTestPost() {
-    this.cookbookService.testRequestPost();
-  }
-
 }

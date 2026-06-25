@@ -11,7 +11,7 @@ abstract class baseController
         http_response_code(200);
         $this->setResponseHeader('json');
 
-        return json_encode([$data]);
+        return json_encode($data);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace cookbook_service\mapper;
 
 use cookbook_service\exception\cookbookException;
 use cookbook_service\model\ingredient;
+use cookbook_service\model\recipe;
 
 class ingredientMapper extends baseMapper
 {
@@ -31,7 +32,44 @@ class ingredientMapper extends baseMapper
     }
 
     /**
+     * @param recipe $recipe
+     * @return $this
+     * @throws cookbookException
+     */
+    public function replaceRecipeIngredients(recipe $recipe) {
+        return $this
+                ->deleteAllIngredientsForRecipe($recipe->getId())
+                ->createIngredientsForRecipe($recipe);
+    }
+
+    /**
+     * @param recipe $recipe
+     * @return $this
+     * @throws cookbookException
+     */
+    public function createIngredientsForRecipe(recipe $recipe) {
+        foreach ($recipe->getIngredients() as $ingredient) {
+          $sql = 'INSERT INTO ingredient (recipeId, ingredientName, unitOfMeasure, amount)
+                  VALUES (:recipeId, :ingredientName, :unitOfMeasure, :amount)';
+
+
+          $stmt = $this->getPdo()->prepare($sql);
+          $stmt->bindValue('recipeId', $recipe->getId(), \PDO::PARAM_INT);
+          $stmt->bindValue('ingredientName', $ingredient->getIngredientName());
+          $stmt->bindValue('unitOfMeasure', $ingredient->getUnitOfMeasure());
+          $stmt->bindValue('amount', $ingredient->getAmount());
+
+          if(!$stmt->execute()) {
+              throw new cookbookException('cant create ingredients for recipe');
+          }
+        }
+
+        return $this;
+    }
+
+    /**
      * @param $recipeId
+     * @return $this
      * @throws cookbookException
      */
     public function deleteAllIngredientsForRecipe($recipeId){
@@ -43,6 +81,8 @@ class ingredientMapper extends baseMapper
         if(!$stmt->execute()) {
             throw new cookbookException('Cant delete ingredients for recipe with id'.$recipeId);
         }
+
+        return $this;
     }
 
     /**

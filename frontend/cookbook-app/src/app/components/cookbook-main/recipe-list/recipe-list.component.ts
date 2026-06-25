@@ -1,8 +1,7 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Recipe} from "../../../../model/recipe";
 import {Router} from "@angular/router";
 import {CookbookService} from "../../../../services/cookbook.service";
-import {CookbookDummyService} from "../../../../services/cookbook-dummy.service";
 
 @Component({
   selector: 'app-recipe-list',
@@ -15,14 +14,14 @@ export class RecipeListComponent implements OnInit {
   public previewRecipe: Recipe = new Recipe();
   public detailRecipe: Recipe = new Recipe();
 
-  constructor(public cookbookService: CookbookService, public cookbookDummyService: CookbookDummyService, public router: Router) {
+  constructor(public cookbookService: CookbookService, public router: Router) {
   }
 
   ngOnInit(): void {
   }
 
   public onShowPreview(recipe: Recipe) {
-    this.cookbookDummyService.loadRecipeById(recipe.id).then((recipe: Recipe) => {
+    this.cookbookService.loadRecipeById(recipe).then((recipe: Recipe) => {
       this.detailRecipe = recipe;
     });
   }
@@ -33,6 +32,7 @@ export class RecipeListComponent implements OnInit {
 
   public onHidePreview() {
     this.previewRecipe = new Recipe();
+    this.detailRecipe = new Recipe();
   }
 
   public onEditRecipe(recipeId: number) {

@@ -9,16 +9,104 @@ export class CookbookService {
     constructor(private appService: AppService, private http: HttpClient) {
     }
 
-    public testRequestGet() {
-        const url: string = AppService.generateApplicationUrl();
+    public async loadAllRecipes(): Promise<Recipe[]> {
+        let recipes: Recipe[] = [];
 
         const options: any = {
             params: {
-                action: 'halloService',
+                action: 'recipeList',
             }
         };
-        const promise = this.http.get(url, options).toPromise();
-        promise.then(()=>{}).catch((error) => console.error(error));
+        const promise = this.http.get(AppService.generateApplicationUrl(), options).toPromise();
+
+        return await promise.then((response: any) => {
+            if (response.recipes.length === 0) {
+                return recipes;
+            }
+            response.recipes.map((rawRecipe: any) => {
+                return Recipe.import(rawRecipe);
+            });
+        }).catch((error) => {
+            console.error(error);
+            this.appService.showErrorDlg('Die Rezepteliste konnte nicht geladen werden!');
+            return recipes;
+        });
+    }
+
+    public async loadRecipeById(recipe: Recipe):Promise<Recipe> {
+        const options: any = {
+            params: {
+                action: 'recipeDetails',
+                recipeId: recipe.id,
+            }
+        };
+        const promise = this.http.get(AppService.generateApplicationUrl(), options).toPromise();
+
+        return await promise.then((response: any): Recipe => {
+            if (response.recipe) {
+                return recipe;
+            }
+            return Recipe.import(response.recipe);
+        }).catch((error) => {
+            console.error(error);
+
+            if(recipe.title.trim() !== '') {
+                this.appService.showErrorDlg('Die Details für das Rezept '+recipe.title+' konnten nicht geladen werden!');
+            } else {
+                this.appService.showErrorDlg('Das Rezept konnten nicht geladen werden!');
+            }
+
+            return recipe;
+        });
+    }
+
+    public async createRecipe(recipe: Recipe): Promise<number> {
+        const params: any = {
+            action: 'createRecipe',
+            recipe: recipe
+        };
+        const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
+
+        return await promise.then((response: any) => {
+            return parseInt(response.newRecipeId);
+        }).catch((error: any)=> {
+            console.error(error);
+
+            this.appService.showErrorDlg('Fehler: Das Rezept konnte nicht anglegt werden!');
+            return 0;
+        });
+    }
+
+    public async updateRecipe(recipe: Recipe): Promise<boolean> {
+        const params: any = {
+            action: 'updateRecipe',
+            recipe: recipe
+        };
+        const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
+
+        return await promise.then((response: any) => {
+            return true;
+        }).catch((error: any)=> {
+            console.error(error);
+            this.appService.showErrorDlg('Fehler: Das Rezept konnte nicht gespeichert werden!');
+            return false;
+        });
+    }
+
+    public async deleteRecipe(recipeId: number): Promise<boolean> {
+        const params: any = {
+            action: 'deleteRecipe',
+            recipeId: recipeId
+        };
+        const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
+
+        return await promise.then((response: any) => {
+            return true;
+        }).catch((error: any)=> {
+            console.error(error);
+            this.appService.showErrorDlg('Fehler: Das Rezept konnte nicht gelöscht werden!');
+            return false;
+        });
     }
 
     public testRequestPost() {
@@ -29,7 +117,6 @@ export class CookbookService {
         const url = AppService.generateApplicationUrl();
         const promise = this.http.post(url, JSON.stringify(params)).toPromise();
         promise.then(()=>{}).catch((error) => console.error(error));
-
     }
 
     public searchRecipe(recipeList: Recipe[], recipeName: string ) {
