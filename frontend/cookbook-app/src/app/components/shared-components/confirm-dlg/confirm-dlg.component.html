@@ -5,7 +5,7 @@
 <div class="confirm-box">
   <div style="min-width: 28rem; min-height: 16rem">
     <div class="row" style="align-self: center; height: 12em; align-content: center;">
-      <div *ngIf="details !== ''" class="col-12" style="text-align: justify; font-size: 10pt; color: gray">
+      <div *ngIf="details !== ''" class="col-12" style="text-align: justify; color: var(--font-color-main)">
           {{ details }}
       </div>
     </div>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="col-6">
-      <button class="btn btn btn-primary" (click)="onClose()">Nein}</button>
+      <button class="btn btn btn-primary" (click)="onClose()">Nein</button>
     </div>
   </div>
 </div>

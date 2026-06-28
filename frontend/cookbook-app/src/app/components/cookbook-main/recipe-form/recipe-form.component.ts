@@ -99,8 +99,6 @@ export class RecipeFormComponent implements OnInit {
   }
 
   public onDeleteRecipe() {
-    this.appService.openPageLoading();
-
     const dailogHelper = new ConfirmDialogHelper(
         this.dialog, '' +
         'Löschen bestätigen',
@@ -108,12 +106,14 @@ export class RecipeFormComponent implements OnInit {
     );
 
     dailogHelper.afterDecision().then((result: boolean)=> {
-      this.appService.openPageLoading();
-
       if (result) {
-        this.cookbookService.deleteRecipe(this.editRecipe.id).then(()=>{
-          this.appService.showSuccessDlg('Das Rezept wurde erfolgreich entfernt');
-          this.onCloseForm();
+        this.appService.openPageLoading();
+
+        this.cookbookService.deleteRecipe(this.editRecipe.id).then((result: boolean)=> {
+          if (result) {
+            this.appService.showSuccessDlg('Das Rezept wurde erfolgreich entfernt');
+            this.onCloseForm();
+          }
         });
       }
     });

@@ -114,18 +114,20 @@ class recipeMapper extends baseMapper
 
     /**
      * @param int $recipeId
-     * @return void
+     * @return $this
      * @throws cookbookException
      */
     public function deleteRecipe(int $recipeId) {
-        $sql = "UPDATE recipe SET deleted=1 WHERE recipeId=:recipeId";
+        $sql = "UPDATE recipe SET deleted = 1 WHERE id=:id";
 
         $stmt = $this->getPdo()->prepare($sql);
-        $stmt->bindValue('recipeId', $recipeId, \PDO::PARAM_INT);
+        $stmt->bindValue('id', $recipeId, \PDO::PARAM_INT);
 
-        if(!$stmt->execute()) {
+        if (!$stmt->execute()) {
             throw new cookbookException('Cant delete recipe with id'.$recipeId);
         }
+
+        return $this;
     }
 
     /**

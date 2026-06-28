@@ -70,14 +70,14 @@ class ingredientMapper extends baseMapper
      * @return $this
      * @throws cookbookException
      */
-    public function deleteAllIngredientsForRecipe($recipeId){
+    public function deleteAllIngredientsForRecipe($recipeId) {
         $sql = "UPDATE ingredient SET deleted=1 WHERE recipeId=:recipeId";
 
         $stmt = $this->getPdo()->prepare($sql);
         $stmt->bindValue('recipeId', $recipeId, \PDO::PARAM_INT);
 
         if(!$stmt->execute()) {
-            throw new cookbookException('Cant delete ingredients for recipe with id'.$recipeId);
+            throw new cookbookException('Cant delete ingredients for recipe with id '.$recipeId);
         }
 
         return $this;
