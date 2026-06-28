@@ -1,0 +1,16 @@
+services:
+  www:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "4567:80"
+  db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: 'cookbook_db'
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./db/cookbook.sql:/docker-entrypoint-initdb.d/cookbook.sql"

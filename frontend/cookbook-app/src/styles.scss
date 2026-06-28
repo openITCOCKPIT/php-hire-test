@@ -1,0 +1,364 @@
+@use '@angular/material' as mat;
+@import '@angular/material/theming';
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/@fortawesome/fontawesome-free/css/all.min";
+
+@include mat.core();
+
+:root {
+  --main-color: #956e3d;
+  --main-color-bg: #e6d9c4;
+  --contend-area: #dab992;
+  --font-color-main: #503511;
+  --contend-area-highlight: #503511;
+  --font-color-highlight: #e6d9c4;
+}
+
+body {
+  background-color: var(--main-color-bg);
+  font-family: Onest;
+  font-size: 13pt;
+  caret-color: transparent;
+}
+
+input, textarea {
+  caret-color: var(--font-color-main);
+}
+
+.btn-primary  {
+  background-color: var(--contend-area-highlight);
+  border: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+}
+
+.btn-primary:hover {
+  background-color: #472d0c;
+  border: #472d0c;
+}
+
+.btn-primary.btn.show  {
+  background-color: var(--contend-area-highlight);
+  border: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+}
+
+.btn-primary.btn:first-child:active  {
+  background-color: var(--contend-area-highlight);
+  border: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+}
+
+.mat-dialog-container {
+  box-shadow: 0 11px 15px -7px #0003, 0 24px 38px 3px #00000024, 0 9px 46px 8px #0000001f;
+  background: var(--contend-area);
+  color: var(--font-color-main);
+}
+
+.system-msg mat-dialog-container{
+  padding: 0;
+}
+
+#cookbook-main {
+  display: grid;
+  grid-template-rows: 7% auto 4%;
+  grid-column-gap: 0.3em;
+  height: 100vh;
+  color: var(--font-color-main);
+}
+
+#cookbook-main .cookbook-navbar {
+  background-color: var(--contend-area);
+}
+
+// Welcome Page--------------------------------------------------------------------------------
+
+.cookbook-welcome {
+  padding: 3em;
+  background-color: var(--contend-area);
+  color: var(--font-color-main);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  height: 100%;
+  align-content: center;
+  margin: 0;
+}
+
+.cookbook-welcome-msg {
+  color: var(--font-color-main);
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.cookbook-welcome-msg h2{
+  font-family: Sacramento;
+  font-size: 65pt;
+}
+
+
+// Control Bar---------------------------------------------------------------------------------
+
+#cookbook-main .control-bar {
+  background-color: var(--contend-area);
+  padding: 3em;
+  margin: 0.4em 0 0;
+}
+
+#cookbook-main .control-bar:first-child{
+  margin: 0;
+}
+
+#cookbook-main .control-bar .search-container {
+  position: relative;
+}
+
+#cookbook-main .control-bar .search-container:focus {
+  height: 50px;
+  padding-left: 35px;
+  border: 1px groove var(--font-color-main);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--main-color-bg);
+  color: var(--font-color-main);
+}
+
+#cookbook-main .control-bar .search-container .search-input {
+  height: 50px;
+  padding-left: 35px;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--main-color-bg);
+  color: var(--font-color-main);
+}
+
+#cookbook-main .control-bar .search-container .search-icon {
+  position: absolute;
+  top: 33%;
+  left: 0.3em;
+  color: var(--main-color);
+}
+
+#cookbook-main .control-bar .search-container .add-icon {
+  position: absolute;
+  top: 44%;
+  right: 0;
+}
+
+#cookbook-main .control-bar .control-bar-button-group .btn{
+  width: 100%;
+  margin-top: 0.4em;
+}
+
+// Main Area --------------------------------------------------------------------------------------
+
+#cookbook-main .recipe-area {
+  max-height: 32em;
+  overflow-y: auto;
+}
+
+#cookbook-main .cookbook-row {
+  box-shadow: 0 11px 15px -7px #0003, 0 24px 38px 3px #00000024, 0 9px 46px 8px #0000001f;
+  background-color: var(--contend-area);
+  padding: 3em;
+  margin: 0.4em 0;
+  position: relative;
+  color: var(--font-color-main);
+}
+
+#cookbook-main .cookbook-row:last-child {
+  margin-bottom: 0;
+}
+
+#cookbook-main .cookbook-row .recipe-title {
+  font-size: 45pt;
+  line-height: 47pt;
+}
+
+#cookbook-main .cookbook-row .edit-recipe-btn {
+  font-size: 30pt;
+}
+
+#cookbook-main .cookbook-row .cookbook-details-preview {
+  transition: 0.3s;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-left: 2px solid var(--contend-area-highlight);
+  margin-top: 0.5em;
+}
+
+#cookbook-main .cookbook-row .cookbook-details-preview .row {
+  padding-left: 4em;
+}
+
+#cookbook-main .cookbook-row .cookbook-details-preview .recipe-details-description {
+  padding-left: 4em;
+  margin-top: 0.8em;
+  margin-bottom: 0.2em;
+}
+
+#cookbook-main .cookbook-row .cookbook-details-preview-hidden {
+  height: 0;
+  transition: 0.3s;
+  overflow: hidden;
+  margin-top: 0.5em;
+}
+
+#cookbook-main .cookbook-row .cookbook-btn-round {
+  border-radius: 100%;
+  background-color: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+  border: unset;
+}
+
+#cookbook-main .cookbook-row .cookbook-btn-round i {
+  border-radius: 100%;
+  color: var(--font-color-highlight)
+}
+
+#cookbook-main .cookbook-row .created-at {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: 2px solid var(--font-color-main);
+  border-right: 2px solid var(--font-color-main);
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.25);
+  width: 6em;
+}
+
+#cookbook-main .cookbook-row .category-preview {
+  position: absolute;
+  top: 0;
+  right: 0;
+  backdrop-filter: blur(10px);
+  width: 7em;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+#cookbook-main .cookbook-row .category-vorspeise {
+  border-left: 2px #c8e6a0 solid;
+  border-bottom: 2px #c8e6a0 solid;
+}
+
+#cookbook-main .cookbook-row .category-hauptgericht {
+  border-left: 2px #ff9e95 solid;
+  border-bottom: 2px #ff9e95 solid;
+}
+
+#cookbook-main .cookbook-row .category-dessert {
+  border-left: 1px #fbd384 solid;
+  border-bottom: 1px #fbd384 solid;
+}
+
+// -------------Form--------------------------------------------------------------------------------
+
+#cookbook-form .cookbook-form-header  {
+  background-color: var(--contend-area-highlight);
+  color: var(--font-color-highlight);
+  font-family: Sacramento;
+  font-size: 45pt;
+  margin: 0;
+}
+
+#cookbook-form .cookbook-form-header .col-12  {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+#cookbook-form .cookbook-form-header .row.form-body {
+  background-color: var(--contend-area);
+  color: var(--font-color-main);
+}
+
+#cookbook-form .cookbook-form-body {
+  background-color: var(--contend-area);
+  padding: 3em;
+  border-top: 1px solid var(--font-color-highlight);
+  margin: 0;
+  position: relative;
+  color: var(--font-color-main)
+}
+
+#cookbook-form .cookbook-form-body label{
+  font-weight: bold;
+  color: var(--font-color-main);
+}
+
+#cookbook-form .cookbook-form-body .form-text{
+  color: var(--font-color-main);
+}
+
+#cookbook-form .cookbook-form-body .text-area-input{
+  min-height: 12em;
+}
+
+#cookbook-form .cookbook-form-body .form-control, #cookbook-form .cookbook-form-body .form-select{
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--main-color-bg);
+  color: var(--font-color-main);
+}
+
+#cookbook-form .cookbook-form-body .cookbook-form-control-bar  {
+  margin-top: 2.3em;
+}
+
+#cookbook-form .cookbook-form-body .cookbook-form-control-bar .btn {
+  width: 100%;
+}
+
+#cookbook-form .row .cookbook-form-ingredient-row {
+  padding-bottom: 0.7em;
+  padding-top: 0.7em;
+}
+
+#cookbook-form .row .cookbook-form-ingredient-row .col-1 {
+  align-content: center;
+  margin-top: 0.1em;
+}
+
+// Foooter -------------------------------------------------------------------------------------------------------------
+#page-footer .cookbook-row {
+  font-size: 10pt;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  margin-top: 0.1em;
+}
+
+// Scrollbar -----------------------------------------------------------------------------------------------------------
+
+::-webkit-scrollbar {
+  width: 0.6em;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: var(--contend-area);
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: var(--contend-area-highlight);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(69,40,4,0.4);
+}
+
+
+// Font ---------------------------------------------------------------------------------------------------------------
+@font-face {
+  font-family: 'Sacramento';
+  font-style: normal;
+  font-weight: 400;
+  src: url('assets/fonts/sacramento-v17-latin_latin-ext-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Onest';
+  font-style: normal;
+  src: url('assets/fonts/onest-v9-latin_latin-ext-100.woff2') format('woff2');
+}

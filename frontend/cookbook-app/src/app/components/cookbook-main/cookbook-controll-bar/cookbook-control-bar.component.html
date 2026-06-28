@@ -1,0 +1,78 @@
+<div class="control-bar row justify-content-center">
+    <div class="col-11 text-center">
+        <div class="search-container">
+            <input type="text" class="form-control search-input" placeholder="Rezept Suchen" [(ngModel)]="searchValue" (ngModelChange)="searchRecipe.emit(searchValue)">
+            <i class="fas fa-search search-icon"></i>
+
+            <i class="fa-solid fa-plus-circle fa-2xl add-icon" (click)="onCreateNewRecipe()" title="Rezept Erstellen"></i>
+        </div>
+    </div>
+
+    <div class="col-md-12 text-center">
+        <div class="row justify-content-md-center control-bar-button-group">
+            <div class="col-md-5 col-xs-12">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Sortieren
+                    </button>
+
+                    <ul class="dropdown-menu">
+                        <li *ngIf="chooseSortField !== 'title' || chooseSortDir === 'desc'" (click)="onChooseSortFieldAndDir('title', 'asc')">
+                            <a class="dropdown-item">Rezepte aufsteigend nach Titel sortieren</a>
+                        </li>
+
+                        <li *ngIf="chooseSortField === 'title' && chooseSortDir !== 'desc'" (click)="onChooseSortFieldAndDir('title', 'desc')">
+                            <a class="dropdown-item">Rezepte absteigend nach Titel sortieren</a>
+                        </li>
+
+                        <li *ngIf="chooseSortField !== 'createdDate' || chooseSortDir === 'desc'" (click)="onChooseSortFieldAndDir('createdDate', 'asc')">
+                            <a class="dropdown-item">Rezepte aufsteigend nach Erstellungsdatum sortieren</a>
+                        </li>
+
+                        <li *ngIf="chooseSortField === 'createdDate' && chooseSortDir !== 'desc'" (click)="onChooseSortFieldAndDir('createdDate', 'desc')">
+                            <a class="dropdown-item">Rezepte absteigend nach Erstellungsdatum sortieren</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-5 col-xs-12">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                       Filtern
+                    </button>
+
+                    <ul class="dropdown-menu">
+                        <li (click)="onChooseFilter('')">
+                            <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter.trim() === ''">
+                                Alle anzeigen
+                                <i *ngIf="chooseCategoryFilter.trim() === ''" class="fas fa-check-circle"></i>
+                            </a>
+                        </li>
+
+                        <li (click)="onChooseFilter('vorspeise')">
+                            <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter === 'vorspeise'">
+                                Vorspeisen
+                                <i *ngIf="chooseCategoryFilter.trim() === 'vorspeise'" class="fas fa-check-circle"></i>
+                            </a>
+                        </li>
+
+                        <li (click)="onChooseFilter('hauptgericht')">
+                            <a class="dropdown-item"  [class.choosen-control]="chooseCategoryFilter === 'hauptgericht'">
+                                Hauptgerichte
+                                <i *ngIf="chooseCategoryFilter.trim() === 'hauptgericht'" class="fas fa-check-circle"></i>
+                            </a>
+                        </li>
+
+                        <li (click)="onChooseFilter('dessert')">
+                            <a class="dropdown-item" [class.choosen-control]="chooseCategoryFilter === 'dessert'">
+                                Desserts
+                                <i *ngIf="chooseCategoryFilter.trim() === 'dessert'" class="fas fa-check-circle"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

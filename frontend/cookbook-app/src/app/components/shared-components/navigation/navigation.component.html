@@ -1,0 +1,17 @@
+<nav class="navbar navbar-expand-lg cookbook-navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" (click)="onNavigate('/')">Kochbuch App</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#cookbookNavigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="cookbookNavigation">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" (click)="onNavigate('/cookbook')" >Rezept Liste</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

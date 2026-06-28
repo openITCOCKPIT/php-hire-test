@@ -1,0 +1,21 @@
+<app-main-layout>
+    <div class="row cookbook-welcome">
+        <div class="col-12 cookbook-welcome-msg form-text">
+            <h2>Willkommen in der Kochbuch-App</h2>
+        </div>
+
+        <ng-container *ngIf="!appService.loading">
+            <div [className]="hasRecipes? 'col-12': 'col-6'">
+                <button class="btn btn-primary w-100" (click)="onNavigateToRecipeList()">
+                    Zur Rezept Liste
+                </button>
+            </div>
+
+            <div *ngIf="!hasRecipes" class="col-6">
+                <button class="btn btn-primary w-100" (click)="onCreateExampleRecipes()">
+                   Beispiel Rezepte anlegen
+                </button>
+            </div>
+        </ng-container>
+    </div>
+</app-main-layout>

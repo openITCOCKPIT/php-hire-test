@@ -1,0 +1,29 @@
+<div class="card msg-dlg"
+     [class.text-white]="mode !== 'normal'"
+     [class.bg-success]="mode === 'success'"
+     [class.bg-danger]="mode === 'error'">
+
+  <div class="card-body">
+    <div class="row card-title">
+      <div *ngIf="mode==='error'" class="col-10" style="display: flex; justify-content: center">
+        <b>Systemfehler!</b>
+      </div>
+
+      <div *ngIf="!autoClose" class="col-1">
+        <i class="close-icon" [class.white]="mode !== 'normal'" style="cursor: pointer" (click)="onClose()">&times;</i>
+      </div>
+    </div>
+
+    <div class="row card-text">
+      <div class="col-2" style="padding-top: 0.3rem">
+        <i class="fas fa-2x" [class.fa-check-circle]="mode==='success'"  [class.fa-exclamation-triangle]="mode==='error'" style="color:white;"></i>
+      </div>
+
+      <div class="col-10" style="margin-top: 0.5rem">
+        {{msg}}
+      </div>
+    </div>
+
+  </div>
+
+</div>

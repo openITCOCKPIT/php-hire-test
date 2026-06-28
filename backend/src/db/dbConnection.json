@@ -1,0 +1,6 @@
+{
+  "database": "cookbook_db",
+  "user": "root",
+  "password": "secret",
+  "host": "db"
+}

@@ -1,0 +1,18 @@
+<div id="cookbook-main">
+    <header id="page-header" class="container">
+        <app-navigation></app-navigation>
+    </header>
+
+    <main id="page-body" class="container">
+        <ng-content></ng-content>
+    </main>
+
+    <footer id="page-footer" class="container">
+        <div class="row cookbook-row">
+            <div class="col-12 text-end">
+                cookbook-app v.{{appService.version}}@mpeters
+            </div>
+        </div>
+    </footer>
+</div>
+
