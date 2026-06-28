@@ -37,9 +37,7 @@ class ingredientMapper extends baseMapper
      * @throws cookbookException
      */
     public function replaceRecipeIngredients(recipe $recipe) {
-        return $this
-                ->deleteAllIngredientsForRecipe($recipe->getId())
-                ->createIngredientsForRecipe($recipe);
+        return ($this->deleteAllIngredientsForRecipe($recipe->getId())->createIngredientsForRecipe($recipe));
     }
 
     /**
@@ -92,6 +90,7 @@ class ingredientMapper extends baseMapper
     private function convertRawIngredient(array $rawIngredient) {
         return (new ingredient())
             ->setId(intval($rawIngredient['id']))
+            ->setIngredientName($rawIngredient['ingredientName'])
             ->setUnitOfMeasure($rawIngredient['unitOfMeasure'])
             ->setRecipeId($rawIngredient['recipeId'])
             ->setAmount(floatval($rawIngredient['amount']))

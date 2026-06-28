@@ -48,4 +48,20 @@ abstract class baseController
         header('Content-Type: ' . $contendType);
         return $this;
     }
+
+    /**
+     * @param mixed $var
+     * @return false|string
+     */
+    public function debugOutVar($var) {
+        ob_start();
+        echo '<pre>'.var_dump($var);
+        echo '</pre>';
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $this->setResponseHeader('html');
+
+        return $output;
+    }
 }

@@ -9,6 +9,37 @@ export class CookbookService {
     constructor(private appService: AppService, private http: HttpClient) {
     }
 
+    public async checkExistRecipes(): Promise<boolean> {
+        const params: any = {
+            action: 'checkExistRecipes'
+        };
+        const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
+
+        return await promise.then((response: any) => {
+            return (response.checkExistRecipes);
+        }).catch((error: any)=> {
+            console.error(error);
+            this.appService.showErrorDlg('Fehler: Der Dienst zum prüfen der Rezepte ist nicht erreichbar!');
+            return false;
+        });
+    }
+
+    public async setupExampleRecipes(): Promise<boolean> {
+        const params: any = {
+            action: 'setupExampleRecipes'
+        };
+        const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
+
+        return await promise.then((response: any) => {
+            return true;
+        }).catch((error: any)=> {
+            console.error(error);
+            this.appService.showErrorDlg('Fehler: Die Beispielrezepte konnten nicht angelegt werden!');
+            return false;
+        });
+
+    }
+
     public async loadAllRecipes(): Promise<Recipe[]> {
         let recipes: Recipe[] = [];
 
@@ -23,7 +54,7 @@ export class CookbookService {
             if (response.recipes.length === 0) {
                 return recipes;
             }
-            response.recipes.map((rawRecipe: any) => {
+            return response.recipes.map((rawRecipe: any) => {
                 return Recipe.import(rawRecipe);
             });
         }).catch((error) => {
@@ -42,8 +73,8 @@ export class CookbookService {
         };
         const promise = this.http.get(AppService.generateApplicationUrl(), options).toPromise();
 
-        return await promise.then((response: any): Recipe => {
-            if (response.recipe) {
+        return promise.then((response: any): Recipe => {
+            if (!response.recipe) {
                 return recipe;
             }
             return Recipe.import(response.recipe);
@@ -79,7 +110,7 @@ export class CookbookService {
 
     public async updateRecipe(recipe: Recipe): Promise<boolean> {
         const params: any = {
-            action: 'updateRecipe',
+            action: 'editRecipe',
             recipe: recipe
         };
         const promise = this.http.post(AppService.generateApplicationUrl(), JSON.stringify(params)).toPromise();
@@ -109,22 +140,12 @@ export class CookbookService {
         });
     }
 
-    public testRequestPost() {
-        const params: any = {
-            action: 'halloService',
-        };
-
-        const url = AppService.generateApplicationUrl();
-        const promise = this.http.post(url, JSON.stringify(params)).toPromise();
-        promise.then(()=>{}).catch((error) => console.error(error));
-    }
-
     public searchRecipe(recipeList: Recipe[], recipeName: string ) {
         if (recipeList.length === 0 || recipeName.trim() === '') {
             return recipeList;
         }
 
-        var directMatches: Recipe[] = recipeList.filter((recipe: Recipe) => {
+        const directMatches: Recipe[] = recipeList.filter((recipe: Recipe) => {
             return (recipe.title.toLowerCase() === recipeName.toLowerCase())
         });
 
@@ -132,11 +153,9 @@ export class CookbookService {
             return directMatches;
         }
 
-        var indirectMatches: Recipe[] =  recipeList.filter((recipe: Recipe) => {
-            return (recipe.title.includes(recipeName.toLowerCase()))
+        return recipeList.filter((recipe: Recipe) => {
+            return (recipe.title.toLowerCase().includes(recipeName.toLowerCase()))
         });
-
-        return indirectMatches;
     }
 
     public filterRecipes(recipeList: Recipe[], category: string): Recipe[] {

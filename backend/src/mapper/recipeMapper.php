@@ -8,14 +8,32 @@ use cookbook_service\model\recipe;
 class recipeMapper extends baseMapper
 {
     /**
+     * @return bool
+     * @throws cookbookException
+     */
+    public function checkExistRecipes() {
+        $sql = 'SELECT count(id) cnt FROM recipe';
+        $stmt = $this->getPdo()->prepare($sql);
+
+        if(!$stmt->execute()) {
+            throw new cookbookException('Cant load recipes count');
+        }
+        $result = $stmt->fetch(\PDO::FETCH_OBJ);
+
+        return (intval($result->cnt) > 0);
+    }
+
+    /**
+     * @throws cookbookException
      * @return recipe[]
      */
     public function loadRecipeList() {
         $sql = 'SELECT id, title, category, createdAt FROM recipe WHERE deleted=0 ORDER BY title ASC';
-
         $stmt = $this->getPdo()->prepare($sql);
-        $stmt->execute();
 
+        if(!$stmt->execute()) {
+            throw new cookbookException('Cant load recipes');
+        }
         $rawRecipeList = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         if(empty($rawRecipeList)) {
@@ -37,8 +55,10 @@ class recipeMapper extends baseMapper
 
         $stmt = $this->getPdo()->prepare($sql);
         $stmt->bindValue('id', $recipeId, \PDO::PARAM_INT);
-        $stmt->execute();
 
+        if(!$stmt->execute()) {
+            throw new cookbookException('Cant load recipe');
+        }
         $rawRecipe = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if(!is_array($rawRecipe) || empty($rawRecipe)) {
@@ -113,12 +133,19 @@ class recipeMapper extends baseMapper
      * @return recipe
      */
     private function convertRawRecipe(array $rawRecipe) {
-        return (new recipe())
-            ->setId(intval($rawRecipe['id']))
-            ->setCategory($rawRecipe['category'])
-            ->setTitle($rawRecipe['title'])
-            ->setCreatedAt($rawRecipe['createdAt'])
-            ->setDescription($rawRecipe['description'])
-            ->setDeleted(false);
+        if(isset($rawRecipe['description'])) {
+            return (new recipe())
+                    ->setId(intval($rawRecipe['id']))
+                    ->setCategory($rawRecipe['category'])
+                    ->setTitle($rawRecipe['title'])
+                    ->setCreatedAt($rawRecipe['createdAt'])
+                    ->setDescription($rawRecipe['description']);
+        } else {
+            return (new recipe())
+                    ->setId(intval($rawRecipe['id']))
+                    ->setCategory($rawRecipe['category'])
+                    ->setTitle($rawRecipe['title'])
+                    ->setCreatedAt($rawRecipe['createdAt']);
+        }
     }
 }

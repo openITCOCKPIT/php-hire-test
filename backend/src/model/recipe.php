@@ -34,6 +34,72 @@ class recipe
     private $deleted = false;
 
     /**
+     * @param array $rawRecipe
+     * @return $this
+     */
+    public function import(array $rawRecipe) {
+        if (isset($rawRecipe['id'])) {
+            $this->setId(intval($rawRecipe['id']));
+        }
+        $this->setTitle(trim($rawRecipe['title']));
+        $this->setCategory(trim($rawRecipe['category']));
+        $this->setDescription($rawRecipe['description']);
+
+        if (stristr($rawRecipe['created'], 'T') !== false) {
+            $this->setCreatedAt(explode('T', $rawRecipe['created'])[0]);
+        } else {
+            $this->setCreatedAt($rawRecipe['created']);
+        }
+
+        $ingredients = array_map(function ($rawIngredient) {
+            return (new ingredient())->import($rawIngredient);
+        }, $rawRecipe['ingredients']);
+
+        $this->setIngredients($ingredients);
+        $this->setDeleted(false);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function export() {
+        $ingredients = array_map(function (ingredient $ingredient) {
+            return $ingredient->export();
+        }, $this->ingredients);
+
+        return [
+            'id' => $this->getId(),
+            'title'=> $this->getTitle(),
+            'category' => $this->getCategory(),
+            'ingredients'=> $ingredients,
+            'description' => $this->getDescription(),
+            'created' => $this->getCreatedAt()->format('Y-m-d'),
+            'deleted' => $this->isDeleted()? 0: 1
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid() {
+        $title = trim($this->getTitle()) !== '';
+        $category = trim($this->getCategory()) !== '';
+        $description = trim($this->getDescription()) !== '';
+        $ingredients = (count($this->getIngredients()) > 0);
+
+        if(!$ingredients) {
+            return false;
+        }
+        foreach ($this->getIngredients() as $ingredient) {
+            $ingredients = ($ingredients && $ingredient->isValid());
+        }
+
+        return ($title && $category && $description && $ingredients);
+    }
+
+    /**
      * @return int
      */
     public function getId() {
@@ -127,7 +193,7 @@ class recipe
      */
     public function setCreatedAt(string $rawDate) {
         $rawDateSplit = explode('-', $rawDate);
-        $this->createdAt = (new \DateTime())->setDate($rawDateSplit[0], $rawDate[1], $rawDate[2]);
+        $this->createdAt = (new \DateTime())->setDate(intval($rawDateSplit[0]), intval($rawDateSplit[1]), intval($rawDateSplit[2]));
 
         return $this;
     }
@@ -146,64 +212,5 @@ class recipe
     public function setDeleted(bool $deleted) {
         $this->deleted = $deleted;
         return $this;
-    }
-
-    /**
-     * @param array $rawRecipe
-     * @return $this
-     */
-    public function import(array $rawRecipe) {
-        $this->setId(intval($rawRecipe['id']));
-        $this->setTitle($rawRecipe['title']);
-        $this->setCategory($rawRecipe['category']);
-        $this->setDescription($rawRecipe['description']);
-        $this->setCreatedAt((new \DateTime())->format('Y-m-d'));
-
-        $ingredients = array_map(function ($rawIngredient) {
-            return (new ingredient())->import($rawIngredient);
-        }, $rawRecipe['ingredients']);
-
-        $this->setIngredients($ingredients);
-        $this->setDeleted(false);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function export() {
-        $ingredients = array_map(function (ingredient $ingredient) {
-            return $ingredient->export();
-        }, $this->ingredients);
-
-        return [
-          'id' => $this->getId(),
-          'title'=> $this->getTitle(),
-          'category' => $this->getCategory(),
-          'ingredients'=> $ingredients,
-          'description' => $this->getDescription(),
-          'created' => $this->getCreatedAt()->format('Y-m-d'),
-          'deleted' => $this->isDeleted()? 0: 1
-        ];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValid() {
-        $title = trim($this->getTitle()) !== '';
-        $category = trim($this->getCategory()) !== '';
-        $description = trim($this->getDescription()) !== '';
-        $ingredients = (count($this->getIngredients()) > 0);
-
-        if(!$ingredients) {
-            return false;
-        }
-        foreach ($this->getIngredients() as $ingredient) {
-            $ingredients = ($ingredients && $ingredient->isValid());
-        }
-
-        return ($title && $category && $description && $ingredients);
     }
 }

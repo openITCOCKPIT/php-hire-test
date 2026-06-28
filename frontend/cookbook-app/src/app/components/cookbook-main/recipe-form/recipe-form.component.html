@@ -1,8 +1,8 @@
 <app-main-layout>
     <div id="cookbook-form">
         <ng-container *ngIf="!appService.loading">
-            <div class="row form-title">
-                <div class="col-12 text-center">
+            <div class="row justify-content-around cookbook-form-header">
+                <div class="col-12 form-title text-center">
                     <ng-container *ngIf="recipe.id > 0">
                         {{recipe.title}} bearbeiten
                     </ng-container>
@@ -13,7 +13,7 @@
                 </div>
             </div>
 
-            <div class="row form-body">
+            <div class="row cookbook-form-body">
                 <div class="col-12">
                     <div class="mb-3">
                         <label for="recipe-titel" class="form-label">Rezept Titel <span class="form-required">*</span></label>
@@ -44,15 +44,13 @@
                 </div>
 
                 <div class="col-12 ingredients-area">
-                    <div class="row ingredients-header">
-                        <div class="col-11">
+                    <div class="row gx-5 ingredients-header">
+                        <div class="col-1">
                             <h3>Zutaten</h3>
                         </div>
 
                         <div class="col-1">
-                            <button class="cookbook-btn-round" (click)="onAddIngredient()">
-                                <i class="fa-solid fa-circle-plus"></i>
-                            </button>
+                            <i class="fa-solid fa-plus-circle fa-2xl add-icon" (click)="onAddIngredient()" title="Zutat Einfügen"></i>
                         </div>
                     </div>
 
@@ -67,22 +65,22 @@
                 </div>
 
                 <div class="col-12">
-                    <div class="row">
+                    <div class="row cookbook-form-control-bar">
                         <div [class.col-4]="editRecipe.id === 0" [class.col-3]="editRecipe.id > 0">
                             <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onSaveRecipe()">
                                 Rezept speichern
                             </button>
                         </div>
 
-                        <div *ngIf="editRecipe.id > 0" class="col-3">
-                            <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onDeleteRecipe()">
-                                Rezept löschen
+                        <div [class.col-4]="editRecipe.id === 0" [class.col-3]="editRecipe.id > 0">
+                            <button type="button" class="btn btn-primary" (click)="onCloseForm()">
+                                Zurück zur Rezeptliste
                             </button>
                         </div>
 
-                        <div [class.col-4]="editRecipe.id === 0" [class.col-3]="editRecipe.id > 0">
-                            <button type="button" class="btn btn-primary" [disabled]="!editRecipe.isValid()" (click)="onCloseForm()">
-                                Zurück zur Rezeptliste
+                        <div *ngIf="editRecipe.id > 0" class="col-3">
+                            <button type="button" class="btn btn-danger" [disabled]="!editRecipe.isValid()" (click)="onDeleteRecipe()">
+                                Rezept löschen
                             </button>
                         </div>
                     </div>

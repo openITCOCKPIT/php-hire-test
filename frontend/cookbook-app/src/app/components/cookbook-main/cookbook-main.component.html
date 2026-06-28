@@ -8,8 +8,10 @@
             (searchRecipe)="onSearchRecipe($event)">
     </app-cookbook-controll-bar>
 
-    <app-recipe-list *ngIf="!appService.loading"
-            [recipes]="filteredRecipeList"
-            [filterOrSearchActive]="searchRecipe.trim() !== '' || categoryFilter.trim() !== ''">
-    </app-recipe-list>
+    <div class="recipe-area">
+        <app-recipe-list *ngIf="!appService.loading"
+                [recipes]="filteredRecipeList"
+                [filterOrSearchActive]="searchRecipe.trim() !== '' || categoryFilter.trim() !== ''">
+        </app-recipe-list>
+    </div>
 </app-main-layout>

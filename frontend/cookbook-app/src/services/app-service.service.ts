@@ -11,7 +11,7 @@ export class AppService {
   public static host = '';
   public static port;
 
-  public version: string = '0.3.0';
+  public version: string = '1.0.0';
   public loading: boolean = false;
   private loadingDialogRef: MatDialogRef<PageLoadingComponent> = null;
 
@@ -62,6 +62,8 @@ export class AppService {
   }
 
   public showErrorDlg(error: string) {
+    this.closePageLoading();
+
     this.dialog.open(SystemMessageDlgComponent, {
       panelClass: 'system-msg',
       data: {

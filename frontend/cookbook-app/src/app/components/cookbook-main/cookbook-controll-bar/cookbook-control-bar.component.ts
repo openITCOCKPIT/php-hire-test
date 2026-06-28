@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {RecipeSortSetting} from "../../../../model/recipeSortSetting";
 import {Router} from "@angular/router";
 
@@ -6,7 +6,7 @@ import {Router} from "@angular/router";
   selector: 'app-cookbook-controll-bar',
   templateUrl: './cookbook-control-bar.component.html'
 })
-export class CookbookControlBarComponent implements OnInit {
+export class CookbookControlBarComponent {
   @Input() chooseCategoryFilter: string = '';
   @Input() chooseSortField: string = 'title'
   @Input() chooseSortDir: string = 'asc';
@@ -18,9 +18,6 @@ export class CookbookControlBarComponent implements OnInit {
   public searchValue: string = ''
 
   constructor(public router: Router) {
-  }
-
-  ngOnInit() {
   }
 
   public onChooseFilter(category: string) {

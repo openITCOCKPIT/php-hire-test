@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Recipe} from "../../../../model/recipe";
 import {Router} from "@angular/router";
 import {CookbookService} from "../../../../services/cookbook.service";
@@ -7,7 +7,7 @@ import {CookbookService} from "../../../../services/cookbook.service";
   selector: 'app-recipe-list',
   templateUrl: './recipe-list.component.html'
 })
-export class RecipeListComponent implements OnInit {
+export class RecipeListComponent {
   @Input() recipes: Recipe[];
   @Input() filterOrSearchActive: boolean = false;
 
@@ -17,22 +17,19 @@ export class RecipeListComponent implements OnInit {
   constructor(public cookbookService: CookbookService, public router: Router) {
   }
 
-  ngOnInit(): void {
-  }
-
   public onShowPreview(recipe: Recipe) {
     this.cookbookService.loadRecipeById(recipe).then((recipe: Recipe) => {
       this.detailRecipe = recipe;
     });
   }
 
-  public onShowDetailsPage(recipeId: number) {
-    this.router.navigate(['cookbook/recipeDetails/'+recipeId]);
-  }
-
   public onHidePreview() {
     this.previewRecipe = new Recipe();
     this.detailRecipe = new Recipe();
+  }
+
+  public onAddRecipe() {
+    this.router.navigate(['cookbook/create/']);
   }
 
   public onEditRecipe(recipeId: number) {
@@ -41,5 +38,10 @@ export class RecipeListComponent implements OnInit {
 
   public getPreviewClass(isHidden: boolean) {
     return ('col-12 cookbook-details-preview '+(isHidden? 'cookbook-details-preview-hidden':''));
+  }
+
+  public showDescription(recipe: Recipe) {
+    return recipe.description;
+    // return recipe.description.replace(/(?:\r\n|\r|\n)/g, '<br>')
   }
 }

@@ -1,33 +1,52 @@
 <ng-container *ngIf="recipes.length > 0">
-    <div class="row cookbook-row" *ngFor="let recipe of recipes" (click)="onShowDetailsPage(recipe.id)" (mouseenter)="onShowPreview(recipe)" (mouseleave)="onHidePreview()" ))>
-        <div class="col-12">
-            <div class="row">
-                <div class="col-12 text-end cookbook-date-info">Erstellt am: {{recipe.created | dateFormat}}</div>
+    <div class="row cookbook-row" *ngFor="let recipe of recipes" (click)="onShowDetailsPage(recipe.id)" (mouseenter)="onShowPreview(recipe)" (mouseleave)="onHidePreview()">
+        <div class="col-9 text-center">
+            <div class="created-at col-3">
+                {{recipe.created | dateFormat}}
             </div>
+
+            <div [className]="'category-'+recipe.category+ ' category-preview col-3'">
+                <b>{{recipe.category | titlecase}}</b>
+            </div>
+
+            <h2 class="recipe-title">{{ recipe.title }}</h2>
         </div>
 
-        <div class="offset-2 col-8">
-            <h2>{{recipe.title}}</h2>
-        </div>
-
-        <div class="offset-2 col-8">
-            <button type="button" class="btn btn-primary cookbook-btn-round" (click)="onEditRecipe(recipe.id)">
+        <div class="col-3 text-center">
+            <button type="button" class="btn btn-primary edit-recipe-btn cookbook-btn-round" (click)="onEditRecipe(recipe.id)">
                 <i class="fa-solid fa-pen-to-square"></i>
             </button>
         </div>
 
-        <div [class]="getPreviewClass(detailRecipe.id !== recipe.id)">
-            <div class="row recipe-details-row">
-                <h4 class="col-12">Zutaten</h4>
+        <div class=" row">
+            <div [class]="getPreviewClass(detailRecipe.id !== recipe.id)">
+                <div class="row">
+                    <div class="col-6">
+                        <b>Zutaten</b>
+                    </div>
+                </div>
 
-                <div class="col-6 text-center" *ngFor="let ingredient of detailRecipe.ingredients">
-                    <ng-container *ngIf="ingredient.unitOfMeasure.trim() !== ''">
-                        {{ingredient.amount}} &nbsp; {{ingredient.unitOfMeasure}} &nbsp; {{ingredient.ingredientName}}
-                    </ng-container>
+                <div class="row">
+                    <div class="col-6 text-center" *ngFor="let ingredient of detailRecipe.ingredients">
+                        <ng-container *ngIf="ingredient.unitOfMeasure.trim() !== ''">
+                            {{ ingredient.amount }} &nbsp; {{ ingredient.unitOfMeasure }}
+                            &nbsp; {{ ingredient.ingredientName }}
+                        </ng-container>
 
-                    <ng-container *ngIf="ingredient.unitOfMeasure.trim() === ''">
-                        {{ingredient.amount}} &nbsp; {{ingredient.ingredientName}}
-                    </ng-container>
+                        <ng-container *ngIf="ingredient.unitOfMeasure.trim() === ''">
+                            {{ ingredient.amount }} &nbsp; &nbsp; {{ ingredient.ingredientName }}
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <b>Beschreibung</b>
+                    </div>
+                </div>
+
+                <div *ngIf="detailRecipe.description.trim() !== ''" class="row recipe-details-description">
+                    <div class="col-6" [innerHTML]="showDescription(detailRecipe)"></div>
                 </div>
             </div>
         </div>
@@ -36,13 +55,18 @@
 
 <ng-container *ngIf="recipes.length === 0">
     <div class="row cookbook-row">
-        <div class="offset-2 col-8">
-            <h2 *ngIf="!filterOrSearchActive">Es sind leider noch keine Rezepte vorhanden</h2>
-            <h2 *ngIf="filterOrSearchActive">Es gibt keine Rezepte für die momentanen Einstellungen</h2>
+        <div class="col-9">
+            <h2 *ngIf="!filterOrSearchActive">
+                Es sind leider noch keine Rezepte vorhanden
+            </h2>
 
-            <h3>Sie können aber neue erstellen:</h3>
-            <h3>Gehen sie dazu in der Leiste auf "Neues Rezept"</h3>
+            <h2 *ngIf="filterOrSearchActive">
+                Es gibt keine Rezepte für die momentanen Einstellungen
+            </h2>
         </div>
 
+        <button type="button" class="btn btn-primary" (click)="onAddRecipe()">
+            Rezept Erstellen
+        </button>
     </div>
 </ng-container>

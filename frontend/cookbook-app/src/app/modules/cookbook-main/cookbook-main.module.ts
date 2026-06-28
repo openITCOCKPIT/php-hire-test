@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {CookbookControlBarComponent} from "../../components/cookbook-main/cookbook-controll-bar/cookbook-control-bar.component";
 import {CookbookMainComponent} from "../../components/cookbook-main/cookbook-main.component";
-import {RecipeDetailsComponent} from "../../components/cookbook-main/recipe-details/recipe-details.component";
 import {RecipeListComponent} from "../../components/cookbook-main/recipe-list/recipe-list.component";
 import {RecipeFormComponent} from "../../components/cookbook-main/recipe-form/recipe-form.component";
 import {RecipeIngredientRowComponent} from "../../components/cookbook-main/recipe-ingredient-row/recipe-ingredient-row.component";
@@ -16,7 +15,6 @@ import {CookbookRoutingModule} from "./cookbook-routing.module";
     declarations: [
         CookbookMainComponent,
         CookbookControlBarComponent,
-        RecipeDetailsComponent,
         RecipeListComponent,
         RecipeFormComponent,
         RecipeIngredientRowComponent

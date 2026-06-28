@@ -30,6 +30,7 @@ class incomingController extends baseController {
         $data = [];
         $action = 'nothing';
 
+        // Rewrite Post from Angular to $_POST superglobal
         $_POST = json_decode(file_get_contents('php://input'), true);
 
         if (isset($_POST['action'])) {
@@ -42,6 +43,7 @@ class incomingController extends baseController {
 
         return match ($action) {
             'halloService' => $this->responseJson(['success'=> true]),
+            'checkExistRecipes' => $this->getRecipeController()->checkExistRecipes(),
             'recipeList' => $this->getRecipeController()->recipeList(),
             'recipeDetails' => $this->getRecipeController()->recipeDetails($data),
             'createRecipe' => $this->getRecipeController()->createRecipe($data),

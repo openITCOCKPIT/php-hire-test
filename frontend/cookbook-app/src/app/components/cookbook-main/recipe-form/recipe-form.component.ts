@@ -9,8 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-recipe-form',
-  templateUrl: './recipe-form.component.html',
-  styleUrls: ['recipe-form.component.scss']
+  templateUrl: './recipe-form.component.html'
 })
 export class RecipeFormComponent implements OnInit {
   public recipeToLoad: Recipe;
@@ -51,10 +50,10 @@ export class RecipeFormComponent implements OnInit {
   }
 
   public onRemoveIngredient(ingredientToRemove: Ingredient) {
-    const removeIndex = this.editRecipe.ingredients.findIndex((ingredient: Ingredient) => ingredient === ingredientToRemove);
+    const removeIndex: number = this.editRecipe.ingredients.findIndex((ingredient: Ingredient) => ingredient === ingredientToRemove);
 
     if(removeIndex !== -1) {
-      this.editRecipe.ingredients.slice(removeIndex, 1);
+      this.editRecipe.ingredients.splice(removeIndex, 1);
     }
   }
 
@@ -74,13 +73,14 @@ export class RecipeFormComponent implements OnInit {
     this.appService.openPageLoading();
 
     this.cookbookService.createRecipe(this.editRecipe).then((newRecipeId: number)=> {
-      this.cookbookService.loadRecipeById(Recipe.createDummyForLoading(newRecipeId)).then((recipe: Recipe) => {
-        this.recipe = recipe;
-        this.editRecipe = Recipe.deepCopy(recipe);
+      if(newRecipeId > 0) {
+        this.cookbookService.loadRecipeById(Recipe.createDummyForLoading(newRecipeId)).then((recipe: Recipe) => {
+          this.appService.closePageLoading();
+          this.appService.showSuccessDlg('Das Rezept wurde erfolgreich erstellt.');
 
-        this.appService.closePageLoading();
-        this.appService.showSuccessDlg('Das Rezept wurde erfolgreich erstellt.');
-      });
+          this.router.navigate(['cookbook/editRecipe/'+newRecipeId]);
+        });
+      }
     });
   }
 

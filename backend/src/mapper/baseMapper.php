@@ -52,7 +52,7 @@ abstract class baseMapper
 
         if (file_exists($configPath)) {
             $configJsonAsString = file_get_contents($configPath);
-            $configJson =  json_decode($configJsonAsString, false);
+            $configJson = json_decode($configJsonAsString, false);
         }
 
         try {

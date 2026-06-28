@@ -1,0 +1,254 @@
+{
+  "recipes": [
+    {
+      "title": "Caprese",
+      "category": "vorspeise",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-27",
+      "ingredients": [
+        {
+          "ingredientName": "Mozzarella",
+          "unitOfMeasure": "Scheiben",
+          "amount": 10.00
+        },
+        {
+          "ingredientName": "Tomaten",
+          "unitOfMeasure": "",
+          "amount": 3.00
+        },
+        {
+          "ingredientName": "Olivenöl",
+          "unitOfMeasure": "ml",
+          "amount": 6.00
+        }
+      ]
+    },
+    {
+      "title": "Kürbissuppe",
+      "category": "vorspeise",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-26",
+      "ingredients": [
+        {
+          "ingredientName": "Hokkaido-Kürbis",
+          "unitOfMeasure": "",
+          "amount": 1.00
+        },
+        {
+          "ingredientName": "Zwiebel",
+          "unitOfMeasure": "",
+          "amount": 2.00
+        },
+        {
+          "ingredientName": "Gemüsebrühe",
+          "unitOfMeasure": "ml",
+          "amount": 500.5
+        }
+      ]
+    },
+    {
+      "title": "Gurkensalat",
+      "category": "vorspeise",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-28",
+      "ingredients": [
+        {
+          "ingredientName": "Salatgurke",
+          "unitOfMeasure": "Glas",
+          "amount": 1.00
+        },
+        {
+          "ingredientName": "Zitronensaft",
+          "unitOfMeasure": "Teelöffel",
+          "amount": 2.00
+        },
+        {
+          "ingredientName": "Salz",
+          "unitOfMeasure": "Prisen",
+          "amount": 3.00
+        },
+        {
+          "ingredientName": "Peffer",
+          "unitOfMeasure": "Prise",
+          "amount": 1.00
+        }
+      ]
+    },
+    {
+      "title": "Spaghetti Bolognese",
+      "category": "hauptgericht",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-25",
+      "ingredients": [
+        {
+          "ingredientName": "Spaghetti",
+          "unitOfMeasure": "Packet",
+          "amount": 1.00
+        },
+        {
+          "ingredientName": "Hackfleisch",
+          "unitOfMeasure": "g",
+          "amount": 10.00
+        },
+        {
+          "ingredientName": "Olivenöl",
+          "unitOfMeasure": "ml",
+          "amount": 1.6
+        }
+      ]
+    },
+    {
+      "title": "Hähnchen mit Ofengemüse",
+      "category": "hauptgericht",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-05-12",
+      "ingredients": [
+        {
+          "ingredientName": "Hähnchenbrust",
+          "unitOfMeasure": "",
+          "amount": 1.00
+        },
+        {
+          "ingredientName": "Kartoffeln",
+          "unitOfMeasure": "",
+          "amount": 6.00
+        },
+        {
+          "ingredientName": "Zucchini",
+          "unitOfMeasure": "",
+          "amount": 3.00
+        }
+      ]
+    },
+    {
+      "title": "Hähnchen mit Ofengemüse",
+      "category": "hauptgericht",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-05-10",
+      "ingredients": [
+        {
+          "ingredientName": "Lasagneplatten",
+          "unitOfMeasure": "",
+          "amount": 4.00
+        },
+        {
+          "ingredientName": "Aubergine",
+          "unitOfMeasure": "",
+          "amount": 2.00
+        },
+        {
+          "ingredientName": "Tomatensauce",
+          "unitOfMeasure": "l",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "title": "Tiramisu",
+      "category": "dessert",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-29",
+      "ingredients": [
+        {
+          "ingredientName": "Sahne",
+          "unitOfMeasure": "ml",
+          "amount": 4.00
+        },
+        {
+          "ingredientName": "Espresso",
+          "unitOfMeasure": "ml",
+          "amount": 10.00
+        },
+        {
+          "ingredientName": "Kakaopulver",
+          "unitOfMeasure": "g",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "title": "Schokoladenmousse",
+      "category": "dessert",
+      "description": "Zwei flinke Boxer jagen die quirlige Eva und ihren Mops durch Sylt.\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.\nZwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich. \nVogel Quax zwickt Johnys Pferd Bim. Sylvia wagt quick den Jux bei Pforzheim.\n Polyfon zwitschernd aßen Mäxchens Vögel Rüben",
+      "created": "2026-06-17",
+      "ingredients": [
+        {
+          "ingredientName": "Zartbitterschokolade",
+          "unitOfMeasure": "g",
+          "amount": 14.00
+        },
+        {
+          "ingredientName": "Sahne",
+          "unitOfMeasure": "ml",
+          "amount": 3.00
+        },
+        {
+          "ingredientName": "Vanillezucker",
+          "unitOfMeasure": "g",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "title": "Obstsalat",
+      "category": "dessert",
+      "description": "Leckerer Obstsalat",
+      "created": "2026-06-17",
+      "ingredients": [
+        {
+          "ingredientName": "Äpfel",
+          "unitOfMeasure": "",
+          "amount": 2.00
+        },
+        {
+          "ingredientName": "Bananen",
+          "unitOfMeasure": "",
+          "amount": 3.00
+        },
+        {
+          "ingredientName": "Kiwi",
+          "unitOfMeasure": "g",
+          "amount": 1.00
+        },
+        {
+          "ingredientName": "Zitronensaft",
+          "unitOfMeasure": "ml",
+          "amount": 4.55
+        }
+      ]
+    },
+    {
+      "title": "Schokoladen-Kuchen",
+      "category": "dessert",
+      "description": "Bei 200 °C 40 Minuten backen.\n\nDies ist ein Beispielrezept für unseren Einstellungstest – Om Nom Nom\n\nDas ist nur ein Beispiel, das wir nie probiert haben, also backt es vielleicht lieber nicht :)",
+      "created": "2026-06-15",
+      "ingredients": [
+        {
+          "ingredientName": "Zucker",
+          "unitOfMeasure": "g",
+          "amount": 100.00
+        },
+        {
+          "ingredientName": "Mehl",
+          "unitOfMeasure": "g",
+          "amount": 50.00
+        },
+        {
+          "ingredientName": "Eier",
+          "unitOfMeasure": "",
+          "amount": 2.00
+        },
+        {
+          "ingredientName": "Schokolade",
+          "unitOfMeasure": "g",
+          "amount": 150.00
+        },
+        {
+          "ingredientName": "Milch",
+          "unitOfMeasure": "ml",
+          "amount": 50.00
+        }
+      ]
+    }
+  ]
+}

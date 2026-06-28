@@ -2,7 +2,6 @@ import {RouterModule, Routes} from "@angular/router";
 import {NgModule} from "@angular/core";
 import {CookbookMainComponent} from "../../components/cookbook-main/cookbook-main.component";
 import {RecipeFormComponent} from "../../components/cookbook-main/recipe-form/recipe-form.component";
-import {RecipeDetailsComponent} from "../../components/cookbook-main/recipe-details/recipe-details.component";
 
 const routes: Routes = [
   {
@@ -16,11 +15,7 @@ const routes: Routes = [
   {
     path: 'editRecipe/:id',
     component: RecipeFormComponent
-  },
-  {
-    path: 'recipeDetails/:id',
-    component: RecipeDetailsComponent
-  },
+  }
 ];
 
 @NgModule({

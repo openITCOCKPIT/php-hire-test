@@ -1,4 +1,5 @@
 import {Ingredient} from "./ingredient";
+import * as moment from "moment";
 
 export class Recipe {
     public id: number = 0;
@@ -26,6 +27,7 @@ export class Recipe {
         recipe.title = rawRecipe.title;
         recipe.category = rawRecipe.category;
         recipe.description = rawRecipe.description;
+        recipe.created = moment(rawRecipe.created, 'YYYY-MM-DD').toDate();
 
         if (rawRecipe.ingredients.length > 0) {
             recipe.ingredients = rawRecipe.ingredients.map((rawIngredient: any) => {

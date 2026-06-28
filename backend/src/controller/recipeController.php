@@ -21,12 +21,27 @@ class recipeController extends baseController
     /**
      * @return string
      */
-    public function recipeList() {
-        $recipes = array_map(function(recipe $recipe) {
-            return $recipe->export();
-        }, $this->getRecipeMapper()->loadRecipeList());
+    public function checkExistRecipes() {
+        try {
+            return $this->responseJson(['checkExistRecipes'=> $this->getRecipeMapper()->checkExistRecipes()]);
+        } catch (cookbookException $cookbookException) {
+            return $this->responseError(400, $cookbookException->getMessage());
+        }
+    }
 
-        return $this->responseJson(['recipes'=> $recipes]);
+    /**
+     * @return string
+     */
+    public function recipeList() {
+        try {
+            $recipes = array_map(function(recipe $recipe) {
+                return $recipe->export();
+            }, $this->getRecipeMapper()->loadRecipeList());
+
+            return $this->responseJson(['recipes'=> $recipes]);
+        } catch (cookbookException $cookbookException) {
+            return $this->responseError(400, $cookbookException->getMessage());
+        }
     }
 
     /**
@@ -34,15 +49,15 @@ class recipeController extends baseController
      * @return string
      */
     public function recipeDetails(array $data) {
-        if(!array_key_exists('recipeId', $data) || intval($data['recipeId']) === 0) {
+        if(!array_key_exists('recipeId', $data) || intval($data['recipeId']) <= 0) {
             return $this->responseError(406, 'Missing incomining recipeId!');
         }
 
         try {
-            $recipe = $this->getRecipeMapper()->loadRecipeById((int) $data['recipeId']);
+            $recipe = $this->getRecipeMapper()->loadRecipeById(intval($data['recipeId']));
             $recipe->setIngredients($this->getIngredientMapper()->loadIngredientsForRecipe($recipe->getId()));
 
-            return $this->responseJson(['recipe'=> $recipe]);
+            return $this->responseJson(['recipe'=> $recipe->export()]);
         } catch (cookbookException $cookbookException) {
             return $this->responseError(400, $cookbookException->getMessage());
         }
@@ -66,7 +81,7 @@ class recipeController extends baseController
             $recipe->setId($this->getRecipeMapper()->createRecipe($recipe));
             $this->getIngredientMapper()->createIngredientsForRecipe($recipe);
 
-            return $this->responseJson(['newRecipeId'=>$recipe->getId()]);
+            return $this->responseJson(['newRecipeId' => $recipe->getId()]);
        } catch (cookbookException $cookbookException) {
             return $this->responseError(intval($cookbookException->getCode()), $cookbookException->getMessage());
        }
@@ -99,7 +114,7 @@ class recipeController extends baseController
             $this->getRecipeMapper()->updateRecipe($recipe);
             $this->getIngredientMapper()->replaceRecipeIngredients($recipe);
 
-            return $this->responseJson(['success'=> true]);
+            return $this->responseJson(['success' => true]);
         } catch (cookbookException $cookbookException) {
             return $this->responseError(intval($cookbookException->getCode()), $cookbookException->getMessage());
         }
@@ -125,7 +140,6 @@ class recipeController extends baseController
             if ($existRecipe->getId() === 0 || $existRecipe->getId() !== $recipe->getId()) {
                 return $this->responseError(404, 'Cant find recipe with given id!');
             }
-
             $this->getIngredientMapper()->deleteAllIngredientsForRecipe($recipe->getId());
             $this->getRecipeMapper()->deleteRecipe($recipe->getId());
 

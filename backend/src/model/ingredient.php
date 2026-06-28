@@ -34,11 +34,15 @@ class ingredient
      * @return $this
      */
     public function import(array $rawIngredient){
-        $this->setId(intval($rawIngredient['id']));
-        $this->setUnitOfMeasure($rawIngredient['unitOfMeasure']);
-        $this->setRecipeId(intval($rawIngredient['recipeId']));
+        if (isset($rawIngredient['id'])) {
+            $this->setId(intval($rawIngredient['id']));
+        }
+        if (isset($rawIngredient['recipeId'])) {
+            $this->setRecipeId(intval($rawIngredient['recipeId']));
+        }
+        $this->setIngredientName(trim($rawIngredient['ingredientName']));
+        $this->setUnitOfMeasure(trim($rawIngredient['unitOfMeasure']));
         $this->setAmount(floatval($rawIngredient['amount']));
-        $this->setDeleted(false);
 
         return $this;
     }

@@ -32,11 +32,15 @@ export class CookbookMainComponent implements OnInit {
   }
 
   public onSearchRecipe(search: string) {
-    this.searchRecipe = search.trim();
-    this.filteredRecipeList = this.cookbookService.searchRecipe(Object.assign([], this.recipeList), search);
+    this.recipeSearch(search);
 
     this.onSort(this.sortField, this.sortDirection);
     this.onFilter(this.categoryFilter);
+  }
+
+  private recipeSearch(search: string) {
+    this.searchRecipe = search.trim();
+    this.filteredRecipeList = this.cookbookService.searchRecipe(Object.assign([], this.recipeList), search);
   }
 
   public onSort(field: string, direction: string) {
@@ -55,12 +59,15 @@ export class CookbookMainComponent implements OnInit {
 
   public onFilter(category: string) {
     this.categoryFilter = category;
+    this.recipeSearch(this.searchRecipe);
 
     if(category.trim() !== '') {
-      this.filteredRecipeList = Object.assign([], this.cookbookService.filterRecipes(this.sortedRecipeList, category));
+      this.filteredRecipeList = Object.assign([], this.cookbookService.filterRecipes(this.filteredRecipeList, category));
     } else if(this.searchRecipe.trim() === '') {
-      this.filteredRecipeList = Object.assign([], this.recipeList);
+      this.filteredRecipeList = Object.assign([], this.filteredRecipeList);
       this.onSort(this.sortField, this.sortDirection);
     }
+
+    this.onSort(this.sortField, this.sortDirection);
   }
 }
